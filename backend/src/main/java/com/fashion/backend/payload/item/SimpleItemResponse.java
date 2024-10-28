@@ -16,7 +16,7 @@ public class SimpleItemResponse {
 
 	@Schema(
 			name = "name",
-			example = "Nguyễn Văn A"
+			example = "Item 1"
 	)
 	private String name;
 
