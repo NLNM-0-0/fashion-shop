@@ -14,7 +14,7 @@ public class FindSaleReportRequest {
 	private int timeFrom;
 
 	@Schema(
-			name = "timeFrom",
+			name = "timeTo",
 			example = "1704067199"
 	)
 	private int timeTo;
