@@ -17,6 +17,8 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.util.Optional;
+
 
 @RequiredArgsConstructor
 @Service
@@ -85,6 +87,13 @@ public class UserService {
 		UserAuth userAuth = Common.findCurrUserAuth(userAuthRepository);
 
 		User user = Common.findUserByUserAuth(userAuth.getId(), userRepository);
+
+		if (request.getEmail() != null) {
+			Optional<User> checkedUser = userRepository.findFirstByEmail(request.getEmail());
+			if (checkedUser.isPresent()) {
+				throw new AppException(HttpStatus.BAD_REQUEST, Message.User.USER_EXIST);
+			}
+		}
 
 		Common.updateIfNotNull(request.getName(), user::setName);
 		Common.updateIfNotNull(request.getEmail(), user::setEmail);

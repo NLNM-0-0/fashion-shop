@@ -22,6 +22,8 @@ public interface UserRepository extends JpaRepository<User, Long>, JpaSpecificat
 
 	Optional<User> findFirstByUserAuthId(Long userAuthId);
 
+	Optional<User> findFirstByEmail(String email);
+
 	default Page<User> findAllNotHasPhoneAndNotDeleteAndNotHaveEmail(String email,
 																	 Specification<User> specs,
 																	 Pageable pageable) {

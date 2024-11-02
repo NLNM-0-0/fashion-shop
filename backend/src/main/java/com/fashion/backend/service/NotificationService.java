@@ -37,12 +37,12 @@ public class NotificationService {
 	public ListResponse<NotificationResponse, NotificationFilter> getNotifications(AppPageRequest page,
 																				   NotificationFilter filter,
 																				   boolean changeToSeen) {
-		UserAuth sender = Common.findCurrUserAuth(userAuthRepository);
+		User receiver = Common.findCurrUser(userRepository, userAuthRepository);
 
 		Pageable pageable = PageRequest.of(page.getPage() - 1,
 										   page.getLimit(),
 										   Sort.by(Sort.Direction.DESC, "createdAt"));
-		Specification<Notification> spec = filterNotifications(sender.getId(), filter);
+		Specification<Notification> spec = filterNotifications(receiver.getId(), filter);
 
 		Page<Notification> notificationPage = notificationRepository.findAll(spec, pageable);
 

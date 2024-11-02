@@ -43,7 +43,7 @@ public class SaleReportService {
 		Date timeTo = new Date(request.getTimeTo() * 1000L);
 
 		// Fetch all invoices within the specified date range
-		List<Order> allOrders = orderRepository.findAllByTimeFromAndTimeTo(timeFrom, timeTo);
+		List<Order> allOrders = orderRepository.findAllDoneByTimeFromAndTimeTo(timeFrom, timeTo);
 		if (allOrders.isEmpty()) {
 			throw new AppException(HttpStatus.BAD_REQUEST, Message.SaleReport.NO_ORDER_BETWEEN_TIME);
 		}

@@ -13,7 +13,7 @@ import lombok.NoArgsConstructor;
 @AllArgsConstructor
 @Entity
 @Table(
-		name = "order_detail"
+		name = "orders_detail"
 )
 public class OrderDetail {
 

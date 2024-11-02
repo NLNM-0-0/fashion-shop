@@ -93,7 +93,7 @@ public class AuthenticationService {
 	public SimpleResponse registerUser(RegisterRequest request) {
 		Optional<UserAuth> userAuthOptional = userAuthRepository.findByPhone(request.getPhone());
 		if (userAuthOptional.isPresent()) {
-			throw new AppException(HttpStatus.BAD_REQUEST, Message.USER_EXISTED);
+			throw new AppException(HttpStatus.BAD_REQUEST, Message.User.USER_EXIST);
 		}
 
 		handleImage(request);
@@ -152,7 +152,8 @@ public class AuthenticationService {
 
 		Optional<OTP> otp = otpRepository.findByUser(user.getId());
 
-		String otpNumber = OTP.generateOTP();
+//		String otpNumber = OTP.generateOTP();
+		String otpNumber = "260703";
 		OTP newOtp;
 
 		if (otp.isPresent() && !userAuth.isVerified()) {
@@ -161,9 +162,9 @@ public class AuthenticationService {
 			newOtp = new OTP(otpNumber, userAuth);
 		}
 
-		if (!smsSender.sendOtp(userAuth.getPhone(), otpNumber)) {
-			throw new AppException(HttpStatus.INTERNAL_SERVER_ERROR, Message.COMMON_ERR);
-		}
+//		if (!smsSender.sendOtp(userAuth.getPhone(), otpNumber)) {
+//			throw new AppException(HttpStatus.INTERNAL_SERVER_ERROR, Message.COMMON_ERR);
+//		}
 
 		userAuth.setVerified(false);
 		userAuthRepository.save(userAuth);

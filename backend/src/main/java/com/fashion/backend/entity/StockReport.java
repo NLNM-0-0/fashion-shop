@@ -40,6 +40,9 @@ public class StockReport {
 	@Column(name = "decrease")
 	private int decrease;
 
+	@Column(name = "payback")
+	private int payback;
+
 	@Column(name = "final")
 	private int finalQty;
 

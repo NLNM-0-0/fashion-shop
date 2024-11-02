@@ -37,7 +37,7 @@ public class Item {
 	private int unitPrice;
 
 	@Column(name = "quantity")
-	@Min(0)
+	@Min(value = 0)
 	private int quantity;
 
 	@Column(nullable = false)

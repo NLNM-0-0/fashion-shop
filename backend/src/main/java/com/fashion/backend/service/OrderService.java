@@ -6,15 +6,22 @@ import com.fashion.backend.constant.StockChangeType;
 import com.fashion.backend.entity.*;
 import com.fashion.backend.exception.AppException;
 import com.fashion.backend.mail.MailSender;
+import com.fashion.backend.payload.ListResponse;
 import com.fashion.backend.payload.SimpleResponse;
 import com.fashion.backend.payload.customer.SimpleCustomerResponse;
 import com.fashion.backend.payload.item.SimpleItemResponse;
 import com.fashion.backend.payload.order.*;
+import com.fashion.backend.payload.page.AppPageRequest;
+import com.fashion.backend.payload.page.AppPageResponse;
 import com.fashion.backend.payload.staff.SimpleStaffResponse;
 import com.fashion.backend.repository.*;
-import com.fashion.backend.utils.AuthHelper;
 import com.fashion.backend.utils.tuple.Pair;
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
+import org.springframework.data.jpa.domain.Specification;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -36,38 +43,84 @@ public class OrderService {
 	private final NotificationRepository notificationRepository;
 
 	@Transactional
-	public void getCurrOrder() {
-//		User customer = getCurrCustomer();
-//
-//
-//
-//		Pageable pageable = PageRequest.of(page.getPage() - 1,
-//										   page.getLimit(),
-//										   Sort.by(Sort.Direction.DESC, "createdAt"));
-//		Specification<Notification> spec = filterNotifications(sender.getId(), filter);
-//
-//		Page<Notification> notificationPage = notificationRepository.findAll(spec, pageable);
-//
-//		List<Notification> notifications = notificationPage.getContent();
-//
-//		List<NotificationResponse> data = notifications.stream().map(this::mapToDTO).toList();
-//
-//		if (changeToSeen) {
-//			notificationRepository.saveAll(notifications.stream()
-//														.peek(notification -> notification.setSeen(true))
-//														.toList());
-//		}
-//
-//		return ListResponse.<NotificationResponse, NotificationFilter>builder()
-//						   .data(data)
-//						   .appPageResponse(AppPageResponse.builder()
-//														   .index(page.getPage())
-//														   .limit(page.getLimit())
-//														   .totalPages(notificationPage.getTotalPages())
-//														   .totalElements(notificationPage.getTotalElements())
-//														   .build())
-//						   .filter(filter)
-//						   .build();
+	public ListResponse<SimpleOrderResponse, StaffOrderFilter> getOrders(AppPageRequest page, StaffOrderFilter filter) {
+		Pageable pageable = PageRequest.of(page.getPage() - 1,
+										   page.getLimit(),
+										   Sort.by(Sort.Direction.DESC, "updatedAt"));
+
+		Specification<Order> spec = filterOrders(filter);
+
+		Page<Order> orderPage = orderRepository.findAll(spec, pageable);
+
+		List<Order> orders = orderPage.getContent();
+
+		List<SimpleOrderResponse> data = orders.stream().map(this::mapToSimpleDTO).toList();
+
+		return ListResponse.<SimpleOrderResponse, StaffOrderFilter>builder()
+						   .data(data)
+						   .appPageResponse(AppPageResponse.builder()
+														   .index(page.getPage())
+														   .limit(page.getLimit())
+														   .totalPages(orderPage.getTotalPages())
+														   .totalElements(orderPage.getTotalElements())
+														   .build())
+						   .filter(filter)
+						   .build();
+	}
+
+	@Transactional
+	public ListResponse<SimpleOrderResponse, UserOrderFilter> getOrders(AppPageRequest page, UserOrderFilter filter) {
+		User customer = Common.findCurrUser(userRepository, userAuthRepository);
+
+		Pageable pageable = PageRequest.of(page.getPage() - 1,
+										   page.getLimit(),
+										   Sort.by(Sort.Direction.DESC, "updatedAt"));
+
+		Specification<Order> spec = filterOrders(customer.getId(), filter);
+
+		Page<Order> orderPage = orderRepository.findAll(spec, pageable);
+
+		List<Order> orders = orderPage.getContent();
+
+		List<SimpleOrderResponse> data = orders.stream().map(this::mapToSimpleDTO).toList();
+
+		return ListResponse.<SimpleOrderResponse, UserOrderFilter>builder()
+						   .data(data)
+						   .appPageResponse(AppPageResponse.builder()
+														   .index(page.getPage())
+														   .limit(page.getLimit())
+														   .totalPages(orderPage.getTotalPages())
+														   .totalElements(orderPage.getTotalElements())
+														   .build())
+						   .filter(filter)
+						   .build();
+	}
+
+	@Transactional
+	public OrderResponse getOrder(Long orderId) {
+		return mapToDTO(Common.findOrderById(orderId, orderRepository));
+	}
+
+	private Specification<Order> filterOrders(Long userId, UserOrderFilter filter) {
+		Specification<Order> spec = OrderSpecs.hasCustomerId(userId);
+		if (filter.getOrderStatus() != null) {
+			spec = spec.and(OrderSpecs.hasStatus(filter.getOrderStatus().name()));
+		}
+		return spec;
+	}
+
+	private Specification<Order> filterOrders(StaffOrderFilter filter) {
+		Specification<Order> spec = Specification.where(null);
+		if (filter.getOrderStatus() != null) {
+			spec = spec.and(OrderSpecs.hasStatus(filter.getOrderStatus().name()));
+		}
+		if (filter.getStaffName() != null) {
+			spec = spec.and(OrderSpecs.hasStaffName(filter.getStaffName()));
+		}
+		if (filter.getCustomerName() != null) {
+			spec = spec.and(OrderSpecs.hasCustomerName(filter.getCustomerName()));
+		}
+		return spec;
 	}
 
 	@Transactional
@@ -77,18 +130,15 @@ public class OrderService {
 			throw new AppException(HttpStatus.BAD_REQUEST, Message.Order.CAN_NOT_BE_REACHED_CLOSED_ORDER);
 		}
 
-		UserAuth userAuth = Common.findCurrUserAuth(userAuthRepository);
-		boolean isCustomerOrder = !Objects.equals(userAuth.getId(), order.getCustomer().getId());
-		boolean isOrderMadeByStaff = order.getStaff() != null;
-		if (isCustomerOrder || isOrderMadeByStaff) {
+		User user = Common.findCurrUser(userRepository, userAuthRepository);
+		boolean isMadeByCurrUser = Objects.equals(user.getId(), order.getCustomer().getId());
+		if (!isMadeByCurrUser) {
 			throw new AppException(HttpStatus.BAD_REQUEST, Message.Order.ORDER_JUST_CAN_BE_REACHED_BY_OWNER_CUSTOMER);
 		}
 
 		order.setStatus(OrderStatus.DONE);
 
 		orderRepository.save(order);
-
-		handleOrderItem(order);
 
 		sendEmailOrderStatusChange(order, order.getCustomer(), OrderStatus.DONE);
 
@@ -107,12 +157,11 @@ public class OrderService {
 
 		orderRepository.save(order);
 
-		if (orderStatus == OrderStatus.DONE) {
-			handleOrderItem(order);
+		if (orderStatus == OrderStatus.CANCELED) {
+			handlePaybackItem(order);
 		}
 
-		UserAuth userAuth = Common.findCurrUserAuth(userAuthRepository);
-		User user = Common.findUserById(userAuth.getId(), userRepository);
+		User user = Common.findCurrUser(userRepository, userAuthRepository);
 		sendEmailOrderStatusChange(order, user, orderStatus);
 
 		return new SimpleResponse();
@@ -127,21 +176,21 @@ public class OrderService {
 	}
 
 	@Transactional
-	public OrderResponse staffPlaceOrder(PlaceOrderRequest request) {
+	public OrderResponse placeOrder(PlaceOrderRequest request, boolean isMadeByStaff) {
 		validateOrderDetails(request);
 
-		User staff = getCurrStaff();
+		User user = Common.findCurrUser(userRepository, userAuthRepository);
 
 		Pair<Integer, List<OrderDetail>> priceCalculation = calcPrice(request.getDetails());
 		int totalPrice = priceCalculation.first();
 		List<OrderDetail> details = priceCalculation.second();
 
 		Order order = Order.builder()
-						   .staff(staff)
-						   .customer(null)
+						   .staff(isMadeByStaff ? user : null)
+						   .customer(isMadeByStaff ? null : user)
 						   .totalPrice(totalPrice)
 						   .orderDetails(details)
-						   .status(OrderStatus.DONE)
+						   .status(isMadeByStaff ? OrderStatus.DONE : OrderStatus.PENDING)
 						   .build();
 
 		order = orderRepository.save(order);
@@ -162,14 +211,6 @@ public class OrderService {
 
 	private boolean isContainOnlyUnique(List<Long> itemIds) {
 		return new HashSet<>(itemIds).stream().toList().size() != itemIds.size();
-	}
-
-	private User getCurrStaff() {
-		UserAuth userAuth = Common.findCurrUserAuth(userAuthRepository);
-		if (AuthHelper.isNormalUser(userAuth)) {
-			throw new AppException(HttpStatus.BAD_REQUEST, Message.Order.NORMAL_USER_CAN_NOT_CREATE_INVOICE_DIRECTLY);
-		}
-		return Common.findUserById(userAuth.getId(), userRepository);
 	}
 
 	private Pair<Integer, List<OrderDetail>> calcPrice(List<OrderDetailRequest> requestDetails) {
@@ -198,6 +239,9 @@ public class OrderService {
 			Item item = orderDetail.getItem();
 
 			int quantityLeft = item.getQuantity() - orderDetail.getQuantity();
+			if (quantityLeft < 0) {
+				throw new AppException(HttpStatus.BAD_REQUEST, Message.Item.QUANTITY_MIN);
+			}
 
 			item.setQuantity(quantityLeft);
 			savedItems.add(item);
@@ -215,35 +259,40 @@ public class OrderService {
 		stockChangeHistoryRepository.saveAll(savedHistories);
 	}
 
-	@Transactional
-	public OrderResponse customerPlaceOrder(PlaceOrderRequest request) {
-		validateOrderDetails(request);
+	private void handlePaybackItem(Order order) {
+		List<Item> savedItems = new ArrayList<>();
+		List<StockChangeHistory> savedHistories = new ArrayList<>();
+		for (OrderDetail orderDetail : order.getOrderDetails()) {
+			Item item = orderDetail.getItem();
 
-		User customer = getCurrCustomer();
+			int quantityLeft = item.getQuantity() + orderDetail.getQuantity();
 
-		Pair<Integer, List<OrderDetail>> priceCalculation = calcPrice(request.getDetails());
-		int totalPrice = priceCalculation.first();
-		List<OrderDetail> details = priceCalculation.second();
+			item.setQuantity(quantityLeft);
+			savedItems.add(item);
 
-		Order order = Order.builder()
-						   .staff(null)
-						   .customer(customer)
-						   .totalPrice(totalPrice)
-						   .orderDetails(details)
-						   .status(OrderStatus.PENDING)
-						   .build();
+			StockChangeHistory history = StockChangeHistory.builder()
+														   .item(item)
+														   .type(StockChangeType.PAYBACK)
+														   .quantityLeft(quantityLeft)
+														   .quantity(orderDetail.getQuantity())
+														   .build();
+			savedHistories.add(history);
+		}
 
-		order = orderRepository.save(order);
-
-		return mapToDTO(order);
+		itemRepository.saveAll(savedItems);
+		stockChangeHistoryRepository.saveAll(savedHistories);
 	}
 
-	private User getCurrCustomer() {
-		UserAuth userAuth = Common.findCurrUserAuth(userAuthRepository);
-		if (!AuthHelper.isNormalUser(userAuth)) {
-			throw new AppException(HttpStatus.BAD_REQUEST, Message.Order.STAFF_CAN_NOT_BUY_ITEM);
-		}
-		return Common.findUserById(userAuth.getId(), userRepository);
+	private SimpleOrderResponse mapToSimpleDTO(Order order) {
+		return SimpleOrderResponse.builder()
+								  .id(order.getId())
+								  .customer(mapToDTOCustomer(order.getCustomer()))
+								  .staff(mapToDTOStaff(order.getStaff()))
+								  .totalPrice(order.getTotalPrice())
+								  .orderStatus(order.getStatus())
+								  .createdAt(order.getCreatedAt())
+								  .updatedAt(order.getUpdatedAt())
+								  .build();
 	}
 
 	private OrderResponse mapToDTO(Order order) {
@@ -254,12 +303,17 @@ public class OrderService {
 							.totalPrice(order.getTotalPrice())
 							.orderStatus(order.getStatus())
 							.createdAt(order.getCreatedAt())
+							.updatedAt(order.getUpdatedAt())
 							.details(order.getOrderDetails().stream().map(this::mapToDTO).toList())
 							.build();
 	}
 
 	private SimpleCustomerResponse mapToDTOCustomer(User user) {
+		if (user == null) {
+			return null;
+		}
 		return SimpleCustomerResponse.builder()
+									 .id(user.getId())
 									 .email(user.getEmail())
 									 .phone(user.getUserAuth().getPhone())
 									 .image(user.getImage())
@@ -268,7 +322,11 @@ public class OrderService {
 	}
 
 	private SimpleStaffResponse mapToDTOStaff(User user) {
+		if (user == null) {
+			return null;
+		}
 		return SimpleStaffResponse.builder()
+								  .id(user.getId())
 								  .email(user.getEmail())
 								  .image(user.getImage())
 								  .name(user.getName())

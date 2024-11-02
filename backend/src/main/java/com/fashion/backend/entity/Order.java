@@ -1,9 +1,12 @@
 package com.fashion.backend.entity;
 
 import com.fashion.backend.constant.OrderStatus;
+import io.swagger.v3.oas.annotations.media.Schema;
 import jakarta.persistence.*;
 import lombok.*;
 import org.springframework.data.annotation.CreatedDate;
+import org.springframework.data.annotation.LastModifiedDate;
+import org.springframework.data.jpa.domain.support.AuditingEntityListener;
 
 import java.util.Date;
 import java.util.List;
@@ -14,6 +17,7 @@ import java.util.List;
 @AllArgsConstructor
 @Entity
 @Table(name = "orders")
+@EntityListeners(AuditingEntityListener.class)
 public class Order {
 	@Getter @Id @GeneratedValue(strategy = GenerationType.IDENTITY)
 	private Long id;
@@ -37,14 +41,6 @@ public class Order {
 	@Column(name = "total_price")
 	private int totalPrice;
 
-	@CreatedDate
-	@Column(
-			name = "created_at",
-			nullable = false,
-			updatable = false
-	)
-	private Date createdAt;
-
 	@OneToMany(
 			fetch = FetchType.LAZY,
 			cascade = CascadeType.ALL,
@@ -59,4 +55,16 @@ public class Order {
 			nullable = false
 	)
 	private OrderStatus status;
+
+	@CreatedDate
+	@Column(
+			name = "created_at",
+			nullable = false,
+			updatable = false
+	)
+	private Date createdAt;
+
+	@LastModifiedDate
+	@Schema(name = "updatedAt")
+	private Date updatedAt;
 }

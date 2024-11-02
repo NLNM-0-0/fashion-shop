@@ -8,11 +8,10 @@ import lombok.Builder;
 import lombok.Data;
 
 import java.util.Date;
-import java.util.List;
 
 @Data
 @Builder
-public class OrderResponse {
+public class SimpleOrderResponse {
 	@Schema(name = "id")
 	private Long id;
 
@@ -33,7 +32,4 @@ public class OrderResponse {
 
 	@Schema(name = "orderStatus")
 	private OrderStatus orderStatus;
-
-	@Schema(name = "details")
-	private List<OrderDetailResponse> details;
 }
