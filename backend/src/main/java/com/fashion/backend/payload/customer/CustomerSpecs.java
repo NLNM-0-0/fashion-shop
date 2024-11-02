@@ -13,14 +13,14 @@ public class CustomerSpecs {
 	}
 
 	public static Specification<User> hasPhone(String phone) {
-		return (root, query, cb) -> cb.like(root.get("phone"), "%" + phone + "%");
+		return (root, query, cb) -> cb.like(root.get("userAuth").get("phone"), "%" + phone + "%");
 	}
 
 	public static Specification<User> isNotDeleted() {
-		return (root, query, builder) -> builder.isFalse(root.get("isDeleted"));
+		return (root, query, builder) -> builder.isFalse(root.get("userAuth").get("isDeleted"));
 	}
 
 	public static Specification<User> isNormalUser() {
-		return (root, query, builder) -> builder.isNotNull(root.get("phone"));
+		return (root, query, builder) -> builder.isNotNull(root.get("userAuth").get("phone"));
 	}
 }

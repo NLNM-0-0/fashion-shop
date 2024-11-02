@@ -51,9 +51,6 @@ public class UserService {
 		String email = Common.getCurrUserName();
 
 		UserAuth userAuth = Common.findUserAuthByEmail(email, userAuthRepository);
-		if (AuthHelper.isNormalUser(userAuth)) {
-			throw new AppException(HttpStatus.BAD_REQUEST, Message.User.CAN_NOT_BE_LIKE_STAFF);
-		}
 
 		User user = Common.findUserByUserAuth(userAuth.getId(), userRepository);
 
@@ -64,10 +61,7 @@ public class UserService {
 	public ProfileResponse seeProfile() {
 		String phone = Common.getCurrUserName();
 
-		UserAuth userAuth = Common.findUserAuthByEmail(phone, userAuthRepository);
-		if (AuthHelper.isStaff(userAuth)) {
-			throw new AppException(HttpStatus.BAD_REQUEST, Message.User.CAN_NOT_BE_LIKE_CUSTOMER);
-		}
+		UserAuth userAuth = Common.findUserAuthByPhone(phone, userAuthRepository);
 
 		User user = Common.findUserByUserAuth(userAuth.getId(), userRepository);
 
@@ -77,9 +71,6 @@ public class UserService {
 	@Transactional
 	public StaffProfileResponse updateUserStaff(UpdateUserStaffRequest request) {
 		UserAuth userAuth = Common.findCurrUserAuth(userAuthRepository);
-		if (AuthHelper.isNormalUser(userAuth)) {
-			throw new AppException(HttpStatus.BAD_REQUEST, Message.User.CAN_NOT_BE_LIKE_STAFF);
-		}
 
 		User user = Common.findUserByUserAuth(userAuth.getId(), userRepository);
 
@@ -92,9 +83,6 @@ public class UserService {
 	@Transactional
 	public ProfileResponse updateUser(UpdateUserRequest request) {
 		UserAuth userAuth = Common.findCurrUserAuth(userAuthRepository);
-		if (AuthHelper.isStaff(userAuth)) {
-			throw new AppException(HttpStatus.BAD_REQUEST, Message.User.CAN_NOT_BE_LIKE_CUSTOMER);
-		}
 
 		User user = Common.findUserByUserAuth(userAuth.getId(), userRepository);
 

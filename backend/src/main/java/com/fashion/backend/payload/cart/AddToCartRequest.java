@@ -20,7 +20,7 @@ public class AddToCartRequest {
 			example = "1"
 	)
 	@Min(
-			value = 0,
+			value = 1,
 			message = Message.Cart.QUANTITY_MIN_VALIDATE
 	)
 	private int quantity;

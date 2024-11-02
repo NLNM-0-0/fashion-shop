@@ -47,13 +47,17 @@ public class Message {
 	}
 
 	public static class Cart {
-		public static final String QUANTITY_MIN_VALIDATE = "Số lượng sản phẩm được thêm ít nhất phải là 1";
+		public static final String QUANTITY_MIN_VALIDATE = "Số lượng sản phẩm ít nhất phải là 1";
 		public static final String ITEM_NOT_IN_CART = "Sản phẩm không có trong giỏ hàng";
 	}
 
 	public static class Item {
 		public static final String ITEM_NOT_EXIST = "Sản phẩm không tồn tại trong hệ thống";
 		public static final String ITEM_IS_DELETED = "Sản phẩm đã bị xóa khỏi hệ thống";
+		public static final String NAME_VALIDATE = "Tên sản phẩm không được trống và tối đa 200 ký tự";
+		public static final String NAME_FILTER_VALIDATE = "Tên sản phẩm không được quá 200 ký tự";
+		public static final String UNIT_PRICE_VALIDATE = "Giá sản phẩm không được trống và tối thiểu bằng 0";
+		public static final String QUANTITY_VALIDATE = "Số lượng sản phẩm không được để trống và tối thiểu bằng 0";
 	}
 
 	public static class User {
@@ -72,10 +76,8 @@ public class Message {
 		public static final String CAN_NOT_SEE_DETAIL_YOURSELF = "Bạn không thể xem chính bạn";
 		public static final String CAN_NOT_REACH_CUSTOMER
 				= "Bạn đang cố truy cập khách hàng chứ không phải nhân viên. Xin hãy kiểm tra lại";
-		public static final String CAN_NOT_BE_LIKE_STAFF
-				= "Bạn đang là khách hàng không phải nhân viên. Xin hãy dừng lại";
-		public static final String CAN_NOT_BE_LIKE_CUSTOMER
-				= "Bạn đang là nhân viên không phải khách hàng. Xin hãy dừng lại";
+		public static final String CAN_NOT_REACH_STAFF
+				= "Bạn đang cố truy cập nhân viên chứ không phải khách hàng. Xin hãy kiểm tra lại";
 	}
 
 	public static class Page {

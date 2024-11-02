@@ -68,7 +68,7 @@ public class StaffService {
 		String currEmail = Common.getCurrUserName();
 		if (Objects.equals(userAuth.getEmail(), currEmail)) {
 			throw new AppException(HttpStatus.BAD_REQUEST, Message.User.CAN_NOT_UPDATE_YOURSELF);
-		} else if (AuthHelper.isNormalUser(currEmail)) {
+		} else if (AuthHelper.isNormalUser(userAuth)) {
 			throw new AppException(HttpStatus.BAD_REQUEST, Message.User.CAN_NOT_REACH_CUSTOMER);
 		}
 
@@ -91,11 +91,11 @@ public class StaffService {
 		String email = Common.getCurrUserName();
 		if (Objects.equals(user.getUserAuth().getEmail(), email)) {
 			throw new AppException(HttpStatus.BAD_REQUEST, Message.User.CAN_NOT_DELETE_YOURSELF);
-		} else if (AuthHelper.isNormalUser(email)) {
+		} else if (AuthHelper.isNormalUser(user.getUserAuth())) {
 			throw new AppException(HttpStatus.BAD_REQUEST, Message.User.CAN_NOT_REACH_CUSTOMER);
 		}
 
-		userAuthRepository.deleteUserById(user.getUserAuth().getId());
+		userAuthRepository.deleteUserAuthById(user.getUserAuth().getId());
 
 		return new SimpleResponse();
 	}
@@ -153,12 +153,12 @@ public class StaffService {
 
 	@Transactional
 	public StaffResponse getStaff(Long id) {
-		User user = Common.findUserById(id, userRepository);
-
 		String email = Common.getCurrUserName();
+
+		User user = Common.findUserById(id, userRepository);
 		if (Objects.equals(user.getUserAuth().getEmail(), email)) {
 			throw new AppException(HttpStatus.BAD_REQUEST, Message.User.CAN_NOT_SEE_DETAIL_YOURSELF);
-		} else if (AuthHelper.isNormalUser(email)) {
+		} else if (AuthHelper.isNormalUser(user.getUserAuth())) {
 			throw new AppException(HttpStatus.BAD_REQUEST, Message.User.CAN_NOT_REACH_CUSTOMER);
 		}
 

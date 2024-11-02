@@ -34,6 +34,12 @@ public class Common {
 		}
 	}
 
+	public static void updateIfNotNull(Integer newValue, Consumer<Integer> setter) {
+		if (newValue != null) {
+			setter.accept(newValue);
+		}
+	}
+
 	public static void updateIfNotNull(Map<String, Object> newValue, Consumer<Map<String, Object>> setter) {
 		if (newValue != null) {
 			setter.accept(newValue);
@@ -117,6 +123,12 @@ public class Common {
 		return userRepository.findFirstByUserAuthId(userAuthId)
 							 .orElseThrow(() -> new AppException(HttpStatus.INTERNAL_SERVER_ERROR,
 																 Message.COMMON_ERR));
+	}
+
+	public static User findCurrUser(UserRepository userRepository, UserAuthRepository userAuthRepository) {
+		UserAuth userAuth = Common.findCurrUserAuth(userAuthRepository);
+
+		return findUserByUserAuth(userAuth.getId(), userRepository);
 	}
 
 	public static Notification findNotificationById(Long notificationId,

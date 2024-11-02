@@ -4,7 +4,6 @@ import com.fashion.backend.constant.Message;
 import com.fashion.backend.entity.Item;
 import com.fashion.backend.entity.Like;
 import com.fashion.backend.entity.User;
-import com.fashion.backend.entity.UserAuth;
 import com.fashion.backend.exception.AppException;
 import com.fashion.backend.payload.SimpleListResponse;
 import com.fashion.backend.payload.SimpleResponse;
@@ -31,10 +30,10 @@ public class LikeService {
 
 	@Transactional
 	public SimpleListResponse<SimpleItemResponse> getLikedItems() {
-		UserAuth userAuth = Common.findCurrUserAuth(userAuthRepository);
+		User user = Common.findCurrUser(userRepository, userAuthRepository);
 
 		List<Like> likes = likeRepository.findAllByUserId(
-				userAuth.getId(),
+				user.getId(),
 				Sort.by(Sort.Direction.DESC, "createdAt"));
 
 		List<SimpleItemResponse> data = likes.stream().map(like -> mapToDTO(like.getItem())).toList();
@@ -46,9 +45,9 @@ public class LikeService {
 
 	@Transactional
 	public SimpleResponse unlikeItem(Long itemId) {
-		UserAuth userAuth = Common.findCurrUserAuth(userAuthRepository);
+		User user = Common.findCurrUser(userRepository, userAuthRepository);
 
-		Like like = likeRepository.findFirstByUserIdAndItemId(userAuth.getId(), itemId)
+		Like like = likeRepository.findFirstByUserIdAndItemId(user.getId(), itemId)
 								  .orElseThrow(() -> new AppException(HttpStatus.BAD_REQUEST,
 																	  Message.Like.ITEM_NOT_IN_LIKED_LIST));
 
@@ -59,8 +58,7 @@ public class LikeService {
 
 	@Transactional
 	public SimpleResponse likeItem(Long itemId) {
-		UserAuth userAuth = Common.findCurrUserAuth(userAuthRepository);
-		User user = Common.findUserById(userAuth.getId(), userRepository);
+		User user = Common.findCurrUser(userRepository, userAuthRepository);
 
 		Item item = Common.findItemById(itemId, itemRepository);
 

@@ -14,7 +14,7 @@ import org.hibernate.validator.constraints.Length;
 		name = "item",
 		uniqueConstraints = {@UniqueConstraint(
 				columnNames = {"name"},
-				name = "Item name"
+				name = "Item's name"
 		)}
 )
 public class Item {

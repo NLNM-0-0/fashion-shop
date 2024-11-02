@@ -3,6 +3,8 @@ package com.fashion.backend.entity;
 import io.swagger.v3.oas.annotations.media.Schema;
 import jakarta.persistence.*;
 import lombok.*;
+import org.springframework.data.annotation.CreatedDate;
+import org.springframework.data.jpa.domain.support.AuditingEntityListener;
 
 import java.util.Date;
 
@@ -12,12 +14,13 @@ import java.util.Date;
 @AllArgsConstructor
 @Entity
 @Table(
-		name = "like",
+		name = "like_item",
 		uniqueConstraints = {@UniqueConstraint(
 				columnNames = {"user_id, item_id"},
 				name = "Item in liked list"
 		)}
 )
+@EntityListeners(AuditingEntityListener.class)
 public class Like {
 	@Getter @Id @GeneratedValue(strategy = GenerationType.IDENTITY) private Long id;
 
@@ -37,6 +40,7 @@ public class Like {
 	)
 	private Item item;
 
+	@CreatedDate
 	@Schema(name = "createdAt")
 	private Date createdAt;
 }
