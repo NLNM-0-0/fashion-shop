@@ -5,14 +5,12 @@ import com.fashion.backend.entity.*;
 import com.fashion.backend.exception.AppException;
 import com.fashion.backend.mail.MailSender;
 import com.fashion.backend.payload.SimpleResponse;
-import com.fashion.backend.payload.feature.FeatureResponse;
 import com.fashion.backend.repository.*;
 import com.fashion.backend.utils.AuthHelper;
 import org.springframework.http.HttpStatus;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.core.userdetails.UserDetails;
 
-import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 import java.util.function.Consumer;
@@ -42,22 +40,16 @@ public class Common {
 		}
 	}
 
+	public static String getCurrUserName() {
+		UserDetails userDetails = (UserDetails) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
+		return userDetails.getUsername();
+	}
+
 	public static User findUserById(Long userId, UserRepository repository) {
 		return repository.findById(userId)
 						 .orElseThrow(() -> new AppException(HttpStatus.BAD_REQUEST,
 															 Message.User.USER_NOT_EXIST));
 	}
-
-//	public static User findUserByEmail(String email, UserRepository repository) {
-//		User user = repository.findByEmail(email)
-//							  .orElseThrow(() -> new AppException(HttpStatus.BAD_REQUEST,
-//																  Message.User.USER_NOT_EXIST));
-//		if (user.isDeleted()) {
-//			throw new AppException(HttpStatus.BAD_REQUEST, Message.User.USER_IS_DELETED);
-//		}
-//
-//		return user;
-//	}
 
 	public static UserAuth findUserAuthById(Long userId, UserAuthRepository repository) {
 		UserAuth userAuth = repository.findById(userId)
@@ -112,20 +104,19 @@ public class Common {
 		return userAuth;
 	}
 
-	public static UserGroup findUserGroupById(Long userGroupId, UserGroupRepository repository) {
-		return repository.findById(userGroupId)
-						 .orElseThrow(() -> new AppException(HttpStatus.BAD_REQUEST,
-															 Message.UserGroup.USER_GROUP_NOT_EXIST));
-	}
-
 	public static UserAuth findCurrUserAuth(UserAuthRepository userAuthRepository) {
-		UserDetails userDetails = (UserDetails) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
-		String userName = userDetails.getUsername();
+		String userName = Common.getCurrUserName();
 
 		if (AuthHelper.isNormalUser(userName)) {
 			return Common.findUserAuthByPhone(userName, userAuthRepository);
 		}
 		return Common.findUserAuthByEmail(userName, userAuthRepository);
+	}
+
+	public static User findUserByUserAuth(Long userAuthId, UserRepository userRepository) {
+		return userRepository.findFirstByUserAuthId(userAuthId)
+							 .orElseThrow(() -> new AppException(HttpStatus.INTERNAL_SERVER_ERROR,
+																 Message.COMMON_ERR));
 	}
 
 	public static Notification findNotificationById(Long notificationId,
@@ -134,8 +125,8 @@ public class Common {
 											  .orElseThrow(() -> new AppException(HttpStatus.BAD_REQUEST,
 																				  Message.Notification.NOTIFICATION_NOT_EXIST));
 
-		UserDetails userDetails = (UserDetails) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
-		String email = userDetails.getUsername();
+		String email = Common.getCurrUserName();
+
 		if (!notification.getToUser().getEmail().equals(email)) {
 			throw new AppException(HttpStatus.BAD_REQUEST, Message.Notification.CAN_NOT_READ_OTHER_S_NOTIFICATION);
 		}
@@ -191,40 +182,7 @@ public class Common {
 
 	}
 
-	public static List<FeatureResponse> getFeatureResponse(List<Long> featureIds,
-														   boolean isIncludeAdmin,
-														   FeatureRepository featureRepository) {
-		List<Feature> features;
-		if (isIncludeAdmin) {
-			features = featureRepository.findAll();
-		} else {
-			features = featureRepository.findAllNotAdmin();
-		}
-
-		List<Long> currFeature = new ArrayList<>();
-		List<FeatureResponse> res = new ArrayList<>();
-		for (Feature feature : features) {
-			boolean has = featureIds.contains(feature.getId());
-			if (has) {
-				currFeature.add(feature.getId());
-			}
-			res.add(FeatureResponse.builder()
-								   .id(feature.getId())
-								   .name(feature.getName())
-								   .code(feature.getCode())
-								   .has(has).build());
-		}
-
-		for (Long id : featureIds) {
-			if (!currFeature.contains(id)) {
-				throw new AppException(HttpStatus.BAD_REQUEST, Message.Feature.FEATURE_NOT_EXIST);
-			}
-		}
-
-		return res;
-	}
-
-	public static Item findItem(Long itemId, ItemRepository itemRepository) {
+	public static Item findItemById(Long itemId, ItemRepository itemRepository) {
 		Item item = itemRepository.findById(itemId)
 								  .orElseThrow(() -> new AppException(HttpStatus.BAD_REQUEST,
 																	  Message.Item.ITEM_NOT_EXIST));
@@ -233,5 +191,12 @@ public class Common {
 			throw new AppException(HttpStatus.BAD_REQUEST, Message.Item.ITEM_IS_DELETED);
 		}
 		return item;
+	}
+
+	public static Order findOrderById(Long itemId, OrderRepository orderRepository) {
+		Order order = orderRepository.findById(itemId)
+									 .orElseThrow(() -> new AppException(HttpStatus.BAD_REQUEST,
+																		 Message.Order.ORDER_NOT_EXIST));
+		return order;
 	}
 }

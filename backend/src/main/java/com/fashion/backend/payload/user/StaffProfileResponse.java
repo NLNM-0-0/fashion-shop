@@ -1,7 +1,6 @@
 package com.fashion.backend.payload.user;
 
 import com.fashion.backend.constant.ApplicationConst;
-import com.fashion.backend.payload.usergroup.UserGroupResponseWithoutHas;
 import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -55,6 +54,9 @@ public class StaffProfileResponse {
 	)
 	private String dob;
 
-	@Schema(name = "userGroup")
-	private UserGroupResponseWithoutHas userGroup;
+	@Schema(
+			name = "admin",
+			example = "false"
+	)
+	private Boolean admin;
 }

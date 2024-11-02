@@ -13,6 +13,7 @@ import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 
@@ -38,6 +39,7 @@ public class UserController {
 			responseCode = "200",
 			description = "Http Status is 200 OK"
 	)
+	@PreAuthorize("hasAnyAuthority('USER')")
 	public ResponseEntity<SimpleResponse> changePassword(
 			@Valid @RequestBody ChangePasswordRequest request
 	) {
@@ -56,6 +58,7 @@ public class UserController {
 			responseCode = "200",
 			description = "Http Status is 200 OK"
 	)
+	@PreAuthorize("hasAnyAuthority('USER')")
 	public ResponseEntity<ProfileResponse> updateUser(
 			@Valid @RequestBody UpdateUserRequest request
 	) {
@@ -74,6 +77,7 @@ public class UserController {
 			responseCode = "200",
 			description = "Http Status is 200 OK"
 	)
+	@PreAuthorize("hasAnyAuthority('USER')")
 	public ResponseEntity<ProfileResponse> seeProfile() {
 		return new ResponseEntity<>(userService.seeProfile(), HttpStatus.OK);
 	}

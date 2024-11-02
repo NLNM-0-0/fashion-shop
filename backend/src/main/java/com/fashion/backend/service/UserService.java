@@ -3,12 +3,9 @@ package com.fashion.backend.service;
 import com.fashion.backend.constant.Message;
 import com.fashion.backend.entity.User;
 import com.fashion.backend.entity.UserAuth;
-import com.fashion.backend.entity.UserGroup;
 import com.fashion.backend.exception.AppException;
 import com.fashion.backend.payload.SimpleResponse;
-import com.fashion.backend.payload.feature.SimpleFeatureResponse;
 import com.fashion.backend.payload.user.*;
-import com.fashion.backend.payload.usergroup.UserGroupResponseWithoutHas;
 import com.fashion.backend.repository.UserAuthRepository;
 import com.fashion.backend.repository.UserRepository;
 import com.fashion.backend.utils.AuthHelper;
@@ -31,72 +28,75 @@ public class UserService {
 	@Transactional
 	public SimpleResponse changePassword(ChangePasswordRequest request) {
 		UserDetails userDetails = (UserDetails) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
-		String email = userDetails.getUsername();
 		if (!passwordEncoder.matches(request.getOldPassword(), userDetails.getPassword())) {
 			throw new AppException(HttpStatus.BAD_REQUEST, Message.User.OLD_PASSWORD_NOT_CORRECT);
 		}
 
-		UserAuth user = Common.findUserAuthByEmail(email, userAuthRepository);
+		String username = userDetails.getUsername();
+		UserAuth userAuth;
+		if (AuthHelper.isStaff(username)) {
+			userAuth = Common.findUserAuthByEmail(username, userAuthRepository);
+		} else {
+			userAuth = Common.findUserAuthByPhone(username, userAuthRepository);
+		}
+		userAuth.setPassword(passwordEncoder.encode(request.getNewPassword()));
+		userAuthRepository.save(userAuth);
 
-		user.setPassword(passwordEncoder.encode(request.getNewPassword()));
-		userAuthRepository.save(user);
 
 		return new SimpleResponse();
 	}
 
 	@Transactional
 	public StaffProfileResponse seeStaffProfile() {
-		UserDetails userDetails = (UserDetails) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
-		String email = userDetails.getUsername();
+		String email = Common.getCurrUserName();
 
 		UserAuth userAuth = Common.findUserAuthByEmail(email, userAuthRepository);
 		if (AuthHelper.isNormalUser(userAuth)) {
-			throw new AppException(HttpStatus.BAD_REQUEST, Message.User.CAN_NOT_REACH_CUSTOMER);
+			throw new AppException(HttpStatus.BAD_REQUEST, Message.User.CAN_NOT_BE_LIKE_STAFF);
 		}
 
-		User user = Common.findUserById(userAuth.getId(), userRepository);
+		User user = Common.findUserByUserAuth(userAuth.getId(), userRepository);
 
-		return mapToStaffDTO(user);
+		return mapToStaffDTO(user, userAuth);
 	}
 
 	@Transactional
 	public ProfileResponse seeProfile() {
-		UserDetails userDetails = (UserDetails) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
-		String email = userDetails.getUsername();
+		String phone = Common.getCurrUserName();
 
-		UserAuth userAuth = Common.findUserAuthByEmail(email, userAuthRepository);
-		if (!AuthHelper.isNormalUser(userAuth)) {
-			throw new AppException(HttpStatus.BAD_REQUEST, Message.User.CAN_NOT_REACH_STAFF);
+		UserAuth userAuth = Common.findUserAuthByEmail(phone, userAuthRepository);
+		if (AuthHelper.isStaff(userAuth)) {
+			throw new AppException(HttpStatus.BAD_REQUEST, Message.User.CAN_NOT_BE_LIKE_CUSTOMER);
 		}
 
-		User user = Common.findUserById(userAuth.getId(), userRepository);
+		User user = Common.findUserByUserAuth(userAuth.getId(), userRepository);
 
-		return mapToUserDTO(user);
+		return mapToUserDTO(user, userAuth);
 	}
 
 	@Transactional
 	public StaffProfileResponse updateUserStaff(UpdateUserStaffRequest request) {
 		UserAuth userAuth = Common.findCurrUserAuth(userAuthRepository);
 		if (AuthHelper.isNormalUser(userAuth)) {
-			throw new AppException(HttpStatus.BAD_REQUEST, Message.User.CAN_NOT_REACH_CUSTOMER);
+			throw new AppException(HttpStatus.BAD_REQUEST, Message.User.CAN_NOT_BE_LIKE_STAFF);
 		}
 
-		User user = Common.findUserById(userAuth.getId(), userRepository);
+		User user = Common.findUserByUserAuth(userAuth.getId(), userRepository);
 
 		Common.updateIfNotNull(request.getAddress(), user::setAddress);
 		Common.updateIfNotNull(request.getImage(), user::setImage);
 
-		return mapToStaffDTO(userRepository.save(user));
+		return mapToStaffDTO(userRepository.save(user), userAuth);
 	}
 
 	@Transactional
 	public ProfileResponse updateUser(UpdateUserRequest request) {
 		UserAuth userAuth = Common.findCurrUserAuth(userAuthRepository);
-		if (!AuthHelper.isNormalUser(userAuth)) {
-			throw new AppException(HttpStatus.BAD_REQUEST, Message.User.CAN_NOT_REACH_STAFF);
+		if (AuthHelper.isStaff(userAuth)) {
+			throw new AppException(HttpStatus.BAD_REQUEST, Message.User.CAN_NOT_BE_LIKE_CUSTOMER);
 		}
 
-		User user = Common.findUserById(userAuth.getId(), userRepository);
+		User user = Common.findUserByUserAuth(userAuth.getId(), userRepository);
 
 		Common.updateIfNotNull(request.getName(), user::setName);
 		Common.updateIfNotNull(request.getEmail(), user::setEmail);
@@ -105,50 +105,32 @@ public class UserService {
 		Common.updateIfNotNull(request.getImage(), user::setImage);
 		Common.updateIfNotNull(request.getMale(), user::setMale);
 
-		return mapToUserDTO(userRepository.save(user));
+		return mapToUserDTO(userRepository.save(user), userAuth);
 	}
 
-	private StaffProfileResponse mapToStaffDTO(User user) {
+	private StaffProfileResponse mapToStaffDTO(User user, UserAuth userAuth) {
 		return StaffProfileResponse.builder()
-								   .id(user.getUserAuth().getId())
+								   .id(user.getId())
 								   .name(user.getName())
-								   .email(user.getUserAuth().getEmail())
+								   .email(userAuth.getEmail())
 								   .image(user.getImage())
 								   .address(user.getAddress())
 								   .male(user.isMale())
 								   .dob(user.getDob())
-								   .userGroup(mapToStaffDTO(user.getUserAuth().getUserGroup()))
+								   .admin(userAuth.isAdmin())
 								   .build();
 	}
 
-	private ProfileResponse mapToUserDTO(User user) {
+	private ProfileResponse mapToUserDTO(User user, UserAuth userAuth) {
 		return ProfileResponse.builder()
-							  .id(user.getUserAuth().getId())
+							  .id(user.getId())
 							  .name(user.getName())
 							  .email(user.getEmail())
-							  .phone(user.getUserAuth().getPhone())
+							  .phone(userAuth.getPhone())
 							  .image(user.getImage())
 							  .address(user.getAddress())
 							  .male(user.isMale())
 							  .dob(user.getDob())
 							  .build();
-	}
-
-	private UserGroupResponseWithoutHas mapToStaffDTO(UserGroup userGroup) {
-		return UserGroupResponseWithoutHas.builder()
-										  .id(userGroup.getId())
-										  .name(userGroup.getName())
-										  .features(userGroup.getUserGroupFeatures()
-															 .stream()
-															 .map(userGroupFeature -> SimpleFeatureResponse.builder()
-																										   .id(userGroupFeature.getFeature()
-																															   .getId())
-																										   .code(userGroupFeature.getFeature()
-																																 .getCode())
-																										   .name(userGroupFeature.getFeature()
-																																 .getName())
-																										   .build())
-															 .toList())
-										  .build();
 	}
 }

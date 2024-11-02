@@ -4,16 +4,14 @@ import com.fashion.backend.constant.ApplicationConst;
 import com.fashion.backend.constant.Message;
 import com.fashion.backend.entity.User;
 import com.fashion.backend.entity.UserAuth;
-import com.fashion.backend.entity.UserGroup;
 import com.fashion.backend.exception.AppException;
 import com.fashion.backend.payload.ListResponse;
+import com.fashion.backend.payload.ListResponseWithoutFilter;
 import com.fashion.backend.payload.SimpleResponse;
 import com.fashion.backend.payload.page.AppPageRequest;
 import com.fashion.backend.payload.page.AppPageResponse;
 import com.fashion.backend.payload.staff.*;
-import com.fashion.backend.payload.usergroup.SimpleUserGroupResponse;
 import com.fashion.backend.repository.UserAuthRepository;
-import com.fashion.backend.repository.UserGroupRepository;
 import com.fashion.backend.repository.UserRepository;
 import com.fashion.backend.utils.AuthHelper;
 import lombok.RequiredArgsConstructor;
@@ -28,34 +26,30 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
+import java.util.Objects;
 
 @Service
 @RequiredArgsConstructor
 public class StaffService {
 	private final UserRepository userRepository;
 	private final UserAuthRepository userAuthRepository;
-	private final UserGroupRepository userGroupRepository;
 	private final PasswordEncoder passwordEncoder;
 
 	@Transactional
 	public StaffResponse createStaff(CreateStaffRequest request) {
-		UserGroup userGroup = Common.findUserGroupById(request.getUserGroup(), userGroupRepository);
-
 		UserAuth userAuth = UserAuth.builder()
 									.email(request.getEmail())
 									.password(passwordEncoder.encode(ApplicationConst.DEFAULT_PASSWORD))
 									.isVerified(true)
 									.isDeleted(false)
-									.userGroup(userGroup)
 									.build();
-
-		userAuth = userAuthRepository.save(userAuth);
+		userAuthRepository.save(userAuth);
 
 		handleImage(request);
 		User user = mapToEntity(request);
 		user.setEmail(null);
+
 		user.setUserAuth(userAuth);
-		user.setId(userAuth.getId());
 
 		return mapToDTO(userRepository.save(user));
 	}
@@ -68,14 +62,18 @@ public class StaffService {
 
 	@Transactional
 	public StaffResponse updateStaff(Long userId, UpdateStaffRequest request) {
-		UserAuth userAuth = Common.findUserAuthById(userId, userAuthRepository);
-		if (userAuth.getEmail().equals(ApplicationConst.ADMIN_EMAIL)) {
-			throw new AppException(HttpStatus.BAD_REQUEST, Message.User.CAN_NOT_REACH_ADMIN);
-		} else if (AuthHelper.isNormalUser(userAuth)) {
+		User user = Common.findUserById(userId, userRepository);
+
+		UserAuth userAuth = user.getUserAuth();
+		String currEmail = Common.getCurrUserName();
+		if (Objects.equals(userAuth.getEmail(), currEmail)) {
+			throw new AppException(HttpStatus.BAD_REQUEST, Message.User.CAN_NOT_UPDATE_YOURSELF);
+		} else if (AuthHelper.isNormalUser(currEmail)) {
 			throw new AppException(HttpStatus.BAD_REQUEST, Message.User.CAN_NOT_REACH_CUSTOMER);
 		}
 
-		User user = Common.findUserById(userId, userRepository);
+		Common.updateIfNotNull(request.getAdmin(), userAuth::setAdmin);
+		userAuthRepository.save(userAuth);
 
 		Common.updateIfNotNull(request.getName(), user::setName);
 		Common.updateIfNotNull(request.getDob(), user::setDob);
@@ -83,50 +81,60 @@ public class StaffService {
 		Common.updateIfNotNull(request.getImage(), user::setImage);
 		Common.updateIfNotNull(request.getMale(), user::setMale);
 
-		updateUserGroup(userAuth, request.getUserGroup());
-
-		userAuthRepository.save(userAuth);
-
-		return mapToDTO(userRepository.save(user));
-	}
-
-	private void updateUserGroup(UserAuth userAuth, Long updatedUserGroupId) {
-		if (updatedUserGroupId != null) {
-			UserGroup userGroup = Common.findUserGroupById(updatedUserGroupId, userGroupRepository);
-			userAuth.setUserGroup(userGroup);
-		}
+		return mapToDTO(user);
 	}
 
 	@Transactional
 	public SimpleResponse deleteStaff(Long userId) {
-		UserAuth userAuth = Common.findUserAuthById(userId, userAuthRepository);
+		User user = Common.findUserById(userId, userRepository);
 
-		if (userAuth.getEmail().equals(ApplicationConst.ADMIN_EMAIL)) {
-			throw new AppException(HttpStatus.BAD_REQUEST, Message.User.CAN_NOT_DELETE_ADMIN);
-		} else if (AuthHelper.isNormalUser(userAuth)) {
+		String email = Common.getCurrUserName();
+		if (Objects.equals(user.getUserAuth().getEmail(), email)) {
+			throw new AppException(HttpStatus.BAD_REQUEST, Message.User.CAN_NOT_DELETE_YOURSELF);
+		} else if (AuthHelper.isNormalUser(email)) {
 			throw new AppException(HttpStatus.BAD_REQUEST, Message.User.CAN_NOT_REACH_CUSTOMER);
 		}
 
-		userAuthRepository.deleteUserById(userId);
+		userAuthRepository.deleteUserById(user.getUserAuth().getId());
 
 		return new SimpleResponse();
 	}
 
 	@Transactional
-	public ListResponse<StaffResponse, StaffFilter> getAllStaff(AppPageRequest page, StaffFilter filter) {
+	public ListResponseWithoutFilter<StaffResponse> getAllStaff(AppPageRequest page) {
+		Pageable pageable = PageRequest.of(page.getPage() - 1,
+										   page.getLimit(),
+										   Sort.by(Sort.Direction.ASC, "name"));
+
+		Page<User> userPage = userRepository.findAllNotHasPhone(Specification.where(null), pageable);
+
+		List<User> users = userPage.getContent();
+
+		List<StaffResponse> data = users.stream().map(this::mapToDTO).toList();
+
+		return ListResponseWithoutFilter.<StaffResponse>builder()
+										.data(data)
+										.appPageResponse(AppPageResponse.builder()
+																		.index(page.getPage())
+																		.limit(page.getLimit())
+																		.totalPages(userPage.getTotalPages())
+																		.totalElements(userPage.getTotalElements())
+																		.build())
+										.build();
+	}
+
+
+	@Transactional
+	public ListResponse<StaffResponse, StaffFilter> getStaffs(AppPageRequest page, StaffFilter filter) {
+		String email = Common.getCurrUserName();
+
 		Pageable pageable = PageRequest.of(page.getPage() - 1,
 										   page.getLimit(),
 										   Sort.by(Sort.Direction.ASC, "name"));
 		Specification<User> spec = filterStaffs(filter);
 
-		Page<User> userPage = userRepository.findAll(spec, pageable);
+		Page<User> userPage = userRepository.findAllNotHasPhoneAndNotDeleteAndNotHaveEmail(email, spec, pageable);
 
-		return getListResponseFromPage(userPage, page, filter);
-	}
-
-	private ListResponse<StaffResponse, StaffFilter> getListResponseFromPage(Page<User> userPage,
-																			 AppPageRequest page,
-																			 StaffFilter filter) {
 		List<User> users = userPage.getContent();
 
 		List<StaffResponse> data = users.stream().map(this::mapToDTO).toList();
@@ -143,30 +151,16 @@ public class StaffService {
 						   .build();
 	}
 
-
-	@Transactional
-	public ListResponse<StaffResponse, StaffFilter> getStaffs(AppPageRequest page, StaffFilter filter) {
-		Pageable pageable = PageRequest.of(page.getPage() - 1,
-										   page.getLimit(),
-										   Sort.by(Sort.Direction.ASC, "name"));
-		Specification<User> spec = filterStaffs(filter);
-
-		Page<User> userPage = userRepository.findAllNotHasPhoneAndNotDeleteAndNotAdmin(spec, pageable);
-
-		return getListResponseFromPage(userPage, page, filter);
-	}
-
 	@Transactional
 	public StaffResponse getStaff(Long id) {
-		UserAuth userAuth = Common.findUserAuthById(id, userAuthRepository);
+		User user = Common.findUserById(id, userRepository);
 
-		if (userAuth.getEmail().equals(ApplicationConst.ADMIN_EMAIL)) {
-			throw new AppException(HttpStatus.BAD_REQUEST, Message.User.CAN_NOT_REACH_ADMIN);
-		} else if (AuthHelper.isNormalUser(userAuth)) {
+		String email = Common.getCurrUserName();
+		if (Objects.equals(user.getUserAuth().getEmail(), email)) {
+			throw new AppException(HttpStatus.BAD_REQUEST, Message.User.CAN_NOT_SEE_DETAIL_YOURSELF);
+		} else if (AuthHelper.isNormalUser(email)) {
 			throw new AppException(HttpStatus.BAD_REQUEST, Message.User.CAN_NOT_REACH_CUSTOMER);
 		}
-
-		User user = Common.findUserById(id, userRepository);
 
 		return mapToDTO(user);
 	}
@@ -179,14 +173,8 @@ public class StaffService {
 		if (filter.getEmail() != null) {
 			spec = spec.and(StaffSpecs.hasEmail(filter.getEmail()));
 		}
-		if (filter.getPhone() != null) {
-			spec = spec.and(StaffSpecs.hasPhone(filter.getPhone()));
-		}
-		if (filter.getUserGroup() != null) {
-			spec = spec.and(StaffSpecs.hasUserGroupName(filter.getUserGroup()));
-		}
-		if (filter.getUserGroupId() != null) {
-			spec = spec.and(StaffSpecs.hasUserGroupId(filter.getUserGroupId()));
+		if (filter.getAdmin() != null) {
+			spec = spec.and(StaffSpecs.isAdmin(filter.getAdmin()));
 		}
 		if (filter.getMale() != null) {
 			spec = spec.and(StaffSpecs.isMale(filter.getMale()));
@@ -202,25 +190,15 @@ public class StaffService {
 
 	private StaffResponse mapToDTO(User user) {
 		return StaffResponse.builder()
-							.id(user.getUserAuth().getId())
+							.id(user.getId())
 							.name(user.getName())
-							.email(user.getEmail())
-							.userGroup(mapToSimpleUserGroup(user.getUserAuth().getUserGroup()))
+							.email(user.getUserAuth().getEmail())
 							.image(user.getImage())
 							.dob(user.getDob())
 							.address(user.getAddress())
 							.male(user.isMale())
+							.admin(user.getUserAuth().isAdmin())
 							.build();
-	}
-
-	private SimpleUserGroupResponse mapToSimpleUserGroup(UserGroup userGroup) {
-		if (userGroup == null) {
-			return null;
-		}
-		return SimpleUserGroupResponse.builder()
-									  .id(userGroup.getId())
-									  .name(userGroup.getName())
-									  .build();
 	}
 
 	private User mapToEntity(CreateStaffRequest request) {
@@ -229,7 +207,6 @@ public class StaffService {
 				   .email(request.getEmail())
 				   .address(request.getAddress())
 				   .dob(request.getDob())
-				   .phone(request.getPhone())
 				   .image(request.getImage())
 				   .male(request.getMale())
 				   .build();

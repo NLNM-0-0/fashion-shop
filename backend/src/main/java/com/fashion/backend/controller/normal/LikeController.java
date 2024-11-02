@@ -11,6 +11,7 @@ import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 
 @RestController
@@ -34,6 +35,7 @@ public class LikeController {
 			responseCode = "200",
 			description = "Http Status is 200 OK"
 	)
+	@PreAuthorize("hasAnyAuthority('USER')")
 	public ResponseEntity<SimpleListResponse<SimpleItemResponse>> getLikedItems() {
 		return new ResponseEntity<>(likeService.getLikedItems(), HttpStatus.OK);
 	}
@@ -50,6 +52,7 @@ public class LikeController {
 			responseCode = "200",
 			description = "Http Status is 200 OK"
 	)
+	@PreAuthorize("hasAnyAuthority('USER')")
 	public ResponseEntity<SimpleResponse> likeItem(
 			@PathVariable Long itemId) {
 		return new ResponseEntity<>(likeService.likeItem(itemId), HttpStatus.OK);
@@ -67,6 +70,7 @@ public class LikeController {
 			responseCode = "200",
 			description = "Http Status is 200 OK"
 	)
+	@PreAuthorize("hasAnyAuthority('USER')")
 	public ResponseEntity<SimpleResponse> deleteCartItem(
 			@PathVariable Long itemId) {
 		return new ResponseEntity<>(likeService.unlikeItem(itemId), HttpStatus.OK);

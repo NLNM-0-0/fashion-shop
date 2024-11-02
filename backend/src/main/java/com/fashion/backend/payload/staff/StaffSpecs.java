@@ -9,19 +9,15 @@ public class StaffSpecs {
 	}
 
 	public static Specification<User> hasEmail(String email) {
-		return (root, query, cb) -> cb.like(root.get("email"), "%" + email + "%");
+		return (root, query, cb) -> cb.like(root.get("userAuth").get("email"), "%" + email + "%");
 	}
 
-	public static Specification<User> hasPhone(String phone) {
-		return (root, query, cb) -> cb.like(root.get("phone"), "%" + phone + "%");
+	public static Specification<User> notHasEmail(String email) {
+		return (root, query, cb) -> cb.notEqual(root.get("userAuth").get("email"), email);
 	}
 
-	public static Specification<User> hasUserGroupName(String userGroup) {
-		return (root, query, cb) -> cb.like(root.get("userAuth").get("userGroup").get("name"), "%" + userGroup + "%");
-	}
-
-	public static Specification<User> hasUserGroupId(Long userGroupId) {
-		return (root, query, cb) -> cb.equal(root.get("userAuth").get("userGroup").get("id"), userGroupId);
+	public static Specification<User> isAdmin(Boolean isAdmin) {
+		return (root, query, cb) -> cb.equal(root.get("userAuth").get("isAdmin"), isAdmin);
 	}
 
 	public static Specification<User> isMale(Boolean male) {
@@ -39,14 +35,10 @@ public class StaffSpecs {
 	}
 
 	public static Specification<User> isNotDeleted() {
-		return (root, query, builder) -> builder.isFalse(root.get("isDeleted"));
+		return (root, query, builder) -> builder.isFalse(root.get("userAuth").get("isDeleted"));
 	}
 
 	public static Specification<User> isStaff() {
-		return (root, query, builder) -> builder.isNotNull(root.get("email"));
-	}
-
-	public static Specification<User> notHaveEmail(String email) {
-		return (root, query, builder) -> builder.notEqual(root.get("email"), email);
+		return (root, query, builder) -> builder.isNotNull(root.get("userAuth").get("email"));
 	}
 }

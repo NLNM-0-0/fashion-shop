@@ -6,7 +6,6 @@ import com.fashion.backend.utils.validation.date.ValidDDMMYYYYFormat;
 import io.swagger.v3.oas.annotations.media.Schema;
 import jakarta.validation.constraints.Email;
 import jakarta.validation.constraints.NotNull;
-import jakarta.validation.constraints.Pattern;
 import lombok.Data;
 import org.hibernate.validator.constraints.Length;
 
@@ -31,17 +30,6 @@ public class CreateStaffRequest {
 	@Email(message = Message.EMAIL_VALIDATE)
 	@NotNull(message = Message.EMAIL_VALIDATE)
 	private String email;
-
-	@Schema(
-			name = "phone",
-			example = "0123456789"
-	)
-	@Pattern(
-			regexp = "\\d{10,11}",
-			message = Message.PHONE_VALIDATE
-	)
-	@NotNull(message = Message.PHONE_VALIDATE)
-	private String phone;
 
 	@Schema(
 			name = "dob",
@@ -77,9 +65,9 @@ public class CreateStaffRequest {
 	private Boolean male;
 
 	@Schema(
-			name = "userGroup",
-			example = "1"
+			name = "admin",
+			example = "false",
+			defaultValue = "false"
 	)
-	@NotNull(message = Message.User.USER_GROUP_VALIDATE)
-	private Long userGroup;
+	private Boolean admin;
 }

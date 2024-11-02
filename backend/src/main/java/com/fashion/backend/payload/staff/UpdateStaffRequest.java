@@ -51,8 +51,8 @@ public class UpdateStaffRequest {
 	private Boolean male;
 
 	@Schema(
-			name = "userGroup",
-			example = "1"
+			name = "admin",
+			example = "false"
 	)
-	private Long userGroup;
+	private Boolean admin;
 }

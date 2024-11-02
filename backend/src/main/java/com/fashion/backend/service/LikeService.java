@@ -62,12 +62,14 @@ public class LikeService {
 		UserAuth userAuth = Common.findCurrUserAuth(userAuthRepository);
 		User user = Common.findUserById(userAuth.getId(), userRepository);
 
-		Item item = Common.findItem(itemId, itemRepository);
+		Item item = Common.findItemById(itemId, itemRepository);
 
 		Like like = Like.builder()
 						.item(item)
 						.user(user)
 						.build();
+
+		likeRepository.save(like);
 
 		return new SimpleResponse();
 	}

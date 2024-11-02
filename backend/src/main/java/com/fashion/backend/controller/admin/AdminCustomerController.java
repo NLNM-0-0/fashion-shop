@@ -40,7 +40,7 @@ public class AdminCustomerController {
 			responseCode = "200",
 			description = "Http Status is 200 OK"
 	)
-	@PreAuthorize("hasAnyAuthority('ADMIN')")
+	@PreAuthorize("hasAnyAuthority('ADMIN', 'STAFF')")
 	public ResponseEntity<ListResponse<CustomerResponse, CustomerFilter>> getUsers(
 			@Valid AppPageRequest page,
 			@Valid CustomerFilter filter) {
@@ -77,7 +77,7 @@ public class AdminCustomerController {
 			responseCode = "200",
 			description = "Http Status is 200 OK"
 	)
-	@PreAuthorize("hasAnyAuthority('ADMIN')")
+	@PreAuthorize("hasAnyAuthority('ADMIN', 'STAFF')")
 	public ResponseEntity<CustomerResponse> getCustomer(@PathVariable Long id) {
 		return new ResponseEntity<>(customerService.getCustomer(id), HttpStatus.OK);
 	}
@@ -94,7 +94,7 @@ public class AdminCustomerController {
 			responseCode = "200",
 			description = "Http Status is 200 OK"
 	)
-	@PreAuthorize("hasAnyAuthority('ADMIN')")
+	@PreAuthorize("hasAnyAuthority('ADMIN', 'STAFF')")
 	public ResponseEntity<SimpleResponse> deleteCustomer(
 			@PathVariable Long id
 	) {

@@ -10,13 +10,11 @@ import org.springframework.stereotype.Component;
 @Component
 public class SmsSender {
 
+	private final SpeedSMSAPI provider;
 	@Value("${sms.speedsms.apiKey}")
 	private String apiKey;
-
 	@Value("${sms.speedsms.phone}")
 	private String apiPhone;
-
-	private final SpeedSMSAPI provider;
 
 	public SmsSender() {
 		provider = new SpeedSMSAPI(apiKey);

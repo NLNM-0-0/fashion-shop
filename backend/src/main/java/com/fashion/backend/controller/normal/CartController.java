@@ -15,6 +15,7 @@ import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 
 @RestController
@@ -38,6 +39,7 @@ public class CartController {
 			responseCode = "200",
 			description = "Http Status is 200 OK"
 	)
+	@PreAuthorize("hasAnyAuthority('USER')")
 	public ResponseEntity<SimpleListResponse<CartDetailResponse>> getCart() {
 		return new ResponseEntity<>(cartService.getCart(), HttpStatus.OK);
 	}
@@ -54,6 +56,7 @@ public class CartController {
 			responseCode = "200",
 			description = "Http Status is 200 OK"
 	)
+	@PreAuthorize("hasAnyAuthority('USER')")
 	public ResponseEntity<NumberNotificationNotSeenResponse> getNumberCartItems() {
 		return new ResponseEntity<>(cartService.getNumberCartItems(), HttpStatus.OK);
 	}
@@ -70,6 +73,7 @@ public class CartController {
 			responseCode = "200",
 			description = "Http Status is 200 OK"
 	)
+	@PreAuthorize("hasAnyAuthority('USER')")
 	public ResponseEntity<SimpleResponse> addCartItem(
 			@Valid AddToCartRequest request) {
 		return new ResponseEntity<>(cartService.addCartItem(request), HttpStatus.OK);
@@ -87,6 +91,7 @@ public class CartController {
 			responseCode = "200",
 			description = "Http Status is 200 OK"
 	)
+	@PreAuthorize("hasAnyAuthority('USER')")
 	public ResponseEntity<SimpleResponse> deleteCartItem(
 			@PathVariable Long itemId) {
 		return new ResponseEntity<>(cartService.deleteCartItem(itemId), HttpStatus.OK);
@@ -104,6 +109,7 @@ public class CartController {
 			responseCode = "200",
 			description = "Http Status is 200 OK"
 	)
+	@PreAuthorize("hasAnyAuthority('USER')")
 	public ResponseEntity<SimpleResponse> changeQuantityCartItem(
 			@PathVariable Long itemId,
 			@Valid ChangeQuantityRequest request) {

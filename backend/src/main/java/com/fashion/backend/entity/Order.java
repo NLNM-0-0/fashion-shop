@@ -26,16 +26,16 @@ public class Order {
 	)
 	private User customer;
 
-	@Column(name = "total_price") // Changed to snake_case for consistency
-	private int totalPrice;
-
 	@ManyToOne
 	@JoinColumn(
-			name = "created_by",
+			name = "staff_id",
 			nullable = true,
 			updatable = false
 	)
-	private User createdBy;
+	private User staff;
+
+	@Column(name = "total_price")
+	private int totalPrice;
 
 	@CreatedDate
 	@Column(

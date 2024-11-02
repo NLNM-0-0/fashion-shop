@@ -16,10 +16,7 @@ public interface UserAuthRepository extends JpaRepository<UserAuth, Long> {
 	@Transactional(propagation = Propagation.REQUIRES_NEW)
 	Optional<UserAuth> findByPhone(String phone);
 
-	@Query("SELECT ua FROM UserAuth ua WHERE ua.userGroup.id = :userGroupId")
-	Optional<UserAuth> findFirstByUserGroupId(Long userGroupId);
-
 	@Modifying
-	@Query("UPDATE UserAuth u SET u.isDeleted = true, u.userGroup = null WHERE u.id = :userId")
+	@Query("UPDATE UserAuth u SET u.isDeleted = true WHERE u.id = :userId")
 	void deleteUserById(Long userId);
 }

@@ -13,6 +13,7 @@ import org.springframework.security.core.userdetails.UserDetails;
 
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.List;
 
 @Data
 @Builder
@@ -45,21 +46,21 @@ public class UserAuth implements UserDetails {
 	@Column(nullable = false)
 	private boolean isVerified = false;
 
-	@ManyToOne(fetch = FetchType.EAGER)
-	@JoinColumn(name = "user_group_id")
-	private UserGroup userGroup;
+	@Column(nullable = false)
+	private boolean isAdmin = false;
 
 	@Override
 	public Collection<? extends GrantedAuthority> getAuthorities() {
-		if (userGroup != null) {
-			return userGroup.getUserGroupFeatures()
-							.stream()
-							.map(feature -> new SimpleGrantedAuthority(feature.getFeature()
-																			  .getCode()))
-							.toList();
-		} else {
-			return new ArrayList<>();
+		List<SimpleGrantedAuthority> authorities = new ArrayList<>();
+		if (isAdmin) {
+			authorities.add(new SimpleGrantedAuthority("ADMIN"));
 		}
+		if (email != null) {
+			authorities.add(new SimpleGrantedAuthority("STAFF"));
+		} else {
+			authorities.add(new SimpleGrantedAuthority("USER"));
+		}
+		return authorities;
 	}
 
 	@Override

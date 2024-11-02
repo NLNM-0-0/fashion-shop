@@ -1,6 +1,5 @@
 package com.fashion.backend.service;
 
-import com.fashion.backend.constant.ApplicationConst;
 import com.fashion.backend.constant.Message;
 import com.fashion.backend.entity.User;
 import com.fashion.backend.entity.UserAuth;
@@ -9,9 +8,9 @@ import com.fashion.backend.payload.ListResponse;
 import com.fashion.backend.payload.SimpleResponse;
 import com.fashion.backend.payload.customer.CustomerFilter;
 import com.fashion.backend.payload.customer.CustomerResponse;
+import com.fashion.backend.payload.customer.CustomerSpecs;
 import com.fashion.backend.payload.page.AppPageRequest;
 import com.fashion.backend.payload.page.AppPageResponse;
-import com.fashion.backend.payload.staff.StaffSpecs;
 import com.fashion.backend.repository.UserAuthRepository;
 import com.fashion.backend.repository.UserRepository;
 import com.fashion.backend.utils.AuthHelper;
@@ -37,10 +36,8 @@ public class CustomerService {
 	public SimpleResponse deleteCustomer(Long customerId) {
 		UserAuth userAuth = Common.findUserAuthById(customerId, userAuthRepository);
 
-		if (userAuth.getEmail().equals(ApplicationConst.ADMIN_EMAIL)) {
-			throw new AppException(HttpStatus.BAD_REQUEST, Message.User.CAN_NOT_DELETE_ADMIN);
-		} else if (!AuthHelper.isNormalUser(userAuth)) {
-			throw new AppException(HttpStatus.BAD_REQUEST, Message.User.CAN_NOT_REACH_STAFF);
+		if (AuthHelper.isNormalUser(userAuth)) {
+			throw new AppException(HttpStatus.BAD_REQUEST, Message.User.CAN_NOT_BE_LIKE_STAFF);
 		}
 
 		userAuthRepository.deleteUserById(customerId);
@@ -96,10 +93,8 @@ public class CustomerService {
 	public CustomerResponse getCustomer(Long id) {
 		UserAuth userAuth = Common.findUserAuthById(id, userAuthRepository);
 
-		if (userAuth.getEmail().equals(ApplicationConst.ADMIN_EMAIL)) {
-			throw new AppException(HttpStatus.BAD_REQUEST, Message.User.CAN_NOT_REACH_ADMIN);
-		} else if (!AuthHelper.isNormalUser(userAuth)) {
-			throw new AppException(HttpStatus.BAD_REQUEST, Message.User.CAN_NOT_REACH_STAFF);
+		if (AuthHelper.isNormalUser(userAuth)) {
+			throw new AppException(HttpStatus.BAD_REQUEST, Message.User.CAN_NOT_BE_LIKE_STAFF);
 		}
 
 		User user = Common.findUserById(id, userRepository);
@@ -110,20 +105,20 @@ public class CustomerService {
 	private Specification<User> filterCustomers(CustomerFilter filter) {
 		Specification<User> spec = Specification.where(null);
 		if (filter.getName() != null) {
-			spec = StaffSpecs.hasName(filter.getName());
+			spec = CustomerSpecs.hasName(filter.getName());
 		}
 		if (filter.getEmail() != null) {
-			spec = spec.and(StaffSpecs.hasEmail(filter.getEmail()));
+			spec = spec.and(CustomerSpecs.hasEmail(filter.getEmail()));
 		}
 		if (filter.getPhone() != null) {
-			spec = spec.and(StaffSpecs.hasPhone(filter.getPhone()));
+			spec = spec.and(CustomerSpecs.hasPhone(filter.getPhone()));
 		}
 		return spec;
 	}
 
 	private CustomerResponse mapToDTO(User user) {
 		return CustomerResponse.builder()
-							   .id(user.getUserAuth().getId())
+							   .id(user.getId())
 							   .name(user.getName())
 							   .email(user.getEmail())
 							   .image(user.getImage())
