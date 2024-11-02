@@ -27,6 +27,7 @@ import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
 import java.util.Objects;
+import java.util.Optional;
 
 @Service
 @RequiredArgsConstructor
@@ -37,6 +38,11 @@ public class StaffService {
 
 	@Transactional
 	public StaffResponse createStaff(CreateStaffRequest request) {
+		Optional<UserAuth> checkUserAuth = userAuthRepository.findByEmail(request.getEmail());
+		if (checkUserAuth.isPresent()) {
+			throw new AppException(HttpStatus.BAD_REQUEST, Message.User.USER_EXIST);
+		}
+
 		UserAuth userAuth = UserAuth.builder()
 									.email(request.getEmail())
 									.password(passwordEncoder.encode(ApplicationConst.DEFAULT_PASSWORD))

@@ -47,8 +47,14 @@ public class StockReportResponse {
 	private int decrease;
 
 	@Schema(
+			name = "payback",
+			example = "10"
+	)
+	private int payback;
+
+	@Schema(
 			name = "final",
-			example = "70"
+			example = "80"
 	)
 	private int finalQty;
 

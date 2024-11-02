@@ -57,6 +57,7 @@ public class StockReportService {
 
 		int qtyInit = 0;
 		int qtySell = 0;
+		int qtyPayback = 0;
 		int qtyIncrease = 0;
 		int qtyDecrease = 0;
 		int qtyFinal = 0;
@@ -70,13 +71,14 @@ public class StockReportService {
 							timeFrom,
 							timeTo);
 
-			int sellAmount = 0, increaseAmount = 0, decreaseAmount = 0;
+			int sellAmount = 0, increaseAmount = 0, decreaseAmount = 0, paybackAmount = 0;
 			for (StockChangeHistory change : stockChanges) {
 				int quantity = change.getQuantity();
 				switch (change.getType()) {
 					case SELL -> sellAmount += quantity;
 					case INCREASE -> increaseAmount += quantity;
 					case DECREASE -> decreaseAmount += quantity;
+					case PAYBACK -> paybackAmount += quantity;
 				}
 			}
 
@@ -88,16 +90,17 @@ public class StockReportService {
 							  initial :
 							  stockChanges.get(stockChanges.size() - 1).getQuantityLeft();
 			if (initial == 0) {
-				initial = finalAmount - increaseAmount - sellAmount - decreaseAmount;
+				initial = finalAmount - increaseAmount - sellAmount - decreaseAmount - paybackAmount;
 			}
 
-			if (initial != 0 || sellAmount != 0 || increaseAmount != 0 || decreaseAmount != 0) {
+			if (initial != 0 || sellAmount != 0 || increaseAmount != 0 || decreaseAmount != 0 || paybackAmount != 0) {
 				StockReportDetail detail = StockReportDetail.builder()
 															.item(item)
 															.initial(initial)
 															.sell(sellAmount)
 															.increase(increaseAmount)
 															.decrease(decreaseAmount)
+															.payback(paybackAmount)
 															.finalQty(finalAmount)
 															.build();
 				allDetails.add(detail);
@@ -107,6 +110,7 @@ public class StockReportService {
 			qtyIncrease += increaseAmount;
 			qtyDecrease += decreaseAmount;
 			qtySell += sellAmount;
+			qtyPayback += paybackAmount;
 			qtyFinal += finalAmount;
 		}
 
@@ -118,6 +122,7 @@ public class StockReportService {
 											 .increase(qtyIncrease)
 											 .decrease(qtyDecrease)
 											 .sell(qtySell)
+											 .payback(qtyPayback)
 											 .finalQty(qtyFinal)
 											 .build();
 
@@ -136,6 +141,7 @@ public class StockReportService {
 								  .initial(report.getInitial())
 								  .increase(report.getIncrease())
 								  .decrease(report.getDecrease())
+								  .payback(report.getPayback())
 								  .finalQty(report.getFinalQty())
 								  .details(report.getDetails().stream().map(this::mapToDTO).toList())
 								  .build();
@@ -148,6 +154,7 @@ public class StockReportService {
 										.initial(detail.getInitial())
 										.increase(detail.getIncrease())
 										.decrease(detail.getDecrease())
+										.payback(detail.getPayback())
 										.finalQty(detail.getFinalQty())
 										.build();
 	}

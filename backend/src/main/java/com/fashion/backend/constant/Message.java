@@ -7,7 +7,6 @@ public class Message {
 	public static final String PHONE_VALIDATE = "Số điện thoại người dùng từ 10 đến 11 chữ số";
 	public static final String USER_NOT_LOGIN = "Xin vui lòng đăng nhập để sử dụng chức năng";
 	public static final String USER_NOT_HAVE_FEATURE = "Bạn không có quyền sử dụng chức năng này";
-	public static final String USER_EXISTED = "Người dùng đã tồn tại.";
 	public static final String TOKEN_NOT_EXIST = "Token không tồn tại. Xin vui lòng kiểm tra lại email";
 	public static final String TOKEN_EXPIRED = "Token đã hết hạn. Xin vui lòng điền lại form quên mật khẩu";
 	public static final String COMMON_ERR = "Đã có lỗi xảy ra. Xin hãy thử lại sau";
@@ -58,11 +57,13 @@ public class Message {
 		public static final String NAME_FILTER_VALIDATE = "Tên sản phẩm không được quá 200 ký tự";
 		public static final String UNIT_PRICE_VALIDATE = "Giá sản phẩm không được trống và tối thiểu bằng 0";
 		public static final String QUANTITY_VALIDATE = "Số lượng sản phẩm không được để trống và tối thiểu bằng 0";
+		public static final String QUANTITY_MIN = "Số lượng sản phẩm tối thiểu bằng 0";
 	}
 
 	public static class User {
 		public static final String USER_IS_NOT_VERIFIED = "Người dùng chưa xác thực tài khoản";
 		public static final String USER_IS_DELETED = "Người dùng đã bị xóa khỏi hệ thống";
+		public static final String USER_EXIST = "Người dùng đã tồn tại trong hệ thống";
 		public static final String USER_NOT_EXIST = "Người dùng không tồn tại trong hệ thống";
 		public static final String NAME_VALIDATE = "Tên người dùng không được trống và tối đa 200 ký tự";
 		public static final String DOB_VALIDATE = "Ngày sinh không hợp lệ";
