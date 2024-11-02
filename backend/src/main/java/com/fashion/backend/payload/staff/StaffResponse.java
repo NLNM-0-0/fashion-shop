@@ -1,7 +1,6 @@
 package com.fashion.backend.payload.staff;
 
 import com.fashion.backend.constant.ApplicationConst;
-import com.fashion.backend.payload.usergroup.SimpleUserGroupResponse;
 import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -55,6 +54,9 @@ public class StaffResponse {
 	)
 	private boolean male;
 
-	@Schema(name = "userGroup")
-	private SimpleUserGroupResponse userGroup;
+	@Schema(
+			name = "admin",
+			example = "true"
+	)
+	private boolean admin;
 }

@@ -23,8 +23,4 @@ public class CustomerSpecs {
 	public static Specification<User> isNormalUser() {
 		return (root, query, builder) -> builder.isNotNull(root.get("phone"));
 	}
-
-	public static Specification<User> notHaveEmail(String email) {
-		return (root, query, builder) -> builder.notEqual(root.get("email"), email);
-	}
 }

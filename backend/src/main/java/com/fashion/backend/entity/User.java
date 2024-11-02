@@ -2,7 +2,6 @@ package com.fashion.backend.entity;
 
 import jakarta.persistence.*;
 import jakarta.validation.constraints.Email;
-import jakarta.validation.constraints.NotEmpty;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
@@ -29,12 +28,17 @@ import org.hibernate.validator.constraints.Length;
 )
 public class User {
 	@Id
+	@GeneratedValue(strategy = GenerationType.IDENTITY)
 	private Long id;
 
-	@OneToOne(fetch = FetchType.LAZY)
+	@OneToOne(
+			fetch = FetchType.LAZY,
+			cascade = CascadeType.ALL
+	)
 	@JoinColumn(
 			name = "user_auth_id",
-			nullable = false
+			nullable = false,
+			referencedColumnName = "id"
 	)
 	private UserAuth userAuth;
 
@@ -43,7 +47,7 @@ public class User {
 			max = 200
 	) private String name;
 
-	@Email @NotEmpty private String email;
+	@Email private String email;
 
 	@Column(
 			nullable = false,

@@ -1,6 +1,7 @@
 package com.fashion.backend.controller.admin;
 
 import com.fashion.backend.payload.ListResponse;
+import com.fashion.backend.payload.ListResponseWithoutFilter;
 import com.fashion.backend.payload.SimpleResponse;
 import com.fashion.backend.payload.page.AppPageRequest;
 import com.fashion.backend.payload.staff.CreateStaffRequest;
@@ -36,7 +37,7 @@ public class AdminStaffController {
 	)
 	@Operation(
 			summary = "Fetch staffs",
-			description = "Note: Fetch all staffs are not deleted and not admin (admin@gmail.com)"
+			description = "Note: Fetch all staffs are not deleted and not current user"
 	)
 	@ApiResponse(
 			responseCode = "200",
@@ -61,10 +62,9 @@ public class AdminStaffController {
 			responseCode = "200",
 			description = "Http Status is 200 OK"
 	)
-	public ResponseEntity<ListResponse<StaffResponse, StaffFilter>> getListStaffs(
-			@Valid AppPageRequest page,
-			@Valid StaffFilter filter) {
-		return new ResponseEntity<>(staffService.getAllStaff(page, filter), HttpStatus.OK);
+	public ResponseEntity<ListResponseWithoutFilter<StaffResponse>> getListStaffs(
+			@Valid AppPageRequest page) {
+		return new ResponseEntity<>(staffService.getAllStaff(page), HttpStatus.OK);
 	}
 
 	@GetMapping("/{id}")

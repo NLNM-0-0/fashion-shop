@@ -160,7 +160,7 @@ public class NotificationService {
 
 	private SimpleNotiUserResponse mapToDTO(User user) {
 		return SimpleNotiUserResponse.builder()
-									 .id(user.getUserAuth().getId())
+									 .id(user.getId())
 									 .name(user.getName())
 									 .email(user.getEmail())
 									 .image(user.getImage())

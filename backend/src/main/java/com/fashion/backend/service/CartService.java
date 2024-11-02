@@ -76,7 +76,7 @@ public class CartService {
 		UserAuth userAuth = Common.findCurrUserAuth(userAuthRepository);
 		User user = Common.findUserById(userAuth.getId(), userRepository);
 
-		Item item = Common.findItem(request.getItemId(), itemRepository);
+		Item item = Common.findItemById(request.getItemId(), itemRepository);
 
 		Cart cartItem = Cart.builder()
 							.item(item)

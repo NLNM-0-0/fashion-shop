@@ -1,6 +1,7 @@
 package com.fashion.backend.entity;
 
 import jakarta.persistence.*;
+import jakarta.validation.constraints.Min;
 import lombok.*;
 import org.hibernate.validator.constraints.Length;
 
@@ -28,6 +29,16 @@ public class Item {
 			nullable = false,
 			columnDefinition = "text"
 	) private String image;
+
+	@Column(
+			nullable = false
+	)
+	@Min(0)
+	private int unitPrice;
+
+	@Column(name = "quantity")
+	@Min(0)
+	private int quantity;
 
 	@Column(nullable = false)
 	private boolean isDeleted = false;

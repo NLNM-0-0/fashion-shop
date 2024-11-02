@@ -1,6 +1,5 @@
 package com.fashion.backend.repository;
 
-import com.fashion.backend.constant.ApplicationConst;
 import com.fashion.backend.entity.User;
 import com.fashion.backend.payload.customer.CustomerSpecs;
 import com.fashion.backend.payload.staff.StaffSpecs;
@@ -12,6 +11,7 @@ import org.springframework.data.jpa.repository.JpaSpecificationExecutor;
 import org.springframework.data.jpa.repository.Query;
 
 import java.util.List;
+import java.util.Optional;
 
 public interface UserRepository extends JpaRepository<User, Long>, JpaSpecificationExecutor<User> {
 	@Query("SELECT u FROM User u WHERE u.userAuth.isDeleted <> true")
@@ -20,10 +20,19 @@ public interface UserRepository extends JpaRepository<User, Long>, JpaSpecificat
 	@Query("SELECT u FROM User u WHERE u.id <> :excludedId AND u.id IN :ids AND u.userAuth.phone = null AND u.userAuth.isDeleted <> true")
 	List<User> findByIdInAndAndIdNotEqualAndNotHasPhoneAndNotDelete(List<Long> ids, Long excludedId);
 
-	default Page<User> findAllNotHasPhoneAndNotDeleteAndNotAdmin(Specification<User> specs, Pageable pageable) {
+	Optional<User> findFirstByUserAuthId(Long userAuthId);
+
+	default Page<User> findAllNotHasPhoneAndNotDeleteAndNotHaveEmail(String email,
+																	 Specification<User> specs,
+																	 Pageable pageable) {
 		Specification<User> spec = StaffSpecs.isNotDeleted()
 											 .and(StaffSpecs.isStaff())
-											 .and(StaffSpecs.notHaveEmail(ApplicationConst.ADMIN_EMAIL));
+											 .and(StaffSpecs.notHasEmail(email));
+		return findAll(specs.and(spec), pageable);
+	}
+
+	default Page<User> findAllNotHasPhone(Specification<User> specs, Pageable pageable) {
+		Specification<User> spec = StaffSpecs.isStaff();
 		return findAll(specs.and(spec), pageable);
 	}
 

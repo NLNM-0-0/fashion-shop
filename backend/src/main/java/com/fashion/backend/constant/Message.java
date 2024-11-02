@@ -22,6 +22,18 @@ public class Message {
 	public static final String DATE_VALIDATE = "Ngày đặt cần theo định dạng dd/MM/yyyy";
 	public static final String TIME_FROM_TIME_TO_VALIDATE = "Thời gian không đúng qui định";
 
+	public static class Order {
+		public static final String ORDER_NOT_EXIST = "Đơn hàng không tồn tại trong hệ thống";
+		public static final String ORDER_JUST_CAN_BE_REACHED_BY_OWNER_CUSTOMER
+				= "Bạn không thể truy cập đến đơn hàng của khách hàng khác";
+		public static final String CAN_NOT_BE_REACHED_CLOSED_ORDER = "Bạn không thể truy cập đến đơn hàng đã đóng";
+		public static final String ORDER_CAN_NOT_HAVE_NO_ITEM = "Đơn hàng không được rỗng";
+		public static final String ORDER_CAN_NOT_HAVE_SAME_ITEM = "Đơn hàng không được có 2 sản phẩm giống nhau";
+		public static final String NORMAL_USER_CAN_NOT_CREATE_INVOICE_DIRECTLY
+				= "Khách hàng không thể tự thanh toán hóa đơn";
+		public static final String STAFF_CAN_NOT_BUY_ITEM = "Nhân viên không thể mua hàng";
+	}
+
 	public static class StockReport {
 		public static final String FUTURE_DATE_INVALID = "Chưa tới thời điểm báo cáo";
 	}
@@ -51,37 +63,24 @@ public class Message {
 		public static final String NAME_VALIDATE = "Tên người dùng không được trống và tối đa 200 ký tự";
 		public static final String DOB_VALIDATE = "Ngày sinh không hợp lệ";
 		public static final String ADDRESS_VALIDATE = "Địa chỉ không được để trống và có tối đa 50 ký tự";
-		public static final String USER_GROUP_VALIDATE = "Nhóm người dùng không được để trống";
 		public static final String GENDER_VALIDATE = "Giới tính người dùng không được để trống";
 		public static final String NAME_FILTER_VALIDATE = "Tên người dùng không được quá 200 ký tự";
 		public static final String PHONE_FILTER_VALIDATE = "Số điện thoại người dùng không được quá 11 ký tự";
 		public static final String OLD_PASSWORD_NOT_CORRECT = "Mật khẩu cũ không khớp";
-		public static final String CAN_NOT_DELETE_ADMIN = "Bạn không thể xóa tài khoản admin";
-		public static final String CAN_NOT_REACH_ADMIN = "Bạn đang truy cập đến tài khoản tối mật. Xin hãy ngùng lại";
+		public static final String CAN_NOT_DELETE_YOURSELF = "Bạn không thể xóa chính bạn";
+		public static final String CAN_NOT_UPDATE_YOURSELF = "Bạn không thể chỉnh sửa chính bạn";
+		public static final String CAN_NOT_SEE_DETAIL_YOURSELF = "Bạn không thể xem chính bạn";
 		public static final String CAN_NOT_REACH_CUSTOMER
 				= "Bạn đang cố truy cập khách hàng chứ không phải nhân viên. Xin hãy kiểm tra lại";
-		public static final String CAN_NOT_REACH_STAFF
-				= "Bạn đang cố xóa truy cập nhân viên chứ không phải khách hàng. Xin hãy kiểm tra lại";
+		public static final String CAN_NOT_BE_LIKE_STAFF
+				= "Bạn đang là khách hàng không phải nhân viên. Xin hãy dừng lại";
+		public static final String CAN_NOT_BE_LIKE_CUSTOMER
+				= "Bạn đang là nhân viên không phải khách hàng. Xin hãy dừng lại";
 	}
 
 	public static class Page {
 		public static final String PAGE_VALIDATE = "Số trang phải lớn hơn 0";
 		public static final String PAGE_LIMIT = "Số lượng hiển thị phải lớn hơn 0";
-	}
-
-	public static class UserGroup {
-		public static final String USER_GROUP_NAME_VALIDATE
-				= "Tên nhóm người dùng không được để trống và tối đa 100 ký tự";
-		public static final String USER_GROUP_NAME_FILTER_VALIDATE = "Tên nhóm người dùng không được quá 100 ký tự";
-		public static final String USER_GROUP_NOT_EXIST = "Nhóm người dùng không tồn tại";
-		public static final String USER_GROUP_STILL_HAVE_STAFFS_CAN_NOT_DELETE
-				= "Nhóm người dùng vẫn còn nhân viên. Xin hãy xóa hết nhân viên rồi thử lại";
-		public static final String ADMIN_USER_GROUP_CAN_NOT_BE_INCLUDED
-				= "Bạn đang cố truy cập nhóm người dùng tối mật. Xin hãy ngừng lại.";
-	}
-
-	public static class Feature {
-		public static final String FEATURE_NOT_EXIST = "Chức năng không tồn tại";
 	}
 
 	public static class SMS {

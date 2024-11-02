@@ -16,6 +16,7 @@ import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 
 @RestController
@@ -39,6 +40,7 @@ public class NotificationController {
 			responseCode = "200",
 			description = "Http Status is 200 OK"
 	)
+	@PreAuthorize("hasAnyAuthority('USER')")
 	public ResponseEntity<ListResponse<NotificationResponse, NotificationFilter>> getNotifications(
 			@Valid AppPageRequest page,
 			@Valid NotificationFilter filter) {
@@ -57,6 +59,7 @@ public class NotificationController {
 			responseCode = "200",
 			description = "Http Status is 200 OK"
 	)
+	@PreAuthorize("hasAnyAuthority('USER')")
 	public ResponseEntity<ListResponse<NotificationResponse, NotificationFilter>> getNotificationsAndMakeItSeen(
 			@Valid AppPageRequest page,
 			@Valid NotificationFilter filter) {
@@ -75,6 +78,7 @@ public class NotificationController {
 			responseCode = "200",
 			description = "Http Status is 200 OK"
 	)
+	@PreAuthorize("hasAnyAuthority('USER')")
 	public ResponseEntity<NotificationResponse> seeNotification(@PathVariable Long id) {
 		return new ResponseEntity<>(notificationService.seeNotification(id), HttpStatus.OK);
 	}
@@ -91,6 +95,7 @@ public class NotificationController {
 			responseCode = "200",
 			description = "Http Status is 200 OK"
 	)
+	@PreAuthorize("hasAnyAuthority('USER')")
 	public ResponseEntity<SimpleResponse> seeAllNotifications() {
 		return new ResponseEntity<>(notificationService.seeAllNotification(), HttpStatus.OK);
 	}
@@ -107,6 +112,7 @@ public class NotificationController {
 			responseCode = "200",
 			description = "Http Status is 200 OK"
 	)
+	@PreAuthorize("hasAnyAuthority('USER')")
 	public ResponseEntity<NumberNotificationNotSeenResponse> getNumberUnseenNotification() {
 		return new ResponseEntity<>(notificationService.getNumberUnseenNotification(), HttpStatus.OK);
 	}
@@ -123,6 +129,7 @@ public class NotificationController {
 			responseCode = "200",
 			description = "Http Status is 200 OK"
 	)
+	@PreAuthorize("hasAnyAuthority('USER')")
 	public ResponseEntity<SimpleListResponse<NotificationResponse>> getUnseenNotification() {
 		return new ResponseEntity<>(notificationService.getUnseenNotifications(), HttpStatus.OK);
 	}

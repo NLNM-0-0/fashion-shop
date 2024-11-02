@@ -39,7 +39,7 @@ public class AdminSaleReportController {
 			responseCode = "200",
 			description = "Http Status is 200 OK"
 	)
-	@PreAuthorize("hasAnyAuthority('ADMIN')")
+	@PreAuthorize("hasAnyAuthority('ADMIN', 'STAFF')")
 	public ResponseEntity<SaleReportResponse> findSaleReport(
 			@Valid FindSaleReportRequest request) {
 		return new ResponseEntity<>(saleReportService.findSaleReport(request), HttpStatus.OK);

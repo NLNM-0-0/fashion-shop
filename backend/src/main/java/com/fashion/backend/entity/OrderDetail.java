@@ -13,25 +13,13 @@ import lombok.NoArgsConstructor;
 @AllArgsConstructor
 @Entity
 @Table(
-		name = "order_detail",
-		uniqueConstraints = {@UniqueConstraint(
-				columnNames = {"order_id", "item_id"},
-				name = "Order detail"
-		)}
+		name = "order_detail"
 )
 public class OrderDetail {
 
 	@Id
 	@GeneratedValue(strategy = GenerationType.IDENTITY)
 	private Long id;
-
-//	@ManyToOne
-//	@JoinColumn(
-//			name = "order_id",
-//			nullable = false,
-//			updatable = false
-//	)
-//	private Order order;
 
 	@ManyToOne
 	@JoinColumn(

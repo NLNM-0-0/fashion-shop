@@ -101,13 +101,11 @@ public class AuthenticationService {
 									.password(passwordEncoder.encode(request.getPassword()))
 									.isDeleted(false)
 									.isVerified(false)
-									.userGroup(null)
+									.isAdmin(false)
 									.build();
 		userAuth = userAuthRepository.save(userAuth);
 
 		User user = User.builder()
-						.id(userAuth.getId())
-						.userAuth(userAuth)
 						.email(request.getEmail())
 						.name(request.getName())
 						.phone(null)
@@ -115,6 +113,7 @@ public class AuthenticationService {
 						.address(request.getAddress())
 						.male(request.getMale())
 						.dob(request.getDob())
+						.userAuth(userAuth)
 						.build();
 
 		userRepository.save(user);

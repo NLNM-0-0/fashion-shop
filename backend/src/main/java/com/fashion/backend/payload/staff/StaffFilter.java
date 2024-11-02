@@ -32,30 +32,10 @@ public class StaffFilter {
 	private String email;
 
 	@Schema(
-			name = "phone",
-			example = "0123456789"
+			name = "admin",
+			example = "false"
 	)
-	@Length(
-			max = 11,
-			message = Message.User.PHONE_FILTER_VALIDATE
-	)
-	private String phone;
-
-	@Schema(
-			name = "userGroup",
-			example = "Tên nhóm người dùng"
-	)
-	@Length(
-			max = 100,
-			message = Message.UserGroup.USER_GROUP_NAME_FILTER_VALIDATE
-	)
-	private String userGroup;
-
-	@Schema(
-			name = "userGroupId",
-			example = "1"
-	)
-	private Long userGroupId;
+	private Boolean admin;
 
 	@Schema(
 			name = "male",

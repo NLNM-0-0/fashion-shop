@@ -41,6 +41,7 @@ public class AdminNotificationController {
 			responseCode = "200",
 			description = "Http Status is 200 OK"
 	)
+	@PreAuthorize("hasAnyAuthority('ADMIN', 'STAFF')")
 	public ResponseEntity<ListResponse<NotificationResponse, NotificationFilter>> getNotifications(
 			@Valid AppPageRequest page,
 			@Valid NotificationFilter filter) {
@@ -59,6 +60,7 @@ public class AdminNotificationController {
 			responseCode = "200",
 			description = "Http Status is 200 OK"
 	)
+	@PreAuthorize("hasAnyAuthority('ADMIN', 'STAFF')")
 	public ResponseEntity<ListResponse<NotificationResponse, NotificationFilter>> getNotificationsAndMakeItSeen(
 			@Valid AppPageRequest page,
 			@Valid NotificationFilter filter) {
@@ -79,7 +81,7 @@ public class AdminNotificationController {
 			responseCode = "201",
 			description = "Http Status is 201 CREATED"
 	)
-	@PreAuthorize("hasAnyAuthority('ADMIN', 'NOTI')")
+	@PreAuthorize("hasAnyAuthority('ADMIN', 'STAFF')")
 	public ResponseEntity<SimpleResponse> sendNotification(@Valid @RequestBody CreateNotificationRequest request) {
 		return new ResponseEntity<>(notificationService.sendNotification(request), HttpStatus.OK);
 	}
@@ -96,6 +98,7 @@ public class AdminNotificationController {
 			responseCode = "200",
 			description = "Http Status is 200 OK"
 	)
+	@PreAuthorize("hasAnyAuthority('ADMIN', 'STAFF')")
 	public ResponseEntity<NotificationResponse> seeNotification(@PathVariable Long id) {
 		return new ResponseEntity<>(notificationService.seeNotification(id), HttpStatus.OK);
 	}
@@ -112,6 +115,7 @@ public class AdminNotificationController {
 			responseCode = "200",
 			description = "Http Status is 200 OK"
 	)
+	@PreAuthorize("hasAnyAuthority('ADMIN', 'STAFF')")
 	public ResponseEntity<SimpleResponse> seeAllNotifications() {
 		return new ResponseEntity<>(notificationService.seeAllNotification(), HttpStatus.OK);
 	}
@@ -128,6 +132,7 @@ public class AdminNotificationController {
 			responseCode = "200",
 			description = "Http Status is 200 OK"
 	)
+	@PreAuthorize("hasAnyAuthority('ADMIN', 'STAFF')")
 	public ResponseEntity<NumberNotificationNotSeenResponse> getNumberUnseenNotification() {
 		return new ResponseEntity<>(notificationService.getNumberUnseenNotification(), HttpStatus.OK);
 	}
@@ -144,6 +149,7 @@ public class AdminNotificationController {
 			responseCode = "200",
 			description = "Http Status is 200 OK"
 	)
+	@PreAuthorize("hasAnyAuthority('ADMIN', 'STAFF')")
 	public ResponseEntity<SimpleListResponse<NotificationResponse>> getUnseenNotification() {
 		return new ResponseEntity<>(notificationService.getUnseenNotifications(), HttpStatus.OK);
 	}
