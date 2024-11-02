@@ -18,5 +18,5 @@ public interface UserAuthRepository extends JpaRepository<UserAuth, Long> {
 
 	@Modifying
 	@Query("UPDATE UserAuth u SET u.isDeleted = true WHERE u.id = :userId")
-	void deleteUserById(Long userId);
+	void deleteUserAuthById(Long userId);
 }

@@ -41,4 +41,9 @@ public interface UserRepository extends JpaRepository<User, Long>, JpaSpecificat
 												.and(CustomerSpecs.isNormalUser());
 		return findAll(specs.and(spec), pageable);
 	}
+
+	default Page<User> findAllHasPhone(Specification<User> specs, Pageable pageable) {
+		Specification<User> spec = CustomerSpecs.isNormalUser();
+		return findAll(specs.and(spec), pageable);
+	}
 }

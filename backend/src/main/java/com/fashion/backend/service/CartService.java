@@ -4,7 +4,6 @@ import com.fashion.backend.constant.Message;
 import com.fashion.backend.entity.Cart;
 import com.fashion.backend.entity.Item;
 import com.fashion.backend.entity.User;
-import com.fashion.backend.entity.UserAuth;
 import com.fashion.backend.exception.AppException;
 import com.fashion.backend.payload.SimpleListResponse;
 import com.fashion.backend.payload.SimpleResponse;
@@ -24,6 +23,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
+import java.util.Optional;
 
 @Service
 @RequiredArgsConstructor
@@ -35,11 +35,11 @@ public class CartService {
 
 	@Transactional
 	public SimpleListResponse<CartDetailResponse> getCart() {
-		UserAuth userAuth = Common.findCurrUserAuth(userAuthRepository);
+		User user = Common.findCurrUser(userRepository, userAuthRepository);
 
 		List<Cart> cartDetails = cartRepository.findAllByUserId(
-				userAuth.getId(),
-				Sort.by(Sort.Direction.DESC, "createdAt"));
+				user.getId(),
+				Sort.by(Sort.Direction.DESC, "updatedAt"));
 
 		List<CartDetailResponse> data = cartDetails.stream().map(this::mapToDTO).toList();
 
@@ -50,19 +50,19 @@ public class CartService {
 
 	@Transactional
 	public NumberNotificationNotSeenResponse getNumberCartItems() {
-		UserAuth currUserAuth = Common.findCurrUserAuth(userAuthRepository);
+		User user = Common.findCurrUser(userRepository, userAuthRepository);
 
 		return NumberNotificationNotSeenResponse.builder()
 												.number(cartRepository.countByUserId(
-														currUserAuth.getId()))
+														user.getId()))
 												.build();
 	}
 
 	@Transactional
 	public SimpleResponse deleteCartItem(Long itemId) {
-		UserAuth userAuth = Common.findCurrUserAuth(userAuthRepository);
+		User user = Common.findCurrUser(userRepository, userAuthRepository);
 
-		Cart cart = cartRepository.findFirstByUserIdAndItemId(userAuth.getId(), itemId)
+		Cart cart = cartRepository.findFirstByUserIdAndItemId(user.getId(), itemId)
 								  .orElseThrow(() -> new AppException(HttpStatus.BAD_REQUEST,
 																	  Message.Cart.ITEM_NOT_IN_CART));
 
@@ -73,16 +73,23 @@ public class CartService {
 
 	@Transactional
 	public SimpleResponse addCartItem(AddToCartRequest request) {
-		UserAuth userAuth = Common.findCurrUserAuth(userAuthRepository);
-		User user = Common.findUserById(userAuth.getId(), userRepository);
+		User user = Common.findCurrUser(userRepository, userAuthRepository);
 
 		Item item = Common.findItemById(request.getItemId(), itemRepository);
 
-		Cart cartItem = Cart.builder()
-							.item(item)
-							.user(user)
-							.quantity(request.getQuantity())
-							.build();
+		Optional<Cart> cartItemOptional = cartRepository.findFirstByUserIdAndItemId(user.getId(), item.getId());
+
+		Cart cartItem;
+		if (cartItemOptional.isEmpty()) {
+			cartItem = Cart.builder()
+						   .item(item)
+						   .user(user)
+						   .quantity(request.getQuantity())
+						   .build();
+		} else {
+			cartItem = cartItemOptional.get();
+			cartItem.setQuantity(request.getQuantity() + cartItem.getQuantity());
+		}
 
 		cartRepository.save(cartItem);
 
@@ -95,9 +102,9 @@ public class CartService {
 			return new SimpleResponse();
 		}
 
-		UserAuth userAuth = Common.findCurrUserAuth(userAuthRepository);
+		User user = Common.findCurrUser(userRepository, userAuthRepository);
 
-		Cart cart = cartRepository.findFirstByUserIdAndItemId(userAuth.getId(), itemId)
+		Cart cart = cartRepository.findFirstByUserIdAndItemId(user.getId(), itemId)
 								  .orElseThrow(() -> new AppException(HttpStatus.BAD_REQUEST,
 																	  Message.Cart.ITEM_NOT_IN_CART));
 		if (cart.getItem().isDeleted()) {
@@ -109,6 +116,7 @@ public class CartService {
 			throw new AppException(HttpStatus.BAD_REQUEST, Message.Cart.QUANTITY_MIN_VALIDATE);
 		} else if (cart.getQuantity() == 0) {
 			cartRepository.delete(cart);
+			return new SimpleResponse();
 		}
 
 		cartRepository.save(cart);
@@ -119,7 +127,7 @@ public class CartService {
 	private CartDetailResponse mapToDTO(Cart cart) {
 		return CartDetailResponse.builder()
 								 .id(cart.getId())
-								 .createdAt(cart.getCreatedAt())
+								 .updatedAt(cart.getUpdatedAt())
 								 .quantity(cart.getQuantity())
 								 .item(mapToDTO(cart.getItem()))
 								 .build();

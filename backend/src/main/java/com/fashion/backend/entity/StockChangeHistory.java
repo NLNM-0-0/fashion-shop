@@ -8,6 +8,7 @@ import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 import org.springframework.data.annotation.CreatedDate;
+import org.springframework.data.jpa.domain.support.AuditingEntityListener;
 
 import java.util.Date;
 
@@ -19,6 +20,7 @@ import java.util.Date;
 @Table(
 		name = "stock_change_history"
 )
+@EntityListeners(AuditingEntityListener.class)
 public class StockChangeHistory {
 	@Id
 	@GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -33,7 +35,6 @@ public class StockChangeHistory {
 	private Item item;
 
 	@Column(name = "quantity")
-	@Min(0)
 	private int quantity;
 
 	@Column(name = "quantity_left")

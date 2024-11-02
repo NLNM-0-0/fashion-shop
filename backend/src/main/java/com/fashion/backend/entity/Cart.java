@@ -4,6 +4,8 @@ import io.swagger.v3.oas.annotations.media.Schema;
 import jakarta.persistence.*;
 import jakarta.validation.constraints.Min;
 import lombok.*;
+import org.springframework.data.annotation.LastModifiedDate;
+import org.springframework.data.jpa.domain.support.AuditingEntityListener;
 
 import java.util.Date;
 
@@ -15,10 +17,11 @@ import java.util.Date;
 @Table(
 		name = "cart",
 		uniqueConstraints = {@UniqueConstraint(
-				columnNames = {"user_id, item_id"},
+				columnNames = {"user_id", "item_id"},
 				name = "Cart item"
 		)}
 )
+@EntityListeners(AuditingEntityListener.class)
 public class Cart {
 	@Getter @Id @GeneratedValue(strategy = GenerationType.IDENTITY) private Long id;
 
@@ -42,6 +45,7 @@ public class Cart {
 	@Min(0)
 	private int quantity;
 
-	@Schema(name = "createdAt")
-	private Date createdAt;
+	@LastModifiedDate
+	@Schema(name = "updatedAt")
+	private Date updatedAt;
 }

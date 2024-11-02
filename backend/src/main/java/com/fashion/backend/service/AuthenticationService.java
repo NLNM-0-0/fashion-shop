@@ -48,7 +48,7 @@ public class AuthenticationService {
 				)
 		);
 
-		UserAuth userAuth = Common.findAvailableUserAuth(request.getPhone(), true, userAuthRepository);
+		UserAuth userAuth = Common.findAvailableUserAuth(request.getPhone(), false, userAuthRepository);
 		String jwtToken = jwtService.generateToken(userAuth);
 		return AuthenticationResponse.builder().token(jwtToken).expired(jwtService.extractExpiration(jwtToken)).build();
 	}
@@ -96,6 +96,8 @@ public class AuthenticationService {
 			throw new AppException(HttpStatus.BAD_REQUEST, Message.USER_EXISTED);
 		}
 
+		handleImage(request);
+
 		UserAuth userAuth = UserAuth.builder()
 									.phone(request.getPhone())
 									.password(passwordEncoder.encode(request.getPassword()))
@@ -121,6 +123,12 @@ public class AuthenticationService {
 		return new SimpleResponse();
 	}
 
+	private void handleImage(RegisterRequest request) {
+		if (request.getImage().isEmpty()) {
+			request.setImage(ApplicationConst.DEFAULT_AVATAR);
+		}
+	}
+
 	@Transactional
 	public SimpleResponse resetPasswordByEmail(ResetPasswordRequest request, String token) {
 		PasswordResetToken passwordResetToken = passwordResetTokenRepository.findByToken(token)
@@ -140,9 +148,11 @@ public class AuthenticationService {
 	@Transactional
 	public SimpleResponse sendOtpToResetPassword(PhoneRequest request) {
 		UserAuth userAuth = Common.findUserAuthByPhone(request.getPhone(), userAuthRepository);
+		User user = Common.findUserByUserAuth(userAuth.getId(), userRepository);
+
+		Optional<OTP> otp = otpRepository.findByUser(user.getId());
 
 		String otpNumber = OTP.generateOTP();
-		Optional<OTP> otp = otpRepository.findByUser(userAuth.getId());
 		OTP newOtp;
 
 		if (otp.isPresent() && !userAuth.isVerified()) {
@@ -165,8 +175,9 @@ public class AuthenticationService {
 	@Transactional
 	public SimpleResponse verifiedOTP(OtpVerifyRequest request) {
 		UserAuth userAuth = Common.findUserAuthByPhone(request.getPhone(), userAuthRepository);
+		User user = Common.findUserByUserAuth(userAuth.getId(), userRepository);
 
-		OTP otp = otpRepository.findByUser(userAuth.getId())
+		OTP otp = otpRepository.findByUser(user.getId())
 							   .orElseThrow(() -> new AppException(HttpStatus.BAD_REQUEST, Message.OTP_NOT_EXIST));
 
 		if (!otp.isValid()) {
@@ -179,8 +190,9 @@ public class AuthenticationService {
 	@Transactional
 	public SimpleResponse resetPasswordByOTP(OtpResetPasswordRequest request) {
 		UserAuth userAuth = Common.findUserAuthByPhone(request.getPhone(), userAuthRepository);
+		User user = Common.findUserByUserAuth(userAuth.getId(), userRepository);
 
-		OTP otp = otpRepository.findByUser(userAuth.getId())
+		OTP otp = otpRepository.findByUser(user.getId())
 							   .orElseThrow(() -> new AppException(HttpStatus.BAD_REQUEST, Message.OTP_NOT_EXIST));
 
 		if (!otp.isValid()) {

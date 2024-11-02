@@ -2,7 +2,6 @@ package com.fashion.backend.service;
 
 import com.fashion.backend.constant.Message;
 import com.fashion.backend.entity.User;
-import com.fashion.backend.entity.UserAuth;
 import com.fashion.backend.exception.AppException;
 import com.fashion.backend.payload.ListResponse;
 import com.fashion.backend.payload.SimpleResponse;
@@ -34,13 +33,13 @@ public class CustomerService {
 
 	@Transactional
 	public SimpleResponse deleteCustomer(Long customerId) {
-		UserAuth userAuth = Common.findUserAuthById(customerId, userAuthRepository);
+		User user = Common.findUserById(customerId, userRepository);
 
-		if (AuthHelper.isNormalUser(userAuth)) {
-			throw new AppException(HttpStatus.BAD_REQUEST, Message.User.CAN_NOT_BE_LIKE_STAFF);
+		if (AuthHelper.isStaff(user.getUserAuth())) {
+			throw new AppException(HttpStatus.BAD_REQUEST, Message.User.CAN_NOT_REACH_STAFF);
 		}
 
-		userAuthRepository.deleteUserById(customerId);
+		userAuthRepository.deleteUserAuthById(user.getUserAuth().getId());
 
 		return new SimpleResponse();
 	}
@@ -52,7 +51,7 @@ public class CustomerService {
 										   Sort.by(Sort.Direction.ASC, "name"));
 		Specification<User> spec = filterCustomers(filter);
 
-		Page<User> userPage = userRepository.findAll(spec, pageable);
+		Page<User> userPage = userRepository.findAllHasPhone(spec, pageable);
 
 		return getListResponseFromPage(userPage, page, filter);
 	}
@@ -78,7 +77,7 @@ public class CustomerService {
 
 
 	@Transactional
-	public ListResponse<CustomerResponse, CustomerFilter> getStaffs(AppPageRequest page, CustomerFilter filter) {
+	public ListResponse<CustomerResponse, CustomerFilter> getCustomers(AppPageRequest page, CustomerFilter filter) {
 		Pageable pageable = PageRequest.of(page.getPage() - 1,
 										   page.getLimit(),
 										   Sort.by(Sort.Direction.ASC, "name"));
@@ -91,13 +90,11 @@ public class CustomerService {
 
 	@Transactional
 	public CustomerResponse getCustomer(Long id) {
-		UserAuth userAuth = Common.findUserAuthById(id, userAuthRepository);
-
-		if (AuthHelper.isNormalUser(userAuth)) {
-			throw new AppException(HttpStatus.BAD_REQUEST, Message.User.CAN_NOT_BE_LIKE_STAFF);
-		}
-
 		User user = Common.findUserById(id, userRepository);
+
+		if (AuthHelper.isStaff(user.getUserAuth())) {
+			throw new AppException(HttpStatus.BAD_REQUEST, Message.User.CAN_NOT_REACH_STAFF);
+		}
 
 		return mapToDTO(user);
 	}
@@ -122,7 +119,7 @@ public class CustomerService {
 							   .name(user.getName())
 							   .email(user.getEmail())
 							   .image(user.getImage())
-							   .phone(user.getPhone())
+							   .phone(user.getUserAuth().getPhone())
 							   .dob(user.getDob())
 							   .address(user.getAddress())
 							   .male(user.isMale())
