@@ -3,7 +3,7 @@
 @tailwind utilities;
 
 body {
-  font-family: Arial, Helvetica, sans-serif;
+  font-family: Helvetica, sans-serif;
 }
 
 @layer utilities {
@@ -75,4 +75,20 @@ body {
   body {
     @apply bg-background text-foreground;
   }
+}
+
+.error___message {
+  @apply text-sm text-red-700;
+}
+
+.sidebar__logo {
+  @apply w-12 h-12 object-contain rounded-md;
+}
+
+.sidebar__list {
+  @apply list-none;
+}
+
+.sidebar__icon {
+  @apply w-6 h-6 inline-block;
 }
