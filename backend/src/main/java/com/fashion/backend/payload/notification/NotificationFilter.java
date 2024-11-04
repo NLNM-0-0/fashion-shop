@@ -14,24 +14,22 @@ import lombok.NoArgsConstructor;
 @Builder
 public class NotificationFilter {
 	@Schema(
-			name = "sender",
-			example = "1"
+			name = "senderName",
+			example = "Tên nhân viên"
 	)
-	private String sender;
+	private String senderName;
 
 	@Schema(
-			name = "fromDate",
-			example = "12/12/2000"
+			name = "timeFrom",
+			example = "1701388800"
 	)
-	@ValidDDMMYYYYFormat(message = Message.DATE_VALIDATE)
-	private String fromDate;
+	private Integer timeFrom;
 
 	@Schema(
-			name = "toDate",
-			example = "12/12/2000"
+			name = "timeTo",
+			example = "1704067199"
 	)
-	@ValidDDMMYYYYFormat(message = Message.DATE_VALIDATE)
-	private String toDate;
+	private Integer timeTo;
 
 	@Schema(
 			name = "seen",
