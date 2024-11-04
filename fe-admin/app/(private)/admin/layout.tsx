@@ -4,6 +4,8 @@ import Sidebar from "@/components/sidebar";
 import HeaderMobile from "@/components/header-mobile";
 import { Helvetica } from "@/lib/fonts";
 import { Toaster } from "@/components/ui/toaster";
+import SWRProvider from "@/components/auth/swr-provider";
+import { AuthProvider } from "@/components/auth/auth-context";
 
 export const metadata: Metadata = {
   title: "Fashion Admin",
@@ -25,11 +27,19 @@ export default function RootLayout({
     <html lang="en">
       <body className={`${Helvetica.className}  antialiased flex h-full`}>
         <>
-          <Sidebar />
+          <SWRProvider>
+            <AuthProvider>
+              <Sidebar />
+            </AuthProvider>
+          </SWRProvider>
           <main className="flex flex-1">
             <div className="flex w-full flex-col overflow-y-hidden">
               {/* <Header /> */}
-              <HeaderMobile />
+              <SWRProvider>
+                <AuthProvider>
+                  <HeaderMobile />
+                </AuthProvider>
+              </SWRProvider>
               <div className="md:p-10 p-4 md:mt-0 mt-12 overflow-auto">
                 {children}
               </div>
