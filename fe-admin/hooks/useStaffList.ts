@@ -6,7 +6,7 @@ export const useStaffList = () => {
   const { filters, filtersReady, updateFilter, resetFilters, removeFilter } =
     useFilteredList();
   const { data, isLoading, error, mutate } = useSWR(
-    filtersReady.current ? filters : null,
+    filtersReady.current ? `staff-${JSON.stringify(filters)}` : null,
     () => getAllStaff(filters),
     {
       revalidateOnFocus: false,
