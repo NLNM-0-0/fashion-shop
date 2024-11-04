@@ -70,14 +70,14 @@ public class NotificationService {
 
 	private Specification<Notification> filterNotifications(Long receiverId, NotificationFilter filter) {
 		Specification<Notification> spec = NotificationSpecs.hasReceiver(receiverId.toString());
-		if (filter.getSender() != null) {
-			spec = spec.and(NotificationSpecs.hasSender(filter.getSender()));
+		if (filter.getSenderName() != null) {
+			spec = spec.and(NotificationSpecs.hasSenderName(filter.getSenderName()));
 		}
-		if (filter.getFromDate() != null) {
-			spec = spec.and(NotificationSpecs.isDateCreatedAfter(filter.getFromDate()));
+		if (filter.getTimeFrom() != null) {
+			spec = spec.and(NotificationSpecs.isDateCreatedAfter(filter.getTimeFrom()));
 		}
-		if (filter.getToDate() != null) {
-			spec = spec.and(NotificationSpecs.isDateCreatedBefore(filter.getToDate()));
+		if (filter.getTimeTo() != null) {
+			spec = spec.and(NotificationSpecs.isDateCreatedBefore(filter.getTimeTo()));
 		}
 		if (filter.getSeen() != null) {
 			spec = spec.and(NotificationSpecs.hasSeen(filter.getSeen()));

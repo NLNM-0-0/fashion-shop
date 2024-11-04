@@ -22,30 +22,21 @@ public class NotificationSpecs {
 		return (root, query, cb) -> cb.equal(root.get("toUser").get("id"), receiverId);
 	}
 
-	public static Specification<Notification> hasSender(String senderId) {
-		return (root, query, cb) -> cb.equal(root.get("fromUser").get("id"), senderId);
+	public static Specification<Notification> hasSenderName(String name) {
+		return (root, query, cb) -> cb.equal(root.get("fromUser").get("name"), name);
 	}
 
-	public static Specification<Notification> isDateCreatedAfter(String from) {
-		Date fromDate;
-		try {
-			fromDate = Date.valueOf(LocalDate.parse(from,
-													DateTimeFormatter.ofPattern("dd/MM/yyyy")));
-		} catch (Exception e) {
-			throw new AppException(HttpStatus.BAD_REQUEST, Message.TIME_INVALID_FORMAT_DD_MM_YYYY);
-		}
-		return (root, query, cb) -> cb.greaterThanOrEqualTo(root.get("createdAt"), fromDate);
+	public static Specification<Notification> isDateCreatedAfter(Integer timeFrom) {
+		return (root, query, cb) -> {
+			Date timeFromDate = new Date((long) timeFrom * 1000);
+			return cb.greaterThanOrEqualTo(root.get("createdAt"), timeFromDate);
+		};
 	}
 
-	public static Specification<Notification> isDateCreatedBefore(String to) {
-		Timestamp toDate;
-		try {
-			LocalDate date = LocalDate.parse(to, DateTimeFormatter.ofPattern("dd/MM/yyyy"));
-			LocalDateTime endOfDay = date.atTime(LocalTime.MAX);
-			toDate = Timestamp.valueOf(endOfDay);
-		} catch (Exception e) {
-			throw new AppException(HttpStatus.BAD_REQUEST, Message.TIME_INVALID_FORMAT_DD_MM_YYYY);
-		}
-		return (root, query, cb) -> cb.lessThanOrEqualTo(root.get("createdAt"), toDate);
+	public static Specification<Notification> isDateCreatedBefore(Integer timeTo) {
+		return (root, query, cb) -> {
+			Date timeToDate = new Date((long) timeTo * 1000);
+			return cb.lessThanOrEqualTo(root.get("createdAt"), timeToDate);
+		};
 	}
 }
