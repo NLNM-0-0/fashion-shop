@@ -9,9 +9,12 @@ import { usePathname } from "next/navigation";
 import { LuChevronDown } from "react-icons/lu";
 import { SidebarItem } from "@/lib/types";
 import { sidebarItems } from "@/lib/constants";
+import { useAuth } from "./auth/auth-context";
+import Profile from "./profile/profile";
 
 export default function Sidebar() {
   const [isCollapse, toggleIsCollapse] = useState(false);
+  const { user } = useAuth();
 
   const toggleSidebarHandler = () => {
     toggleIsCollapse((prev) => !prev);
@@ -20,7 +23,7 @@ export default function Sidebar() {
   return (
     <div className="md:flex hidden z-20">
       <aside
-        className={`bg-white h-screen p-1 transition-all shadow-md overflow-auto ${
+        className={`bg-white relative h-screen p-1 transition-all shadow-md overflow-y-auto overflow-x-hidden ${
           isCollapse ? "w-[3.8rem]" : "w-64"
         }`}
       >
@@ -61,13 +64,36 @@ export default function Sidebar() {
           </div>
 
           <ul className="sidebar__list">
-            {sidebarItems.map((item) => (
-              <li className="sidebar__item" key={item.title}>
-                <MenuItem item={item} isCollapse={isCollapse}></MenuItem>
-              </li>
-            ))}
+            {sidebarItems.map((item) => {
+              {
+                if (item.title === "Staffs" && !user?.admin) {
+                  return null;
+                } else {
+                  return (
+                    <li className="sidebar__item" key={item.title}>
+                      <MenuItem item={item} isCollapse={isCollapse}></MenuItem>
+                    </li>
+                  );
+                }
+              }
+            })}
           </ul>
         </nav>
+        <div
+          className={`absolute px-1 bottom-10 flex items-center  ${
+            isCollapse ? "justify-center" : "justify-start"
+          }`}
+        >
+          <Profile>
+            <span
+              className={`ml-2 text-lg overflow-hidden cursor-pointer ${
+                isCollapse ? "hidden opacity-0" : "block opacity-100"
+              }`}
+            >
+              Profile
+            </span>
+          </Profile>
+        </div>
       </aside>
     </div>
   );

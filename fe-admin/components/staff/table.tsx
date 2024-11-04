@@ -27,6 +27,9 @@ import { FormFilterValues, Staff } from "@/lib/types";
 import { staffFilterValues } from "@/lib/constants";
 import { useStaffList } from "@/hooks/useStaffList";
 import Filter from "../filter/filter";
+import CreateStaffDialog from "./create-staff";
+import EditStaffDialog from "./edit-staff";
+import DeleteStaff from "./delete-staff";
 
 export const columns: ColumnDef<Staff>[] = [
   {
@@ -63,19 +66,17 @@ export const columns: ColumnDef<Staff>[] = [
     ),
   },
   {
-    accessorKey: "phone",
+    accessorKey: "actions",
     header: () => {
-      return <div className="font-semibold flex justify-end">Phone</div>;
+      return <div className="font-semibold">Actions</div>;
     },
-    cell: ({ row }) => (
-      <div className="text-right">{row.getValue("phone")}</div>
-    ),
+    cell: () => <></>,
   },
 ];
 
 export function StaffTable() {
   const router = useRouter();
-  const { filters, data, isLoading, error } = useStaffList();
+  const { filters, data, isLoading, error, mutate } = useStaffList();
 
   const staffs: Staff[] = data?.data.data || [];
   const table = useReactTable({
@@ -105,6 +106,10 @@ export function StaffTable() {
   } else
     return (
       <div className="w-full">
+        <div className="flex justify-between items-center">
+          <h1 className="lg:text-3xl text-2xl">Manage Staff</h1>
+          <CreateStaffDialog onAdded={() => void mutate()} />
+        </div>
         <Filter
           title="Filter staffs"
           filters={filters}
@@ -142,14 +147,27 @@ export function StaffTable() {
                     key={row.id}
                     data-state={row.getIsSelected() && "selected"}
                   >
-                    {row.getVisibleCells().map((cell) => (
-                      <TableCell key={cell.id}>
-                        {flexRender(
-                          cell.column.columnDef.cell,
-                          cell.getContext()
-                        )}
-                      </TableCell>
-                    ))}
+                    {row.getVisibleCells().map((cell) =>
+                      cell.id.includes("actions") ? (
+                        <div key={cell.id} className="flex py-2 gap-2">
+                          <EditStaffDialog
+                            staff={row.original}
+                            onAdded={() => void mutate()}
+                          />
+                          <DeleteStaff
+                            id={row.original.id}
+                            onDelete={() => void mutate()}
+                          />
+                        </div>
+                      ) : (
+                        <TableCell key={cell.id}>
+                          {flexRender(
+                            cell.column.columnDef.cell,
+                            cell.getContext()
+                          )}
+                        </TableCell>
+                      )
+                    )}
                   </TableRow>
                 ))
               ) : (

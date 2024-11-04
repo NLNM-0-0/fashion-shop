@@ -1,13 +1,13 @@
 import useSWR from "swr";
 import { useFilteredList } from "./useFilterList";
-import getAllStaff from "../lib/api/staff/getAllStaff";
+import getAllNotification from "@/lib/api/notification/getAllNotification";
 
-export const useStaffList = () => {
+export const useNotificationList = () => {
   const { filters, filtersReady, updateFilter, resetFilters, removeFilter } =
     useFilteredList();
   const { data, isLoading, error, mutate } = useSWR(
-    filtersReady.current ? `staff-${JSON.stringify(filters)}` : null,
-    () => getAllStaff(filters),
+    filtersReady.current ? `notification-${JSON.stringify(filters)}` : null,
+    () => getAllNotification(filters),
     {
       revalidateOnFocus: false,
     }

@@ -20,8 +20,10 @@ import GenderRadioButton from "../ui/gender-radio-button";
 import { Input } from "../ui/input";
 import { FilterInputType } from "@/lib/constants/enum";
 import { LuFilter } from "react-icons/lu";
-import { useEffect } from "react";
+import { useCallback, useEffect } from "react";
 import { FilterPopoverProps } from "./filter";
+import DaypickerPopup from "../ui/daypicker-popup";
+import { stringNumberToDate } from "@/lib/helpers/date";
 
 const FilterPopover = ({
   title,
@@ -49,7 +51,7 @@ const FilterPopover = ({
     onOpenChange(false);
   };
 
-  useEffect(() => {
+  const resetFilter = useCallback(() => {
     reset({
       filters: Object.entries(filters).map(([key, value]) => ({
         type: key,
@@ -58,11 +60,18 @@ const FilterPopover = ({
     });
   }, [filters, reset]);
 
+  useEffect(() => {
+    resetFilter();
+  }, [resetFilter]);
+
   return (
     <Popover
       open={open}
       onOpenChange={(open) => {
         onOpenChange(open);
+        if (open) {
+          resetFilter();
+        }
       }}
     >
       <PopoverTrigger asChild>
@@ -113,14 +122,14 @@ const FilterPopover = ({
                       min={1}
                       max={12}
                     ></Input>
-                  ) : filterItem?.inputType === FilterInputType.GENDER ? (
+                  ) : filterItem?.inputType === FilterInputType.BOOLEAN ? (
                     <Controller
                       control={control}
                       name={`filters.${index}.value`}
                       render={({ field }) => (
                         <div className="flex flex-1 gap-2">
                           <GenderRadioButton
-                            title="Male"
+                            title={filterItem.trueTitle ?? "True"}
                             value={true}
                             onSelect={(value) =>
                               field.onChange(value.toString())
@@ -129,7 +138,7 @@ const FilterPopover = ({
                             className="flex-1"
                           />
                           <GenderRadioButton
-                            title="Female"
+                            title={filterItem.falseTitle ?? "False"}
                             value={false}
                             onSelect={(value) =>
                               field.onChange(value.toString())
@@ -139,6 +148,24 @@ const FilterPopover = ({
                           />
                         </div>
                       )}
+                    />
+                  ) : filterItem?.inputType === FilterInputType.DATE ? (
+                    <Controller
+                      control={control}
+                      name={`filters.${index}.value`}
+                      render={({ field }) => {
+                        const dateObject = stringNumberToDate(field.value);
+                        return (
+                          <DaypickerPopup
+                            triggerClassname="flex-1 w-full"
+                            date={dateObject ?? new Date()}
+                            setDate={(date) => {
+                              const seconds = date?.valueOf();
+                              field.onChange(`${(seconds ?? 0) / 1000}`);
+                            }}
+                          />
+                        );
+                      }}
                     />
                   ) : null}
                   <Button

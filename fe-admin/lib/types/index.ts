@@ -18,7 +18,10 @@ export interface User {
   image: string;
   male: boolean;
 }
-
+export interface UserInfo extends User {
+  id: number;
+  admin: boolean;
+}
 export interface SignupUser extends User {
   password: string;
 }
@@ -27,8 +30,31 @@ export interface Customer extends User {
   id: number;
 }
 
-export interface Staff extends Customer {
+export interface Staff {
+  id: number;
+  email: string;
+  name: string;
+  dob: string;
+  address: string;
+  image: string;
+  male: boolean;
   admin: boolean;
+}
+
+export interface CreateStaffPayload {
+  email: string;
+  name: string;
+  dob: string;
+  address: string;
+  image: string;
+  male: boolean;
+  admin: boolean;
+}
+
+export interface CreateNotificationPayload {
+  title: string;
+  description: string;
+  receiver: number[];
 }
 
 export interface CustomerData {
@@ -40,10 +66,10 @@ export interface StaffData {
   data: Staff[];
   page: PagingType;
 }
-export interface Feature {
-  id: number;
-  code: string;
-  name: string;
+
+export interface NotificationData {
+  data: Notification[];
+  page: PagingType;
 }
 
 export interface LoginPayload {
@@ -64,6 +90,7 @@ export interface PagingType {
   index: number;
   limit: number;
   totalPages: 2;
+  totalElements: number;
 }
 
 export interface CustomerFilterParam extends PagingParam {
@@ -80,6 +107,13 @@ export interface StaffFilterParam extends PagingParam {
   monthDOB?: number;
   yearDOB?: number;
 }
+
+export interface NotiFilterParam extends PagingParam {
+  sender?: string;
+  fromDate?: string;
+  toDate?: string;
+  seen?: boolean;
+}
 export interface FormFilterItem {
   type: string;
   value: string;
@@ -89,8 +123,44 @@ export interface FormFilterType {
   type: string;
   title: string;
   inputType: FilterInputType;
+  trueTitle?: string;
+  falseTitle?: string;
 }
 
 export interface FormFilterValues {
   filters: FormFilterItem[];
+}
+
+export interface ChangePasswordPayload {
+  oldPassword: string;
+  newPassword: string;
+}
+
+export interface ApiError {
+  timestamp: string;
+  status: string;
+  message: string;
+  detail: string;
+}
+
+export interface Notification {
+  id: number;
+  title: string;
+  description: string;
+  from: {
+    id: number;
+    email: string;
+    phone: string;
+    name: string;
+    image: string;
+  };
+  to: {
+    id: number;
+    email: string;
+    phone: string;
+    name: string;
+    image: string;
+  };
+  createdAt: number;
+  seen: boolean;
 }

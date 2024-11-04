@@ -5,8 +5,9 @@ import { useFilteredList } from "./useFilterList";
 export const useCustomerList = () => {
   const { filters, updateFilter, resetFilters, removeFilter } =
     useFilteredList();
-  const { data, isLoading, error, mutate } = useSWR(filters, () =>
-    getAllCustomer(filters)
+  const { data, isLoading, error, mutate } = useSWR(
+    `customer-${JSON.stringify(filters)}`,
+    () => getAllCustomer(filters)
   );
 
   return {
