@@ -34,7 +34,7 @@ public class NotificationResponse {
 	private SimpleNotiUserResponse to;
 
 	@Schema(name = "createdAt")
-	private Date createdAt;
+	private long createdAt;
 
 	@Schema(name = "seen")
 	private Boolean seen;
