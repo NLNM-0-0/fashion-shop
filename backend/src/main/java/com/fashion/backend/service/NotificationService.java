@@ -154,7 +154,7 @@ public class NotificationService {
 								   .from(mapToDTO(notification.getFromUser()))
 								   .to(mapToDTO(notification.getToUser()))
 								   .seen(notification.isSeen())
-								   .createdAt(TimeHelper.plus7Hours(notification.getCreatedAt()))
+								   .createdAt(TimeHelper.convertDateToNumber(notification.getCreatedAt()))
 								   .build();
 	}
 
