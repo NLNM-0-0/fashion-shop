@@ -26,7 +26,7 @@ export const customerFilterValues: FormFilterType[] = [
 export const staffFilterValues: FormFilterType[] = [
   { type: "name", title: "Name", inputType: FilterInputType.TEXT },
   { type: "email", title: "Email", inputType: FilterInputType.TEXT },
-  { type: "male", title: "Gender", inputType: FilterInputType.GENDER },
+  { type: "male", title: "Gender", inputType: FilterInputType.BOOLEAN, trueTitle: "Male", falseTitle: "Female" },
   {
     type: "monthDOB",
     title: "Month of birth",
@@ -37,4 +37,11 @@ export const staffFilterValues: FormFilterType[] = [
     title: "Year of birth",
     inputType: FilterInputType.YEAR,
   },
+];
+
+export const notiFilterValues: FormFilterType[] = [
+  { type: "sender", title: "Sender Name", inputType: FilterInputType.TEXT },
+  { type: "fromDate", title: "From Date", inputType: FilterInputType.DATE },
+  { type: "toDate", title: "To Date", inputType: FilterInputType.DATE },
+  { type: "seen", title: "Seen", inputType: FilterInputType.BOOLEAN, trueTitle:"Seen", falseTitle:"Not Seen" },
 ];

@@ -2,6 +2,9 @@ import { FilterParams } from "@/hooks/useFilterList";
 import { FormFilterType, FormFilterValues } from "@/lib/types";
 import FilterPopover from "./filter-popover";
 import { FilterInputType } from "@/lib/constants/enum";
+import { stringNumberToDate } from "@/lib/helpers/date";
+import { format } from "date-fns";
+import { vi } from "date-fns/locale";
 
 export interface FilterPopoverProps {
   title: string;
@@ -26,12 +29,21 @@ const Filter = ({ ...props }: FilterPopoverProps) => {
               className="rounded-xl flex self-start px-3 py-2 h-fit outline-none text-sm text-primary bg-gray-200 items-center gap-1 group"
             >
               <span>
-                {filterItem?.title}
-                {": "}
-                {filterItem?.inputType === FilterInputType.GENDER
+                {filterItem?.inputType !== FilterInputType.BOOLEAN && (
+                  <>
+                    {filterItem?.title}
+                    {": "}
+                  </>
+                )}
+
+                {filterItem?.inputType === FilterInputType.BOOLEAN
                   ? value === "true"
-                    ? "Male"
-                    : "Female"
+                    ? filterItem.trueTitle
+                    : filterItem.falseTitle
+                  : filterItem?.inputType === FilterInputType.DATE
+                  ? format(stringNumberToDate(value), "dd/MM/yyyy", {
+                      locale: vi,
+                    })
                   : value}
               </span>
             </div>
