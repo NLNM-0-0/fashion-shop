@@ -139,7 +139,7 @@ public class Common {
 
 		String email = Common.getCurrUserName();
 
-		if (!notification.getToUser().getEmail().equals(email)) {
+		if (!notification.getToUser().getUserAuth().getEmail().equals(email)) {
 			throw new AppException(HttpStatus.BAD_REQUEST, Message.Notification.CAN_NOT_READ_OTHER_S_NOTIFICATION);
 		}
 
