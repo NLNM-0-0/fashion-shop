@@ -6,6 +6,7 @@ import { Helvetica } from "@/lib/fonts";
 import { Toaster } from "@/components/ui/toaster";
 import SWRProvider from "@/components/auth/swr-provider";
 import { AuthProvider } from "@/components/auth/auth-context";
+import { LoadingSpinner } from "@/components/loading-spinner";
 
 export const metadata: Metadata = {
   title: "Fashion Admin",
@@ -27,6 +28,7 @@ export default function RootLayout({
     <html lang="en">
       <body className={`${Helvetica.className}  antialiased flex h-full`}>
         <>
+          <LoadingSpinner />
           <SWRProvider>
             <AuthProvider>
               <Sidebar />
