@@ -65,6 +65,6 @@ public class Order {
 	private Date createdAt;
 
 	@LastModifiedDate
-	@Schema(name = "updatedAt")
+	@Schema(name = "updated_at")
 	private Date updatedAt;
 }
