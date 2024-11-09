@@ -23,6 +23,9 @@ const Filter = ({ ...props }: FilterPopoverProps) => {
       <div className="flex flex-wrap gap-2">
         {Object.entries(props.filters).map(([key, value]) => {
           const filterItem = props.filterValues.find((v) => v.type === key);
+          if (!filterItem?.type) {
+            return null;
+          }else 
           return (
             <div
               key={key}

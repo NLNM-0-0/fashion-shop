@@ -5,7 +5,11 @@ type EncodableParams =
   | StaffFilterParam
   | { [key: string]: string | number | boolean };
 
-export default function encodeParams(params: EncodableParams, prefix = "") {
+export default function encodeParams(
+  params: EncodableParams,
+  hasPaging = true,
+  prefix = ""
+) {
   const searchParams = new URLSearchParams();
 
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
@@ -18,9 +22,11 @@ export default function encodeParams(params: EncodableParams, prefix = "") {
   }
 
   const { page = 1, limit = 10, ...otherParams } = params;
-
-  addParam("page", page);
-  addParam("limit", limit);
+  
+  if (hasPaging) {
+    addParam("page", page);
+    addParam("limit", limit);
+  }
 
   Object.entries(otherParams).forEach(([key, value]) =>
     addParam(prefix ? `${prefix}[${key}]` : key, value)

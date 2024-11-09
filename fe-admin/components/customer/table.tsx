@@ -98,7 +98,7 @@ export function CustomerTable() {
     setOpenFilter(false);
     router.push(`?${updatedParams.toString()}`);
   };
-
+  
   if (isLoading) {
     return (
       <TableSkeleton
@@ -127,6 +127,9 @@ export function CustomerTable() {
   } else
     return (
       <div className="w-full">
+        <div className="flex justify-between items-center">
+          <h1 className="table___title">Manage Customer</h1>
+        </div>
         <Filter
           title="Filter customers"
           filters={filters}

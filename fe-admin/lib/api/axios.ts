@@ -18,7 +18,6 @@ apiClient.interceptors.request.use((config) => {
   }
 
   if (config.method !== "get") {
-    console.log("Loading start");
     loadingEmitter.emit("loading", true);
   }
 

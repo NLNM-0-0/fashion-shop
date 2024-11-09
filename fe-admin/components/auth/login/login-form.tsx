@@ -8,6 +8,9 @@ import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import { passwordMinError } from "@/lib/helpers/zod";
 import Link from "next/link";
+import { AxiosError } from "axios";
+import { ApiError } from "@/lib/types";
+import { toast } from "@/hooks/use-toast";
 
 const LoginScheme = z.object({
   email: z.string().email("Invalid email"),
@@ -34,8 +37,13 @@ const LoginForm = () => {
       .then(() => {
         window.location.href = "/admin";
       })
-      .catch((err) => {
-        console.log(err);
+      .catch((err: AxiosError<ApiError>) => {
+        toast({
+          variant: "destructive",
+          title: "Error",
+          description:
+            err.response?.data.message ?? "Create notification failed",
+        });
       });
   };
 
@@ -67,7 +75,9 @@ const LoginForm = () => {
         >
           Forgotten your password?
         </Link>
-        <Button className="w-full">SIGN IN</Button>
+        <Button type="submit" className="w-full">
+          SIGN IN
+        </Button>
       </div>
     </form>
   );

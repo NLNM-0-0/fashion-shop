@@ -6,8 +6,11 @@ export const login = (payload: LoginPayload) => {
   return axios
     .post<LoginToken>("/admin/auth/authenticate", payload)
     .then((res) => {
+      const expirationDate = new Date(res.data.expired);
+
       Cookies.set("token", res.data.token, {
         sameSite: "Strict",
+        expires: expirationDate,
       });
     });
 };

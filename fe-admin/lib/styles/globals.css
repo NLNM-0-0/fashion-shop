@@ -131,3 +131,7 @@ body {
     transform: rotate(0.5turn);
   }
 }
+
+.table___title {
+  @apply lg:text-3xl text-2xl;
+}

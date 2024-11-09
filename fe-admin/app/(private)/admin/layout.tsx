@@ -19,37 +19,33 @@ export const metadata: Metadata = {
   manifest: "/site.webmanifest",
 };
 
-export default function RootLayout({
+export default function PrivateLayout({
   children,
 }: Readonly<{
   children: React.ReactNode;
 }>) {
   return (
-    <html lang="en">
-      <body className={`${Helvetica.className}  antialiased flex h-full`}>
-        <>
-          <LoadingSpinner />
+    <div className="flex flex-1">
+      <LoadingSpinner />
+      <SWRProvider>
+        <AuthProvider>
+          <Sidebar />
+        </AuthProvider>
+      </SWRProvider>
+      <main className="flex flex-1 h-screen">
+        <div className="flex w-full flex-col overflow-y-hidden">
+          {/* <Header /> */}
           <SWRProvider>
             <AuthProvider>
-              <Sidebar />
+              <HeaderMobile />
             </AuthProvider>
           </SWRProvider>
-          <main className="flex flex-1">
-            <div className="flex w-full flex-col overflow-y-hidden">
-              {/* <Header /> */}
-              <SWRProvider>
-                <AuthProvider>
-                  <HeaderMobile />
-                </AuthProvider>
-              </SWRProvider>
-              <div className="md:p-10 p-4 md:mt-0 mt-12 overflow-auto">
-                {children}
-              </div>
-              <Toaster />
-            </div>
-          </main>
-        </>
-      </body>
-    </html>
+          <div className="md:p-10 p-4 md:mt-0 mt-12 overflow-auto">
+            {children}
+          </div>
+          <Toaster />
+        </div>
+      </main>
+    </div>
   );
 }
