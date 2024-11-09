@@ -15,6 +15,7 @@ import { seeAllNotification } from "@/lib/api/notification/seeAllNotification";
 import { AxiosError } from "axios";
 import { toast } from "@/hooks/use-toast";
 import { UNSEEN_KEY } from "@/hooks/useUnseenNumber";
+import NotiListSkeleton from "./noti-list-skeleton";
 
 const NotificationList = () => {
   const { mutate: mutate2 } = useSWRConfig();
@@ -57,14 +58,14 @@ const NotificationList = () => {
   };
 
   if (isLoading) {
-    return <>Skeleton...</>;
+    return <NotiListSkeleton number={3} />;
   } else if (error) {
     return <div>Failed to load</div>;
   }
   return (
     <div>
       <div className="pb-5 mb-7 border-b w-full flex flex-row justify-between items-center">
-        <h1 className="lg:text-3xl text-2xl">Notifications</h1>
+        <h1 className="table___title">Notifications</h1>
         {user?.address && <CreateNotification onCreated={() => mutate()} />}
       </div>
       <div className="w-full flex flex-col overflow-x-auto">
