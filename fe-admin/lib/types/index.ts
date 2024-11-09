@@ -1,5 +1,5 @@
 import { IconType } from "react-icons";
-import { FilterInputType } from "../constants/enum";
+import { FilterInputType, OrderStatus } from "../constants/enum";
 
 export interface SidebarItem {
   title: string;
@@ -41,6 +41,21 @@ export interface Staff {
   admin: boolean;
 }
 
+export interface OrderStaff {
+  id: number;
+  email: string;
+  name: string;
+  image: string;
+}
+
+export interface OrderCustomer {
+  id: number;
+  email: string;
+  phone: number;
+  name: string;
+  image: string;
+}
+
 export interface CreateStaffPayload {
   email: string;
   name: string;
@@ -49,6 +64,13 @@ export interface CreateStaffPayload {
   image: string;
   male: boolean;
   admin: boolean;
+}
+
+export interface CreateProductPayload {
+  name: string;
+  image: string;
+  unitPrice: number;
+  quantity: number;
 }
 
 export interface CreateNotificationPayload {
@@ -62,6 +84,15 @@ export interface CustomerData {
   page: PagingType;
 }
 
+export interface ProductData {
+  data: Product[];
+  page: PagingType;
+}
+
+export interface OrderData {
+  data: Order[];
+  page: PagingType;
+}
 export interface StaffData {
   data: Staff[];
   page: PagingType;
@@ -79,6 +110,7 @@ export interface LoginPayload {
 
 export interface LoginToken {
   token: string;
+  expired: string;
 }
 
 export interface PagingParam {
@@ -99,6 +131,16 @@ export interface CustomerFilterParam extends PagingParam {
   phone?: string;
 }
 
+export interface ProductFilterParam extends PagingParam {
+  name?: string;
+}
+
+export interface OrderFilterParam extends PagingParam {
+  orderStatus?: OrderStatus;
+  staffName?: string;
+  customerName?: string;
+}
+
 export interface StaffFilterParam extends PagingParam {
   name?: string;
   email?: string;
@@ -106,6 +148,12 @@ export interface StaffFilterParam extends PagingParam {
   male?: boolean;
   monthDOB?: number;
   yearDOB?: number;
+}
+
+// Memo: no paging param
+export interface ReportFilterParam extends PagingParam {
+  timeFrom?: number;
+  timeTo?: number;
 }
 
 export interface NotiFilterParam extends PagingParam {
@@ -131,6 +179,10 @@ export interface FormFilterValues {
   filters: FormFilterItem[];
 }
 
+export interface OrderStatusValue {
+  title: string;
+  value: OrderStatus;
+}
 export interface ChangePasswordPayload {
   oldPassword: string;
   newPassword: string;
@@ -163,4 +215,53 @@ export interface Notification {
   };
   createdAt: number;
   seen: boolean;
+}
+
+export interface Product {
+  id: number;
+  name: string;
+  image: string;
+  deleted: boolean;
+}
+
+export interface Order {
+  id: number;
+  customer: OrderCustomer;
+  totalPrice: number;
+  staff: OrderStaff;
+  createdAt: string;
+  updatedAt: string;
+  orderStatus: string;
+}
+
+export interface SaleReportItem {
+  item: Product;
+  amount: number;
+  totalSales: number;
+}
+
+export interface StockReportItem {
+  item: Product;
+  initial: number;
+  sell: number;
+  increase: number;
+  decrease: number;
+  payback: number;
+  final: number;
+}
+
+export interface SaleReportData {
+  total: number;
+  amount: number;
+  details: SaleReportItem[];
+}
+
+export interface StockReportData {
+  initial: number;
+  sell: number;
+  increase: number;
+  decrease: number;
+  payback: number;
+  final: number;
+  details: StockReportItem[];
 }
