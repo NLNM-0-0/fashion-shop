@@ -15,6 +15,7 @@ import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 @RestController
@@ -41,7 +42,7 @@ public class AdminStockReportController {
 	)
 	@PreAuthorize("hasAnyAuthority('ADMIN')")
 	public ResponseEntity<StockReportResponse> findStockReport(
-			@Valid FindStockReportRequest request) {
+			@Valid @RequestParam FindStockReportRequest request) {
 		return new ResponseEntity<>(stockReportService.findStockReport(request), HttpStatus.OK);
 	}
 }
