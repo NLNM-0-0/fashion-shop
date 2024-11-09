@@ -19,13 +19,10 @@ export const useFilteredList = () => {
     searchParams.forEach((value: string, key: string) => {
       initialFilters[key] = value;
     });
+
     setFilters(initialFilters);
     filtersReady.current = true;
   }, [searchParams]);
-
-  useEffect(() => {
-    resetFilters();
-  }, [resetFilters]);
 
   const removeFilter = (filterName: string) => {
     setFilters((prev) => {
@@ -35,9 +32,21 @@ export const useFilteredList = () => {
     });
   };
 
+  const updateFilters = (newFilters: FilterParams) => {
+    setFilters((prev) => ({
+      ...prev,
+      ...newFilters,
+    }));
+  };
+
+  useEffect(() => {
+    resetFilters();
+  }, [resetFilters]);
+
   return {
     filters: useMemo(() => filters, [filters]),
     updateFilter,
+    updateFilters,
     resetFilters,
     removeFilter,
     filtersReady,
