@@ -2,7 +2,6 @@ import type { Metadata } from "next";
 import "@/lib/styles/globals.css";
 import Sidebar from "@/components/sidebar";
 import HeaderMobile from "@/components/header-mobile";
-import { Helvetica } from "@/lib/fonts";
 import { Toaster } from "@/components/ui/toaster";
 import SWRProvider from "@/components/auth/swr-provider";
 import { AuthProvider } from "@/components/auth/auth-context";

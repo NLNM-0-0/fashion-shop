@@ -228,12 +228,20 @@ export interface Order {
   id: number;
   customer: OrderCustomer;
   totalPrice: number;
+  totalQuantity: number;
   staff: OrderStaff;
   createdAt: string;
   updatedAt: string;
   orderStatus: string;
+  details: OrderDetail[];
 }
 
+export interface OrderDetail {
+  item: Product;
+  quantity: number;
+  unitPrice: number;
+  totalSubPrice: number;
+}
 export interface SaleReportItem {
   item: Product;
   amount: number;

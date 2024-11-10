@@ -24,7 +24,7 @@ export default function AuthLayout({
     <>
       <LoadingSpinner />
 
-      <main className="flex flex-1 w-full md:p-10 p-4 overflow-auto">
+      <main className="flex flex-1 h-screen w-full md:p-10 p-4 overflow-auto">
         {children}
         <Toaster />
       </main>

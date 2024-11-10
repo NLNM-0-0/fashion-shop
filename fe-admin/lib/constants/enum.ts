@@ -5,5 +5,13 @@ export enum FilterInputType {
   YEAR = "YEAR",
   MONTH = "MONTH",
   // Memo: date in milliseconds
-  DATE = "DATE", 
+  DATE = "DATE",
+}
+
+export enum OrderStatus {
+  PENDING = "PENDING",
+  CONFIRMED = "CONFIRMED",
+  SHIPPING = "SHIPPING",
+  DONE = "DONE",
+  CANCELED = "CANCELED",
 }

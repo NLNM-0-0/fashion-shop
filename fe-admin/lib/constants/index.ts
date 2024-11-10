@@ -4,7 +4,8 @@ import { FilterInputType, OrderStatus } from "./enum";
 import { PiDress } from "react-icons/pi";
 import { LuClipboardList } from "react-icons/lu";
 import { AiOutlineLineChart } from "react-icons/ai";
-
+import { LucideIcon } from "lucide-react";
+import { Menu, PackageCheck, PackageX, Truck, Receipt } from "lucide-react";
 export const sidebarItems: SidebarItem[] = [
   {
     title: "Products",
@@ -107,3 +108,27 @@ export const orderStatusValues: OrderStatusValue[] = [
   { title: "Complete", value: OrderStatus.DONE },
   { title: "Cancelled", value: OrderStatus.CANCELED },
 ];
+
+export const orderStatusColors: Record<OrderStatus, string> = {
+  [OrderStatus.PENDING]: "bg-orange-400",
+  [OrderStatus.CONFIRMED]: "bg-cyan-600",
+  [OrderStatus.SHIPPING]: "bg-green-700",
+  [OrderStatus.DONE]: "bg-sky-600",
+  [OrderStatus.CANCELED]: "bg-red-700",
+};
+
+export const orderStatusTitle: Record<OrderStatus, string> = {
+  [OrderStatus.PENDING]: "Pending",
+  [OrderStatus.CONFIRMED]: "Confirmed",
+  [OrderStatus.SHIPPING]: "Delivering",
+  [OrderStatus.DONE]: "Complete",
+  [OrderStatus.CANCELED]: "Cancelled",
+};
+
+export const orderStatusIcons: Record<OrderStatus, LucideIcon> = {
+  [OrderStatus.PENDING]: Menu,
+  [OrderStatus.CONFIRMED]: Receipt,
+  [OrderStatus.SHIPPING]: Truck,
+  [OrderStatus.DONE]: PackageCheck,
+  [OrderStatus.CANCELED]: PackageX,
+};

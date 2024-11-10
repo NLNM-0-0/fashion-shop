@@ -50,7 +50,7 @@ const AddNewProduct = () => {
     console.log(data);
     createProduct(data)
       .then(() => {
-        router.push("/admin/products")
+        router.push("/admin/products");
         toast({
           variant: "success",
           title: "Success",
@@ -129,7 +129,9 @@ const AddNewProduct = () => {
       </div>
 
       <div className="flex mt-16 w-full justify-center gap-4">
-        <Button variant={"outline"}>Cancel</Button>
+        <Button type="button" variant={"outline"}>
+          Cancel
+        </Button>
         <Button className="w-40">Create</Button>
       </div>
     </form>
