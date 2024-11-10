@@ -43,7 +43,7 @@ public class OrderService {
 	private final NotificationRepository notificationRepository;
 
 	@Transactional
-	public ListResponse<SimpleOrderResponse, StaffOrderFilter> getOrders(AppPageRequest page, StaffOrderFilter filter) {
+	public ListResponse<OrderResponse, StaffOrderFilter> getOrders(AppPageRequest page, StaffOrderFilter filter) {
 		Pageable pageable = PageRequest.of(page.getPage() - 1,
 										   page.getLimit(),
 										   Sort.by(Sort.Direction.DESC, "updatedAt"));
@@ -54,9 +54,9 @@ public class OrderService {
 
 		List<Order> orders = orderPage.getContent();
 
-		List<SimpleOrderResponse> data = orders.stream().map(this::mapToSimpleDTO).toList();
+		List<OrderResponse> data = orders.stream().map(this::mapToDTO).toList();
 
-		return ListResponse.<SimpleOrderResponse, StaffOrderFilter>builder()
+		return ListResponse.<OrderResponse, StaffOrderFilter>builder()
 						   .data(data)
 						   .appPageResponse(AppPageResponse.builder()
 														   .index(page.getPage())
@@ -69,7 +69,7 @@ public class OrderService {
 	}
 
 	@Transactional
-	public ListResponse<SimpleOrderResponse, UserOrderFilter> getOrders(AppPageRequest page, UserOrderFilter filter) {
+	public ListResponse<OrderResponse, UserOrderFilter> getOrders(AppPageRequest page, UserOrderFilter filter) {
 		User customer = Common.findCurrUser(userRepository, userAuthRepository);
 
 		Pageable pageable = PageRequest.of(page.getPage() - 1,
@@ -82,9 +82,9 @@ public class OrderService {
 
 		List<Order> orders = orderPage.getContent();
 
-		List<SimpleOrderResponse> data = orders.stream().map(this::mapToSimpleDTO).toList();
+		List<OrderResponse> data = orders.stream().map(this::mapToDTO).toList();
 
-		return ListResponse.<SimpleOrderResponse, UserOrderFilter>builder()
+		return ListResponse.<OrderResponse, UserOrderFilter>builder()
 						   .data(data)
 						   .appPageResponse(AppPageResponse.builder()
 														   .index(page.getPage())

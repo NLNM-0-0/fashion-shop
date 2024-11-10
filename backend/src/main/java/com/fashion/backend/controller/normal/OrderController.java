@@ -41,7 +41,7 @@ public class OrderController {
 			description = "Http Status is 200 OK"
 	)
 	@PreAuthorize("hasAnyAuthority('USER')")
-	public ResponseEntity<ListResponse<SimpleOrderResponse, UserOrderFilter>> getOrders(
+	public ResponseEntity<ListResponse<OrderResponse, UserOrderFilter>> getOrders(
 			@Valid AppPageRequest page,
 			@Valid UserOrderFilter filter) {
 		return new ResponseEntity<>(orderService.getOrders(page, filter), HttpStatus.OK);
