@@ -21,6 +21,9 @@ public class SimpleOrderResponse {
 	@Schema(name = "totalPrice")
 	private int totalPrice;
 
+	@Schema(name = "totalQuantity")
+	private int totalQuantity;
+
 	@Schema(name = "staff")
 	private SimpleStaffResponse staff;
 
