@@ -15,7 +15,6 @@ public class FindStockReportRequest {
 			example = "1701388800"
 	)
 	@NotNull(message = Message.TIME_FROM_TIME_TO_VALIDATE)
-	@NotEmpty(message = Message.TIME_FROM_TIME_TO_VALIDATE)
 	private Integer timeFrom;
 
 	@Schema(
@@ -23,6 +22,5 @@ public class FindStockReportRequest {
 			example = "1704067199"
 	)
 	@NotNull(message = Message.TIME_FROM_TIME_TO_VALIDATE)
-	@NotEmpty(message = Message.TIME_FROM_TIME_TO_VALIDATE)
 	private Integer timeTo;
 }
