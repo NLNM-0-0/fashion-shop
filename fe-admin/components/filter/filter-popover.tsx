@@ -168,16 +168,18 @@ const FilterPopover = ({
                       }}
                     />
                   ) : null}
-                  <Button
-                    type="button"
-                    variant={"ghost"}
-                    className={`px-3 `}
-                    onClick={() => {
-                      remove(index);
-                    }}
-                  >
-                    <AiOutlineClose />
-                  </Button>
+                  {filterItem && (
+                    <Button
+                      type="button"
+                      variant={"ghost"}
+                      className={`px-3 `}
+                      onClick={() => {
+                        remove(index);
+                      }}
+                    >
+                      <AiOutlineClose />
+                    </Button>
+                  )}
                 </div>
               );
             })}

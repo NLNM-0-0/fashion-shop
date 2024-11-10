@@ -8,7 +8,7 @@ import {
   useReactTable,
 } from "@tanstack/react-table";
 
-import { Button } from "@/components/ui/button";
+import { Button, buttonVariants } from "@/components/ui/button";
 
 import {
   Table,
@@ -23,19 +23,35 @@ import { useState } from "react";
 import { useRouter } from "next/navigation";
 
 import Paging from "../paging";
-import { Customer, FormFilterValues } from "@/lib/types";
-import { useCustomerList } from "@/hooks/useCustomerList";
-import { customerFilterValues } from "@/lib/constants";
+import { FormFilterValues, Product } from "@/lib/types";
+import { productFilterValues } from "@/lib/constants";
 import Filter from "../filter/filter";
 import TableSkeleton from "../table-skeleton";
+import { useProductList } from "@/hooks/useProductList";
+import { Avatar, AvatarFallback, AvatarImage } from "../ui/avatar";
+import { FaPlus } from "react-icons/fa";
+import Link from "next/link";
+import { cn } from "@/lib/utils";
 
-export const columns: ColumnDef<Customer>[] = [
+export const columns: ColumnDef<Product>[] = [
   {
     accessorKey: "id",
     header: () => {
       return <span className="font-semibold">ID</span>;
     },
     cell: ({ row }) => <div>{row.getValue("id")}</div>,
+  },
+  {
+    accessorKey: "image",
+    header: () => {},
+    cell: ({ row }) => (
+      <div className="flex justify-end">
+        <Avatar>
+          <AvatarImage src={row.getValue("image")} alt="img" />
+          <AvatarFallback>{row.original.name.substring(0, 2)}</AvatarFallback>
+        </Avatar>
+      </div>
+    ),
   },
   {
     accessorKey: "name",
@@ -52,33 +68,13 @@ export const columns: ColumnDef<Customer>[] = [
     },
     cell: ({ row }) => <div className="capitalize">{row.getValue("name")}</div>,
   },
-  {
-    accessorKey: "email",
-    header: () => {
-      return <div className="font-semibold">Email</div>;
-    },
-    cell: ({ row }) => (
-      <div className="lg:max-w-[16rem] max-w-[3rem] truncate">
-        {row.getValue("email")}
-      </div>
-    ),
-  },
-  {
-    accessorKey: "phone",
-    header: () => {
-      return <div className="font-semibold flex justify-end">Phone</div>;
-    },
-    cell: ({ row }) => (
-      <div className="text-right">{row.getValue("phone")}</div>
-    ),
-  },
 ];
 
-export function CustomerTable() {
+export function ProductTable() {
   const router = useRouter();
-  const { filters, data, isLoading, error } = useCustomerList();
+  const { filters, data, isLoading, error } = useProductList();
 
-  const customers: Customer[] = data?.data.data || [];
+  const customers: Product[] = data?.data.data || [];
   const table = useReactTable({
     data: customers,
     columns,
@@ -98,7 +94,7 @@ export function CustomerTable() {
     setOpenFilter(false);
     router.push(`?${updatedParams.toString()}`);
   };
-  
+
   if (isLoading) {
     return (
       <TableSkeleton
@@ -128,12 +124,24 @@ export function CustomerTable() {
     return (
       <div className="w-full">
         <div className="flex justify-between items-center">
-          <h1 className="table___title">Manage Customer</h1>
+          <h1 className="table___title">Manage Product</h1>
+          <Link
+            href={"/admin/products/new"}
+            className={cn(
+              "px-4 whitespace-nowrap",
+              buttonVariants({ variant: "default" })
+            )}
+          >
+            <div className="flex flex-wrap gap-1 items-center capitalize">
+              <FaPlus />
+              Add new product
+            </div>
+          </Link>
         </div>
         <Filter
-          title="Filter customers"
+          title="Filter products"
           filters={filters}
-          filterValues={customerFilterValues}
+          filterValues={productFilterValues}
           open={openFilter}
           onOpenChange={(open) => {
             setOpenFilter(open);

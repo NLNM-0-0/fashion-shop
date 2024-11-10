@@ -8,7 +8,6 @@ import {
   useReactTable,
 } from "@tanstack/react-table";
 
-import { Button } from "@/components/ui/button";
 
 import {
   Table,
@@ -30,6 +29,7 @@ import Filter from "../filter/filter";
 import CreateStaffDialog from "./create-staff";
 import EditStaffDialog from "./edit-staff";
 import DeleteStaff from "./delete-staff";
+import TableSkeleton from "../table-skeleton";
 
 export const columns: ColumnDef<Staff>[] = [
   {
@@ -41,16 +41,8 @@ export const columns: ColumnDef<Staff>[] = [
   },
   {
     accessorKey: "name",
-    header: ({ column }) => {
-      return (
-        <Button
-          className="p-2"
-          variant="ghost"
-          onClick={() => column.toggleSorting(column.getIsSorted() === "asc")}
-        >
-          <span className="font-semibold">Name</span>
-        </Button>
-      );
+    header: () => {
+      return <span className="font-semibold">Name</span>;
     },
     cell: ({ row }) => <div className="capitalize">{row.getValue("name")}</div>,
   },
@@ -100,14 +92,35 @@ export function StaffTable() {
   };
 
   if (isLoading) {
-    return <>skeleton...</>;
+    return (
+      <TableSkeleton
+        isHasExtensionAction={false}
+        isHasFilter={true}
+        isHasSearch={true}
+        isHasChooseVisibleRow={false}
+        isHasCheckBox={false}
+        isHasPaging={true}
+        numberRow={5}
+        cells={[
+          {
+            percent: 1,
+          },
+          {
+            percent: 5,
+          },
+          {
+            percent: 1,
+          },
+        ]}
+      ></TableSkeleton>
+    );
   } else if (error) {
     return <div>Failed to load</div>;
   } else
     return (
       <div className="w-full">
         <div className="flex justify-between items-center">
-          <h1 className="lg:text-3xl text-2xl">Manage Staff</h1>
+          <h1 className="table___title">Manage Staff</h1>
           <CreateStaffDialog onAdded={() => void mutate()} />
         </div>
         <Filter

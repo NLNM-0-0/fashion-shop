@@ -1,0 +1,298 @@
+"use client";
+
+import * as React from "react";
+import {
+  ColumnDef,
+  flexRender,
+  getCoreRowModel,
+  useReactTable,
+} from "@tanstack/react-table";
+
+import {
+  Table,
+  TableBody,
+  TableCell,
+  TableHead,
+  TableHeader,
+  TableRow,
+} from "@/components/ui/table";
+import { useEffect } from "react";
+
+import { StockReportItem } from "@/lib/types";
+
+import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
+import { useStockReportList } from "@/hooks/useStockReportList";
+import TableSkeleton from "@/components/table-skeleton";
+import ReportFilter, {
+  ReportFilterValue,
+} from "@/components/filter/report-filter";
+import { FilterParams } from "@/hooks/useFilterList";
+import { unknown } from "zod";
+
+export const columns: ColumnDef<StockReportItem>[] = [
+  {
+    accessorKey: "id",
+    header: () => {
+      return <span className="font-semibold">ProdID</span>;
+    },
+    cell: ({ row }) => <div>{row.original.item.id}</div>,
+  },
+  {
+    accessorKey: "image",
+    header: () => {},
+    cell: ({ row }) => (
+      <div className="flex justify-end">
+        <Avatar>
+          <AvatarImage src={row.getValue("image")} alt="img" />
+          <AvatarFallback>
+            {row.original.item.name.substring(0, 2)}
+          </AvatarFallback>
+        </Avatar>
+      </div>
+    ),
+  },
+  {
+    accessorKey: "name",
+    header: () => {
+      return <span className="font-semibold">Name</span>;
+    },
+    cell: ({ row }) => (
+      <div className="capitalize">{row.original.item.name}</div>
+    ),
+  },
+  {
+    accessorKey: "initial",
+    header: () => (
+      <div className="flex justify-end">
+        <span className="font-semibold">Previous</span>
+      </div>
+    ),
+    cell: ({ row }) => {
+      return (
+        <div className="text-right font-medium">{row.original.initial}</div>
+      );
+    },
+  },
+  {
+    accessorKey: "sell",
+    header: () => (
+      <div className="flex justify-end">
+        <span className="font-semibold">Sale</span>
+      </div>
+    ),
+    cell: ({ row }) => {
+      return <div className="text-right font-medium">{row.original.sell}</div>;
+    },
+  },
+  {
+    accessorKey: "change",
+    header: () => (
+      <div className="flex justify-end">
+        <span className="font-semibold">Change</span>
+      </div>
+    ),
+    cell: ({ row }) => {
+      return (
+        <div className="text-right font-medium">
+          {row.original.increase + row.original.decrease}
+        </div>
+      );
+    },
+  },
+  {
+    accessorKey: "return",
+    header: () => (
+      <div className="flex justify-end">
+        <span className="font-semibold">Return</span>
+      </div>
+    ),
+    cell: ({ row }) => {
+      return (
+        <div className="text-right font-medium">{row.original.payback}</div>
+      );
+    },
+  },
+  {
+    accessorKey: "final",
+    header: () => (
+      <div className="flex justify-end">
+        <span className="font-semibold">Final</span>
+      </div>
+    ),
+    cell: ({ row }) => {
+      return <div className="text-right font-medium">{row.original.final}</div>;
+    },
+  },
+];
+
+export function StockReportTable() {
+  const { filters, data, isLoading, error, updateFilters } =
+    useStockReportList();
+
+  const customers: StockReportItem[] = data?.data.details || [];
+  const table = useReactTable({
+    data: customers,
+    columns,
+    getCoreRowModel: getCoreRowModel(),
+  });
+
+  const onApplyFilters = (data: ReportFilterValue) => {
+    const filterParams: FilterParams = {
+      ...data,
+    };
+    updateFilters(filterParams);
+  };
+  useEffect(() => {
+    const now = new Date(new Date().setHours(0, 0, 0, 0));
+    const date = now.setDate(now.getDate() + 1);
+
+    const seconds = Math.round(date.valueOf() / 1000);
+    const initialFilters: FilterParams = {
+      timeTo: seconds.toString(),
+      timeFrom: (seconds - 2592000).toString(),
+    };
+    updateFilters(initialFilters);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
+
+  if (isLoading) {
+    return (
+      <TableSkeleton
+        isHasExtensionAction={false}
+        isHasFilter={true}
+        isHasSearch={true}
+        isHasChooseVisibleRow={false}
+        isHasCheckBox={false}
+        isHasPaging={true}
+        numberRow={5}
+        cells={[
+          {
+            percent: 1,
+          },
+          {
+            percent: 5,
+          },
+          {
+            percent: 1,
+          },
+        ]}
+      ></TableSkeleton>
+    );
+  } else if (error) {
+    return (
+      <>
+        <div>Failed to load</div>
+      </>
+    );
+  } else
+    return (
+      <div className="w-full">
+        <div className="flex justify-between items-center">
+          <h1 className="table___title">Stock Report</h1>
+        </div>
+        <ReportFilter filters={filters} onApplyFilters={onApplyFilters} />
+        <div className="rounded-md border overflow-x-auto min-w-full max-w-[50vw]">
+          <Table className="min-w-full w-max">
+            <TableHeader>
+              {table.getHeaderGroups().map((headerGroup) => (
+                <TableRow key={headerGroup.id}>
+                  {headerGroup.headers.map((header) => {
+                    return (
+                      <TableHead key={header.id}>
+                        {header.isPlaceholder
+                          ? null
+                          : flexRender(
+                              header.column.columnDef.header,
+                              header.getContext()
+                            )}
+                      </TableHead>
+                    );
+                  })}
+                </TableRow>
+              ))}
+              <TableRow key={"subHeaderRow"}>
+                <TableHead key={"header-final"} className="col-span-2">
+                  {flexRender(
+                    <div className="font-semibold">Total:</div>,
+                    unknown
+                  )}
+                </TableHead>
+                <TableHead key={"header-empty-1"}></TableHead>
+                <TableHead key={"header-empty-2"}></TableHead>
+                <TableHead key={"header-amount"}>
+                  {flexRender(
+                    <div className="text-right font-semibold">
+                      {data?.data.initial}
+                    </div>,
+                    unknown
+                  )}
+                </TableHead>
+                <TableHead key={"header-money"}>
+                  {flexRender(
+                    <div className="text-right font-semibold">
+                      {data?.data.sell}
+                    </div>,
+                    unknown
+                  )}
+                </TableHead>
+                <TableHead key={"header-change"}>
+                  {flexRender(
+                    <div className="text-right font-semibold">
+                      {data?.data
+                        ? 0
+                        : data?.data.increase! + data?.data.decrease!}
+                    </div>,
+                    unknown
+                  )}
+                </TableHead>
+                <TableHead key={"header-return"}>
+                  {flexRender(
+                    <div className="text-right font-semibold">
+                      {data?.data.payback}
+                    </div>,
+                    unknown
+                  )}
+                </TableHead>
+                <TableHead key={"header-final"}>
+                  {flexRender(
+                    <div className="text-right font-semibold">
+                      {data?.data.final}
+                    </div>,
+                    unknown
+                  )}
+                </TableHead>
+              </TableRow>
+            </TableHeader>
+            <TableBody>
+              {table.getRowModel().rows?.length ? (
+                table.getRowModel().rows.map((row) => (
+                  <TableRow
+                    key={row.id}
+                    data-state={row.getIsSelected() && "selected"}
+                  >
+                    {row.getVisibleCells().map((cell) => (
+                      <TableCell key={cell.id}>
+                        {flexRender(
+                          cell.column.columnDef.cell,
+                          cell.getContext()
+                        )}
+                      </TableCell>
+                    ))}
+                  </TableRow>
+                ))
+              ) : (
+                <TableRow>
+                  <TableCell
+                    colSpan={columns.length}
+                    className="h-24 text-center"
+                  >
+                    Nothing found.
+                  </TableCell>
+                </TableRow>
+              )}
+            </TableBody>
+          </Table>
+        </div>
+      </div>
+    );
+}

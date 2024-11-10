@@ -15,6 +15,7 @@ import {
   CommandList,
 } from "../ui/command";
 import { cn } from "@/lib/utils";
+import { Skeleton } from "../ui/skeleton";
 
 export interface StaffListProps {
   staff: string | number;
@@ -34,7 +35,7 @@ const StaffList = ({ isId, staff, setStaff, readonly }: StaffListProps) => {
 
   if (error) return <div>Failed to load</div>;
   if (isLoading) {
-    return <>Skeleton...</>;
+    return <Skeleton className="h-10 w-full" />;
   } else {
     return (
       <Popover open={open} onOpenChange={setOpen}>

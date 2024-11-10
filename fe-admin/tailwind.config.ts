@@ -60,6 +60,7 @@ const config: Config = {
           },
           bg: "#F5F5F5",
           error: "#D43F21",
+          success: "#009951",
         },
       },
       borderRadius: {
