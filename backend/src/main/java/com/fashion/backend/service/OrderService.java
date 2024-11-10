@@ -16,6 +16,7 @@ import com.fashion.backend.payload.page.AppPageResponse;
 import com.fashion.backend.payload.staff.SimpleStaffResponse;
 import com.fashion.backend.repository.*;
 import com.fashion.backend.utils.tuple.Pair;
+import com.fashion.backend.utils.tuple.Triple;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
@@ -181,14 +182,16 @@ public class OrderService {
 
 		User user = Common.findCurrUser(userRepository, userAuthRepository);
 
-		Pair<Integer, List<OrderDetail>> priceCalculation = calcPrice(request.getDetails());
-		int totalPrice = priceCalculation.first();
-		List<OrderDetail> details = priceCalculation.second();
+		Triple<Integer, Integer, List<OrderDetail>> orderInfo = handleOrder(request.getDetails());
+		int totalPrice = orderInfo.first();
+		int totalQuantity = orderInfo.second();
+		List<OrderDetail> details = orderInfo.third();
 
 		Order order = Order.builder()
 						   .staff(isMadeByStaff ? user : null)
 						   .customer(isMadeByStaff ? null : user)
 						   .totalPrice(totalPrice)
+							.totalQuantity(totalQuantity)
 						   .orderDetails(details)
 						   .status(isMadeByStaff ? OrderStatus.DONE : OrderStatus.PENDING)
 						   .build();
@@ -213,8 +216,9 @@ public class OrderService {
 		return new HashSet<>(itemIds).stream().toList().size() != itemIds.size();
 	}
 
-	private Pair<Integer, List<OrderDetail>> calcPrice(List<OrderDetailRequest> requestDetails) {
+	private Triple<Integer, Integer, List<OrderDetail>> handleOrder(List<OrderDetailRequest> requestDetails) {
 		int totalPrice = 0;
+		int totalQuantity = 0;
 		List<OrderDetail> details = new ArrayList<>();
 		for (OrderDetailRequest requestDetail : requestDetails) {
 			Item item = Common.findItemById(requestDetail.getItemId(), itemRepository);
@@ -228,8 +232,9 @@ public class OrderService {
 			details.add(orderDetail);
 
 			totalPrice += item.getUnitPrice() * requestDetail.getQuantity();
+			totalQuantity += requestDetail.getQuantity();
 		}
-		return new Pair<>(totalPrice, details);
+		return new Triple<>(totalPrice, totalQuantity, details);
 	}
 
 	private void handleOrderItem(Order order) {
@@ -289,6 +294,7 @@ public class OrderService {
 								  .customer(mapToDTOCustomer(order.getCustomer()))
 								  .staff(mapToDTOStaff(order.getStaff()))
 								  .totalPrice(order.getTotalPrice())
+				.totalQuantity(order.getTotalQuantity())
 								  .orderStatus(order.getStatus())
 								  .createdAt(order.getCreatedAt())
 								  .updatedAt(order.getUpdatedAt())
@@ -301,6 +307,7 @@ public class OrderService {
 							.customer(mapToDTOCustomer(order.getCustomer()))
 							.staff(mapToDTOStaff(order.getStaff()))
 							.totalPrice(order.getTotalPrice())
+							.totalQuantity(order.getTotalQuantity())
 							.orderStatus(order.getStatus())
 							.createdAt(order.getCreatedAt())
 							.updatedAt(order.getUpdatedAt())

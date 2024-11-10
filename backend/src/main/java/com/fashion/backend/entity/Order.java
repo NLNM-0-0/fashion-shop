@@ -41,6 +41,9 @@ public class Order {
 	@Column(name = "total_price")
 	private int totalPrice;
 
+	@Column(name = "total_quantity")
+	private int totalQuantity;
+
 	@OneToMany(
 			fetch = FetchType.LAZY,
 			cascade = CascadeType.ALL,
