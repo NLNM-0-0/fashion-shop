@@ -27,6 +27,7 @@ import ReportFilter, {
   ReportFilterValue,
 } from "@/components/filter/report-filter";
 import { FilterParams } from "@/hooks/useFilterList";
+import { unknown } from "zod";
 
 export const columns: ColumnDef<SaleReportItem>[] = [
   {
@@ -55,7 +56,9 @@ export const columns: ColumnDef<SaleReportItem>[] = [
     header: () => {
       return <span className="font-semibold">Name</span>;
     },
-    cell: ({ row }) => <div className="capitalize">{row.getValue("name")}</div>,
+    cell: ({ row }) => (
+      <div className="capitalize">{row.original.item.name}</div>
+    ),
   },
   {
     accessorKey: "amount",
@@ -65,9 +68,9 @@ export const columns: ColumnDef<SaleReportItem>[] = [
       </div>
     ),
     cell: ({ row }) => {
-      const amount = parseFloat(row.getValue("quantity"));
-
-      return <div className="text-right font-medium">{amount}</div>;
+      return (
+        <div className="text-right font-medium">{row.original.amount}</div>
+      );
     },
   },
   {
@@ -105,8 +108,8 @@ export function SaleReportTable() {
     const now = new Date().setHours(0, 0, 0, 0);
     const seconds = Math.round(now.valueOf() / 1000);
     const initialFilters: FilterParams = {
-      timeFrom: seconds.toString(),
-      timeTo: (seconds - 2592000).toString(),
+      timeTo: seconds.toString(),
+      timeFrom: (seconds - 2592000).toString(),
     };
     updateFilters(initialFilters);
     // eslint-disable-next-line react-hooks/exhaustive-deps
@@ -167,6 +170,32 @@ export function SaleReportTable() {
                   })}
                 </TableRow>
               ))}
+              <TableRow key={"subHeaderRow"}>
+                <TableHead key={"header-final"} className="col-span-2">
+                  {flexRender(
+                    <div className="font-semibold">Total:</div>,
+                    unknown
+                  )}
+                </TableHead>
+                <TableHead key={"header-empty-1"}></TableHead>
+                <TableHead key={"header-empty-2"}></TableHead>
+                <TableHead key={"header-amount"}>
+                  {flexRender(
+                    <div className="text-right font-semibold">
+                      {data?.data.amount}
+                    </div>,
+                    unknown
+                  )}
+                </TableHead>
+                <TableHead key={"header-money"}>
+                  {flexRender(
+                    <div className="text-right font-semibold">
+                      {data?.data.total}
+                    </div>,
+                    unknown
+                  )}
+                </TableHead>
+              </TableRow>
             </TableHeader>
             <TableBody>
               {table.getRowModel().rows?.length ? (

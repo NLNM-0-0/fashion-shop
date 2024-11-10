@@ -16,6 +16,7 @@ export const useSaleReportList = () => {
     () => getSaleReport(filters),
     {
       revalidateOnFocus: false,
+      shouldRetryOnError: false,
     }
   );
 

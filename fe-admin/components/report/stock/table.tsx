@@ -27,6 +27,7 @@ import ReportFilter, {
   ReportFilterValue,
 } from "@/components/filter/report-filter";
 import { FilterParams } from "@/hooks/useFilterList";
+import { unknown } from "zod";
 
 export const columns: ColumnDef<StockReportItem>[] = [
   {
@@ -55,35 +56,75 @@ export const columns: ColumnDef<StockReportItem>[] = [
     header: () => {
       return <span className="font-semibold">Name</span>;
     },
-    cell: ({ row }) => <div className="capitalize">{row.getValue("name")}</div>,
+    cell: ({ row }) => (
+      <div className="capitalize">{row.original.item.name}</div>
+    ),
   },
   {
-    accessorKey: "amount",
+    accessorKey: "initial",
     header: () => (
       <div className="flex justify-end">
-        <span className="font-semibold">Quantity</span>
+        <span className="font-semibold">Previous</span>
       </div>
     ),
     cell: ({ row }) => {
-      const amount = parseFloat(row.getValue("quantity"));
-
-      return <div className="text-right font-medium">{amount}</div>;
+      return (
+        <div className="text-right font-medium">{row.original.initial}</div>
+      );
     },
   },
   {
-    accessorKey: "totalStocks",
+    accessorKey: "sell",
     header: () => (
       <div className="flex justify-end">
-        <span className="font-semibold">Total Stocks</span>
+        <span className="font-semibold">Sale</span>
       </div>
     ),
     cell: ({ row }) => {
-      const totalStocks = parseFloat(row.getValue("totalStocks"));
-
-      return <div className="text-right font-medium">{totalStocks}</div>;
+      return <div className="text-right font-medium">{row.original.sell}</div>;
+    },
+  },
+  {
+    accessorKey: "change",
+    header: () => (
+      <div className="flex justify-end">
+        <span className="font-semibold">Change</span>
+      </div>
+    ),
+    cell: ({ row }) => {
+      return (
+        <div className="text-right font-medium">
+          {row.original.increase + row.original.decrease}
+        </div>
+      );
+    },
+  },
+  {
+    accessorKey: "return",
+    header: () => (
+      <div className="flex justify-end">
+        <span className="font-semibold">Return</span>
+      </div>
+    ),
+    cell: ({ row }) => {
+      return (
+        <div className="text-right font-medium">{row.original.payback}</div>
+      );
+    },
+  },
+  {
+    accessorKey: "final",
+    header: () => (
+      <div className="flex justify-end">
+        <span className="font-semibold">Final</span>
+      </div>
+    ),
+    cell: ({ row }) => {
+      return <div className="text-right font-medium">{row.original.final}</div>;
     },
   },
 ];
+
 export function StockReportTable() {
   const { filters, data, isLoading, error, updateFilters } =
     useStockReportList();
@@ -102,11 +143,13 @@ export function StockReportTable() {
     updateFilters(filterParams);
   };
   useEffect(() => {
-    const now = new Date().setHours(0, 0, 0, 0);
-    const seconds = Math.round(now.valueOf() / 1000);
+    const now = new Date(new Date().setHours(0, 0, 0, 0));
+    const date = now.setDate(now.getDate() + 1);
+
+    const seconds = Math.round(date.valueOf() / 1000);
     const initialFilters: FilterParams = {
-      timeFrom: seconds.toString(),
-      timeTo: (seconds - 2592000).toString(),
+      timeTo: seconds.toString(),
+      timeFrom: (seconds - 2592000).toString(),
     };
     updateFilters(initialFilters);
     // eslint-disable-next-line react-hooks/exhaustive-deps
@@ -167,6 +210,58 @@ export function StockReportTable() {
                   })}
                 </TableRow>
               ))}
+              <TableRow key={"subHeaderRow"}>
+                <TableHead key={"header-final"} className="col-span-2">
+                  {flexRender(
+                    <div className="font-semibold">Total:</div>,
+                    unknown
+                  )}
+                </TableHead>
+                <TableHead key={"header-empty-1"}></TableHead>
+                <TableHead key={"header-empty-2"}></TableHead>
+                <TableHead key={"header-amount"}>
+                  {flexRender(
+                    <div className="text-right font-semibold">
+                      {data?.data.initial}
+                    </div>,
+                    unknown
+                  )}
+                </TableHead>
+                <TableHead key={"header-money"}>
+                  {flexRender(
+                    <div className="text-right font-semibold">
+                      {data?.data.sell}
+                    </div>,
+                    unknown
+                  )}
+                </TableHead>
+                <TableHead key={"header-change"}>
+                  {flexRender(
+                    <div className="text-right font-semibold">
+                      {data?.data
+                        ? 0
+                        : data?.data.increase! + data?.data.decrease!}
+                    </div>,
+                    unknown
+                  )}
+                </TableHead>
+                <TableHead key={"header-return"}>
+                  {flexRender(
+                    <div className="text-right font-semibold">
+                      {data?.data.payback}
+                    </div>,
+                    unknown
+                  )}
+                </TableHead>
+                <TableHead key={"header-final"}>
+                  {flexRender(
+                    <div className="text-right font-semibold">
+                      {data?.data.final}
+                    </div>,
+                    unknown
+                  )}
+                </TableHead>
+              </TableRow>
             </TableHeader>
             <TableBody>
               {table.getRowModel().rows?.length ? (
