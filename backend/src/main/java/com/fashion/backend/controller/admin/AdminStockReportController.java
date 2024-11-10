@@ -42,7 +42,7 @@ public class AdminStockReportController {
 	)
 	@PreAuthorize("hasAnyAuthority('ADMIN')")
 	public ResponseEntity<StockReportResponse> findStockReport(
-			@Valid @RequestParam FindStockReportRequest request) {
+			@Valid FindStockReportRequest request) {
 		return new ResponseEntity<>(stockReportService.findStockReport(request), HttpStatus.OK);
 	}
 }

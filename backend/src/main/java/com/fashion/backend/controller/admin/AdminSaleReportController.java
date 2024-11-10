@@ -42,7 +42,7 @@ public class AdminSaleReportController {
 	)
 	@PreAuthorize("hasAnyAuthority('ADMIN', 'STAFF')")
 	public ResponseEntity<SaleReportResponse> findSaleReport(
-			@Valid @RequestParam FindSaleReportRequest request) {
+			@Valid FindSaleReportRequest request) {
 		return new ResponseEntity<>(saleReportService.findSaleReport(request), HttpStatus.OK);
 	}
 }
