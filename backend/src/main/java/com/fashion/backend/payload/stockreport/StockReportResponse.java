@@ -1,5 +1,6 @@
 package com.fashion.backend.payload.stockreport;
 
+import com.fasterxml.jackson.annotation.JsonProperty;
 import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.Builder;
 import lombok.Data;
@@ -56,6 +57,7 @@ public class StockReportResponse {
 			name = "final",
 			example = "80"
 	)
+	@JsonProperty("final")
 	private int finalQty;
 
 	@Schema(name = "details")

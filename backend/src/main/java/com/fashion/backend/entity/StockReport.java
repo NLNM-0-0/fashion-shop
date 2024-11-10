@@ -47,7 +47,6 @@ public class StockReport {
 	private int finalQty;
 
 	@OneToMany(
-			mappedBy = "report",
 			fetch = FetchType.LAZY,
 			cascade = CascadeType.ALL,
 			orphanRemoval = true,

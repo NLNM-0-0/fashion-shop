@@ -27,14 +27,6 @@ public class StockReportDetail {
 	)
 	private Item item;
 
-	@ManyToOne(fetch = FetchType.LAZY)
-	@JoinColumn(
-			name = "report_id",
-			nullable = false,
-			updatable = false
-	)
-	private StockReport report;
-
 	@Column(name = "initial")
 	private int initial;
 
