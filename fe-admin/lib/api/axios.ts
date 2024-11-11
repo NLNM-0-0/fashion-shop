@@ -1,5 +1,4 @@
 import axios, { AxiosError, AxiosResponse } from "axios";
-import Router from "next/router";
 import Cookies from "js-cookie";
 import { ApiError } from "next/dist/server/api-utils";
 import loadingEmitter from "./loading-emitter";
@@ -37,7 +36,7 @@ apiClient.interceptors.response.use(
     }
     if (error.response?.status === 401) {
       Cookies.remove("token");
-      Router.push("/login");
+      window.location.href = "/login";
     }
     return Promise.reject(error);
   }

@@ -95,7 +95,7 @@ export function ProductTable() {
     router.push(`?${updatedParams.toString()}`);
   };
 
-  if (isLoading) {
+  if (isLoading || !data) {
     return (
       <TableSkeleton
         isHasExtensionAction={false}

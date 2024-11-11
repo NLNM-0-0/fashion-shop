@@ -1,6 +1,5 @@
 import type { Metadata } from "next";
 import "@/lib/styles/globals.css";
-import { Helvetica } from "@/lib/fonts";
 import { Toaster } from "@/components/ui/toaster";
 import { LoadingSpinner } from "@/components/loading-spinner";
 

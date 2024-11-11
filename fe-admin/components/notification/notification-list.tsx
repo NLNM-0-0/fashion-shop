@@ -57,7 +57,7 @@ const NotificationList = () => {
     router.push(`?${updatedParams.toString()}`);
   };
 
-  if (isLoading) {
+  if (isLoading || !data) {
     return <NotiListSkeleton number={3} />;
   } else if (error) {
     return <div>Failed to load</div>;

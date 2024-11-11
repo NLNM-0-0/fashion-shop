@@ -34,7 +34,7 @@ const StaffList = ({ isId, staff, setStaff, readonly }: StaffListProps) => {
   }, [data]);
 
   if (error) return <div>Failed to load</div>;
-  if (isLoading) {
+  if (isLoading || !data) {
     return <Skeleton className="h-10 w-full" />;
   } else {
     return (

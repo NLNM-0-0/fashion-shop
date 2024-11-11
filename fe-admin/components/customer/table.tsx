@@ -98,8 +98,8 @@ export function CustomerTable() {
     setOpenFilter(false);
     router.push(`?${updatedParams.toString()}`);
   };
-  
-  if (isLoading) {
+
+  if (isLoading || !data) {
     return (
       <TableSkeleton
         isHasExtensionAction={false}
