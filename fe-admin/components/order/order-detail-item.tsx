@@ -1,4 +1,5 @@
 import { OrderDetail } from "@/lib/types";
+import { toVND } from "@/lib/utils";
 import Image from "next/image";
 const OrderDetailItem = ({ detail }: { detail: OrderDetail }) => {
   return (
@@ -19,12 +20,7 @@ const OrderDetailItem = ({ detail }: { detail: OrderDetail }) => {
           <span>x {detail.quantity}</span>
         </div>
         <div className="self-end">
-          <span>
-            {new Intl.NumberFormat("vi-VN", {
-              style: "currency",
-              currency: "VND",
-            }).format(detail.unitPrice)}
-          </span>
+          <span>{toVND(detail.unitPrice)}</span>
         </div>
       </div>
     </div>

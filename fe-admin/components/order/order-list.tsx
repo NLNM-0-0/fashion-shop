@@ -13,7 +13,6 @@ const OrderList = () => {
   const {
     orders,
     isLoadingMore,
-    isReachingEnd,
     error,
     lastItemRef,
     filters,

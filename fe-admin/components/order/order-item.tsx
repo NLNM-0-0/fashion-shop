@@ -2,15 +2,17 @@ import { Order } from "@/lib/types";
 import { Avatar, AvatarFallback, AvatarImage } from "../ui/avatar";
 import OrderDetailItem from "./order-detail-item";
 import OrderStatusView from "./order-status-view";
-import { OrderStatus } from "@/lib/constants/enum";
+import Link from "next/link";
+import { toVND } from "@/lib/utils";
 
 interface OrderItemProps {
   order: Order;
 }
 const OrderItem = ({ order }: OrderItemProps) => {
   return (
-    <div
-      className={`p-4 flex flex-col gap-2 rounded-xl shadow-[0px_1px_2px_0px_rgba(0,0,0,0.1)] hover:shadow-md border overflow-clip`}
+    <Link
+      href={`/admin/order/${order.id}`}
+      className={`p-4 flex flex-col gap-2 rounded-xl shadow-[0px_1px_2px_0px_rgba(0,0,0,0.1)] hover:shadow-md border overflow-clip cursor-pointer`}
     >
       <div className="flex justify-between items-center border-b pb-3">
         {order.customer ? (
@@ -28,19 +30,16 @@ const OrderItem = ({ order }: OrderItemProps) => {
         ) : (
           <div></div>
         )}
-        <OrderStatusView status={order.orderStatus as OrderStatus} />
+        <OrderStatusView status={order.orderStatus} />
       </div>
       {order.details.map((detail, index) => (
         <OrderDetailItem key={`order-detail-${index}`} detail={detail} />
       ))}
       <span className="text-lg font-medium self-end">
         Total ({order.totalQuantity} item{order.totalQuantity > 1 ? "s" : ""}):{" "}
-        {new Intl.NumberFormat("vi-VN", {
-          style: "currency",
-          currency: "VND",
-        }).format(order.totalPrice)}
+        {toVND(order.totalPrice)}
       </span>
-    </div>
+    </Link>
   );
 };
 
