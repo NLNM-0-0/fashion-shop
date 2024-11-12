@@ -96,6 +96,11 @@ public class AuthenticationService {
 			throw new AppException(HttpStatus.BAD_REQUEST, Message.User.USER_EXIST);
 		}
 
+		Optional<User> userOptional = userRepository.findFirstByEmail(request.getEmail());
+		if (userOptional.isPresent()) {
+			throw new AppException(HttpStatus.BAD_REQUEST, Message.User.USER_EXIST);
+		}
+
 		handleImage(request);
 
 		UserAuth userAuth = UserAuth.builder()
@@ -152,22 +157,24 @@ public class AuthenticationService {
 
 		Optional<OTP> otp = otpRepository.findByUser(user.getId());
 
-//		String otpNumber = OTP.generateOTP();
-		String otpNumber = "260703";
+		String otpNumber = OTP.generateOTP();
 		OTP newOtp;
 
 		if (otp.isPresent() && !userAuth.isVerified()) {
-			newOtp = new OTP(otpNumber, userAuth, otp.get().getNextRetry());
+			newOtp = otp.get();
+			newOtp.increaseRetry();
+			newOtp.setOtp(otpNumber);
 		} else {
 			newOtp = new OTP(otpNumber, userAuth);
+
+			userAuth.setVerified(false);
+			userAuthRepository.save(userAuth);
 		}
 
 //		if (!smsSender.sendOtp(userAuth.getPhone(), otpNumber)) {
 //			throw new AppException(HttpStatus.INTERNAL_SERVER_ERROR, Message.COMMON_ERR);
 //		}
 
-		userAuth.setVerified(false);
-		userAuthRepository.save(userAuth);
 		otpRepository.save(newOtp);
 
 		return new SimpleResponse();

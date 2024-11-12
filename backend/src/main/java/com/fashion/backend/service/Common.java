@@ -66,7 +66,7 @@ public class Common {
 			throw new AppException(HttpStatus.BAD_REQUEST, Message.User.USER_IS_DELETED);
 		}
 		if (!isByEmail && !userAuth.isVerified()) {
-			throw new AppException(HttpStatus.BAD_REQUEST, Message.User.USER_IS_NOT_VERIFIED);
+			throw new AppException(HttpStatus.FORBIDDEN, Message.User.USER_IS_NOT_VERIFIED);
 		}
 		return userAuth;
 	}
