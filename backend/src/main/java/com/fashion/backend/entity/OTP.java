@@ -38,7 +38,7 @@ public class OTP {
 	private String otp;
 
 	@OneToOne(
-			targetEntity = UserAuth.class,
+			targetEntity = User.class,
 			fetch = FetchType.EAGER
 	)
 	@JoinColumn(
@@ -46,7 +46,7 @@ public class OTP {
 			unique = true,
 			nullable = false
 	)
-	private UserAuth user;
+	private User user;
 
 	private Date expiryDate;
 
@@ -55,7 +55,7 @@ public class OTP {
 	@Max(MAX_RETRY)
 	private int retry = 0;
 
-	public OTP(String otp, UserAuth user) {
+	public OTP(String otp, User user) {
 		this.otp        = otp;
 		this.user       = user;
 		this.expiryDate = getOTPExpirationTime();

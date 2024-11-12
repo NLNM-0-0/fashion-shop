@@ -165,7 +165,7 @@ public class AuthenticationService {
 			newOtp.increaseRetry();
 			newOtp.setOtp(otpNumber);
 		} else {
-			newOtp = new OTP(otpNumber, userAuth);
+			newOtp = new OTP(otpNumber, user);
 
 			userAuth.setVerified(false);
 			userAuthRepository.save(userAuth);
