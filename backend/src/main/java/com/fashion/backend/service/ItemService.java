@@ -32,11 +32,11 @@ public class ItemService {
 	private final StockChangeHistoryRepository stockChangeHistoryRepository;
 
 	@Transactional
-	public ListResponse<SimpleItemResponse, ItemFilter> userGetItems(AppPageRequest page, ItemFilter filter) {
+	public ListResponse<SimpleItemResponse, UserItemFilter> userGetItems(AppPageRequest page, UserItemFilter filter) {
 		Pageable pageable = PageRequest.of(page.getPage() - 1,
 										   page.getLimit(),
 										   Sort.by(Sort.Direction.ASC, "name"));
-		Specification<Item> spec = staffFilterItems(filter);
+		Specification<Item> spec = userFilterItems(filter);
 
 		Page<Item> itemPage = itemRepository.findAllNotDelete(spec, pageable);
 
@@ -44,7 +44,7 @@ public class ItemService {
 
 		List<SimpleItemResponse> data = items.stream().map(this::mapToDTOSimple).toList();
 
-		return ListResponse.<SimpleItemResponse, ItemFilter>builder()
+		return ListResponse.<SimpleItemResponse, UserItemFilter>builder()
 						   .data(data)
 						   .appPageResponse(AppPageResponse.builder()
 														   .index(page.getPage())
@@ -54,10 +54,30 @@ public class ItemService {
 														   .build())
 						   .filter(filter)
 						   .build();
+	}
+
+	private Specification<Item> userFilterItems(UserItemFilter filter) {
+		Specification<Item> spec = Specification.where(null);
+		if (filter.getCategoryId() != null) {
+			spec = spec.and(ItemSpecs.hasCategoryId(filter.getCategoryId()));
+		}
+		if (filter.getName() != null) {
+			spec = spec.and(ItemSpecs.hasName(filter.getName()));
+		}
+//		if (filter.getSeasons() != null && !filter.getSeasons().isEmpty()) {
+//			spec = spec.and(ItemSpecs.hasSeason(filter.getSeasons()));
+//		}
+//		if (filter.getGenders() != null) {
+//			spec = spec.and(ItemSpecs.hasGender(filter.getGenders()));
+//		}
+//		if (filter.getColors() != null) {
+//			spec = spec.and(ItemSpecs.hasColor(filter.getColors()));
+//		}
+		return spec;
 	}
 
 	@Transactional
-	public ListResponse<SimpleItemResponse, ItemFilter> staffGetItems(AppPageRequest page, ItemFilter filter) {
+	public ListResponse<SimpleItemResponse, AdminItemFilter> staffGetItems(AppPageRequest page, AdminItemFilter filter) {
 		Pageable pageable = PageRequest.of(page.getPage() - 1,
 										   page.getLimit(),
 										   Sort.by(Sort.Direction.ASC, "name"));
@@ -69,7 +89,7 @@ public class ItemService {
 
 		List<SimpleItemResponse> data = items.stream().map(this::mapToDTOSimple).toList();
 
-		return ListResponse.<SimpleItemResponse, ItemFilter>builder()
+		return ListResponse.<SimpleItemResponse, AdminItemFilter>builder()
 						   .data(data)
 						   .appPageResponse(AppPageResponse.builder()
 														   .index(page.getPage())
@@ -81,20 +101,20 @@ public class ItemService {
 						   .build();
 	}
 
-	private Specification<Item> staffFilterItems(ItemFilter filter) {
+	private Specification<Item> staffFilterItems(AdminItemFilter filter) {
 		Specification<Item> spec = Specification.where(null);
 		if (filter.getName() != null) {
 			spec = spec.and(ItemSpecs.hasName(filter.getName()));
 		}
-		if (filter.getGender() != null) {
-		    spec = spec.and(ItemSpecs.hasGender(filter.getGender().name()));
-		}
-		if (filter.getSeason() != null) {
-			spec = spec.and(ItemSpecs.hasGender(filter.getSeason().name()));
-		}
-		if (filter.getCategoryName() != null) {
-			spec = spec.and(ItemSpecs.hasGender(filter.getCategoryName()));
-		}
+//		if (filter.getGender() != null) {
+//		    spec = spec.and(ItemSpecs.hasGender(filter.getGender().name()));
+//		}
+//		if (filter.getSeason() != null) {
+//			spec = spec.and(ItemSpecs.hasGender(filter.getSeason().name()));
+//		}
+//		if (filter.getCategoryName() != null) {
+//			spec = spec.and(ItemSpecs.hasGender(filter.getCategoryName()));
+//		}
 		return spec;
 	}
 
