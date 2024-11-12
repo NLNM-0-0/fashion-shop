@@ -1,8 +1,6 @@
 package com.fashion.backend.service;
 
-import com.fashion.backend.constant.Gender;
 import com.fashion.backend.constant.Message;
-import com.fashion.backend.constant.Season;
 import com.fashion.backend.entity.*;
 import com.fashion.backend.exception.AppException;
 import com.fashion.backend.mail.MailSender;
@@ -191,8 +189,8 @@ public class Common {
 	public static List<Category> findCategoryByIds(List<Long> categoryIds, CategoryRepository categoryRepository) {
 		List<Category> categories = categoryRepository.findAllById(categoryIds);
 		if (categories.isEmpty() || categories.size() != categoryIds.size()) {
-		    throw new AppException(HttpStatus.BAD_REQUEST,
-									   Message.Category.CATEGORY_NOT_EXIST);
+			throw new AppException(HttpStatus.BAD_REQUEST,
+								   Message.Category.CATEGORY_NOT_EXIST);
 		}
 		return categories;
 	}

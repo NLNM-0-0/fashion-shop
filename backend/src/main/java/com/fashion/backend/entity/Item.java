@@ -1,10 +1,10 @@
 package com.fashion.backend.entity;
 
+import com.fashion.backend.constant.Color;
 import com.fashion.backend.constant.Gender;
 import com.fashion.backend.constant.Season;
-import com.fashion.backend.utils.converter.ItemColorListConverter;
-import com.fashion.backend.utils.converter.ItemImageListConverter;
 import com.fashion.backend.utils.converter.ItemSizeListConverter;
+import com.fashion.backend.utils.converter.ListConverter;
 import jakarta.persistence.*;
 import jakarta.validation.constraints.Min;
 import lombok.AllArgsConstructor;
@@ -42,17 +42,26 @@ public class Item {
 	)
 	private Gender gender;
 
-	@Column(name = "images", columnDefinition = "text")
-	@Convert(converter = ItemImageListConverter.class)
-	private List<ItemImage> images;
+	@Column(
+			name = "images",
+			columnDefinition = "text"
+	)
+	@Convert(converter = ListConverter.class)
+	private List<String> images;
 
-	@Column(name = "sizes", columnDefinition = "text")
+	@Column(
+			name = "sizes",
+			columnDefinition = "text"
+	)
 	@Convert(converter = ItemSizeListConverter.class)
 	private List<ItemSize> sizes;
 
-	@Column(name = "colors", columnDefinition = "text")
-	@Convert(converter = ItemColorListConverter.class)
-	private List<ItemColor> colors;
+	@Column(
+			name = "colors",
+			columnDefinition = "text"
+	)
+	@Convert(converter = ListConverter.class)
+	private List<Color> colors;
 
 	@ManyToMany(
 			fetch = FetchType.LAZY,

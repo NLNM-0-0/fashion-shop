@@ -80,14 +80,15 @@ public class GlobalExceptionHandler extends ResponseEntityExceptionHandler {
 																WebRequest webRequest) {
 		return createErrorResponse(Message.Auth.USER_NOT_CORRECT, webRequest, HttpStatus.BAD_REQUEST);
 	}
-	
+
 	@ExceptionHandler(InternalAuthenticationServiceException.class)
-	public ResponseEntity<ErrorResponse> handleInternalAuthenticationServiceException(InternalAuthenticationServiceException exception,
-																WebRequest webRequest) {
+	public ResponseEntity<ErrorResponse> handleInternalAuthenticationServiceException(
+			InternalAuthenticationServiceException exception,
+			WebRequest webRequest) {
 		Throwable cause = exception.getCause();
 		if (cause instanceof AppException appException) {
 			if (appException.getStatus() == HttpStatus.FORBIDDEN) {
-			    return createErrorResponse(appException.getMessage(), webRequest, appException.getStatus());
+				return createErrorResponse(appException.getMessage(), webRequest, appException.getStatus());
 			}
 		}
 		return createErrorResponse(exception, webRequest, HttpStatus.INTERNAL_SERVER_ERROR);

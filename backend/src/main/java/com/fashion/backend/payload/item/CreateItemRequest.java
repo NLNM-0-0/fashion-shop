@@ -1,5 +1,6 @@
 package com.fashion.backend.payload.item;
 
+import com.fashion.backend.constant.Color;
 import com.fashion.backend.constant.Gender;
 import com.fashion.backend.constant.Message;
 import com.fashion.backend.constant.Season;
@@ -34,13 +35,13 @@ public class CreateItemRequest {
 	@Schema(
 			name = "images"
 	)
-	private List<ItemImageDTO> images;
+	private List<String> images;
 
 	@Schema(
 			name = "colors"
 	)
 	@NotNull(message = Message.Item.COLOR_VALIDATE)
-	private List<CreateItemColorRequest> colors;
+	private List<Color> colors;
 
 	@Schema(
 			name = "sizes"

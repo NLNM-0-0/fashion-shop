@@ -27,10 +27,13 @@ public class Message {
 				= "Bạn không thể truy cập đến đơn hàng của khách hàng khác";
 		public static final String CAN_NOT_BE_REACHED_CLOSED_ORDER = "Bạn không thể truy cập đến đơn hàng đã đóng";
 		public static final String ORDER_CAN_NOT_HAVE_NO_ITEM = "Đơn hàng không được rỗng";
+		public static final String ORDER_ITEM_MUST_HAVE_COLOR = "Thông tin đơn hàng cần kèm theo màu sắc";
+		public static final String ORDER_ITEM_MUST_HAVE_SIZE = "Thông tin đơn hàng cần kèm theo kích thước";
 		public static final String ORDER_CAN_NOT_HAVE_SAME_ITEM = "Đơn hàng không được có 2 sản phẩm giống nhau";
-		public static final String NORMAL_USER_CAN_NOT_CREATE_INVOICE_DIRECTLY
-				= "Khách hàng không thể tự thanh toán hóa đơn";
-		public static final String STAFF_CAN_NOT_BUY_ITEM = "Nhân viên không thể mua hàng";
+		public static final String CAN_NOT_PLACE_ORDER_ITEM_SIZE_NOT_EXIST
+				= "Không thể tạo đơn hàng với kích cỡ không có sẵn";
+		public static final String CAN_NOT_PLACE_ORDER_ITEM_COLOR_NOT_EXIST
+				= "Không thể tạo đơn hàng với màu sắc không có sẵn";
 	}
 
 	public static class StockReport {
@@ -52,7 +55,8 @@ public class Message {
 
 	public static class Category {
 		public static final String NAME_VALIDATE = "Tên danh mục không được trống và tối đa 200 ký tự";
-		public static final String CAN_NOT_DELETE_CATEGORY_THAT_EXIST_ITEM_CONTAIN_ONLY_IT = "Có sản phẩm chỉ tồn tại duy nhất danh mục này. Không thể xóa";
+		public static final String CAN_NOT_DELETE_CATEGORY_THAT_EXIST_ITEM_CONTAIN_ONLY_IT
+				= "Có sản phẩm chỉ tồn tại duy nhất danh mục này. Không thể xóa";
 		public static final String CATEGORY_NOT_EXIST = "Danh mục không tồn tại trong hệ thống";
 	}
 
@@ -72,6 +76,7 @@ public class Message {
 		public static final String UNIT_PRICE_VALIDATE = "Giá sản phẩm không được trống và tối thiểu bằng 0";
 		public static final String QUANTITY_VALIDATE = "Số lượng sản phẩm không được để trống và tối thiểu bằng 0";
 		public static final String QUANTITY_MIN = "Số lượng sản phẩm tối thiểu bằng 0";
+		public static final String CAN_NOT_FILTER_2_TYPE_PRICE_FILTER = "Không được lọc 2 loại mệnh giá";
 	}
 
 	public static class User {

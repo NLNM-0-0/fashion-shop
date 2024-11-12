@@ -1,6 +1,6 @@
 package com.fashion.backend.payload.item;
 
-import com.fashion.backend.constant.ApplicationConst;
+import com.fashion.backend.constant.Color;
 import com.fashion.backend.constant.Gender;
 import com.fashion.backend.constant.Message;
 import com.fashion.backend.constant.Season;
@@ -30,15 +30,14 @@ public class UpdateItemRequest {
 	private Gender gender;
 
 	@Schema(
-			name = "images",
-			example = ApplicationConst.DEFAULT_IMAGE
+			name = "images"
 	)
-	private List<ItemImageDTO> images;
+	private List<String> images;
 
 	@Schema(
 			name = "colors"
 	)
-	private List<CreateItemColorRequest> colors;
+	private List<Color> colors;
 
 	@Schema(
 			name = "sizes"

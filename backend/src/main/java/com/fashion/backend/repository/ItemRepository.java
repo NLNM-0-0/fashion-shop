@@ -1,6 +1,5 @@
 package com.fashion.backend.repository;
 
-import com.fashion.backend.entity.Category;
 import com.fashion.backend.entity.Item;
 import com.fashion.backend.payload.item.ItemSpecs;
 import org.springframework.data.domain.Page;
@@ -13,6 +12,11 @@ import java.util.List;
 
 public interface ItemRepository extends JpaRepository<Item, Long>, JpaSpecificationExecutor<Item> {
 	List<Item> findAllByCategories_Id(Long categoryId);
+
+	default List<Item> findAllNotDelete() {
+		Specification<Item> spec = ItemSpecs.isNotDeleted();
+		return findAll(spec);
+	}
 
 	default Page<Item> findAllNotDelete(Specification<Item> specs,
 										Pageable pageable) {

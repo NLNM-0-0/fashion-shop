@@ -1,5 +1,6 @@
 package com.fashion.backend.entity;
 
+import com.fashion.backend.constant.Color;
 import jakarta.persistence.*;
 import jakarta.validation.constraints.Min;
 import lombok.AllArgsConstructor;
@@ -28,6 +29,16 @@ public class OrderDetail {
 			updatable = false
 	)
 	private Item item;
+
+	@Column(
+			name = "size",
+			columnDefinition = "text"
+	)
+	private String size;
+
+	@Enumerated(EnumType.STRING)
+	@Column(name = "color")
+	private Color color;
 
 	@Column(name = "quantity")
 	@Min(1)

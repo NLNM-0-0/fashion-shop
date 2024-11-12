@@ -9,7 +9,6 @@ import com.fashion.backend.mail.MailSender;
 import com.fashion.backend.payload.ListResponse;
 import com.fashion.backend.payload.SimpleResponse;
 import com.fashion.backend.payload.customer.SimpleCustomerResponse;
-import com.fashion.backend.payload.item.ItemImageDTO;
 import com.fashion.backend.payload.item.SimpleItemResponse;
 import com.fashion.backend.payload.order.*;
 import com.fashion.backend.payload.page.AppPageRequest;
@@ -222,9 +221,17 @@ public class OrderService {
 		List<OrderDetail> details = new ArrayList<>();
 		for (OrderDetailRequest requestDetail : requestDetails) {
 			Item item = Common.findItemById(requestDetail.getItemId(), itemRepository);
+			if (item.getSizes().stream().noneMatch(size -> size.getName().equals(requestDetail.getSize()))) {
+				throw new AppException(HttpStatus.BAD_REQUEST, Message.Order.CAN_NOT_PLACE_ORDER_ITEM_SIZE_NOT_EXIST);
+			}
+			if (item.getColors().stream().noneMatch(color -> color.equals(requestDetail.getColor()))) {
+				throw new AppException(HttpStatus.BAD_REQUEST, Message.Order.CAN_NOT_PLACE_ORDER_ITEM_COLOR_NOT_EXIST);
+			}
 
 			OrderDetail orderDetail = OrderDetail.builder()
 												 .unitPrice(item.getUnitPrice())
+												 .color(requestDetail.getColor())
+												 .size(requestDetail.getSize())
 												 .quantity(requestDetail.getQuantity())
 												 .item(item)
 												 .build();
@@ -288,19 +295,6 @@ public class OrderService {
 		stockChangeHistoryRepository.saveAll(savedHistories);
 	}
 
-	private SimpleOrderResponse mapToSimpleDTO(Order order) {
-		return SimpleOrderResponse.builder()
-								  .id(order.getId())
-								  .customer(mapToDTOCustomer(order.getCustomer()))
-								  .staff(mapToDTOStaff(order.getStaff()))
-								  .totalPrice(order.getTotalPrice())
-								  .totalQuantity(order.getTotalQuantity())
-								  .orderStatus(order.getStatus())
-								  .createdAt(order.getCreatedAt())
-								  .updatedAt(order.getUpdatedAt())
-								  .build();
-	}
-
 	private OrderResponse mapToDTO(Order order) {
 		return OrderResponse.builder()
 							.id(order.getId())
@@ -343,6 +337,8 @@ public class OrderService {
 	private OrderDetailResponse mapToDTO(OrderDetail detail) {
 		return OrderDetailResponse.builder()
 								  .item(mapToDTO(detail.getItem()))
+								  .color(detail.getColor())
+								  .size(detail.getSize())
 								  .quantity(detail.getQuantity())
 								  .unitPrice(detail.getUnitPrice())
 								  .totalSubPrice(detail.getQuantity() * detail.getUnitPrice())
@@ -353,14 +349,8 @@ public class OrderService {
 		return SimpleItemResponse.builder()
 								 .id(item.getId())
 								 .name(item.getName())
-								 .images(item.getImages().stream().map(this::mapToDTO).toList())
+								 .images(item.getImages())
 								 .isDeleted(item.isDeleted())
 								 .build();
-	}
-
-	private ItemImageDTO mapToDTO(ItemImage image) {
-		return ItemImageDTO.builder()
-						   .image(image.getImage())
-						   .build();
 	}
 }
