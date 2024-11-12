@@ -32,11 +32,11 @@ public class ItemService {
 	private final StockChangeHistoryRepository stockChangeHistoryRepository;
 
 	@Transactional
-	public ListResponse<SimpleItemResponse, ItemFilter> getItems(AppPageRequest page, ItemFilter filter) {
+	public ListResponse<SimpleItemResponse, ItemFilter> userGetItems(AppPageRequest page, ItemFilter filter) {
 		Pageable pageable = PageRequest.of(page.getPage() - 1,
 										   page.getLimit(),
 										   Sort.by(Sort.Direction.ASC, "name"));
-		Specification<Item> spec = filterItems(filter);
+		Specification<Item> spec = staffFilterItems(filter);
 
 		Page<Item> itemPage = itemRepository.findAllNotDelete(spec, pageable);
 
@@ -56,10 +56,44 @@ public class ItemService {
 						   .build();
 	}
 
-	private Specification<Item> filterItems(ItemFilter filter) {
+	@Transactional
+	public ListResponse<SimpleItemResponse, ItemFilter> staffGetItems(AppPageRequest page, ItemFilter filter) {
+		Pageable pageable = PageRequest.of(page.getPage() - 1,
+										   page.getLimit(),
+										   Sort.by(Sort.Direction.ASC, "name"));
+		Specification<Item> spec = staffFilterItems(filter);
+
+		Page<Item> itemPage = itemRepository.findAllNotDelete(spec, pageable);
+
+		List<Item> items = itemPage.getContent();
+
+		List<SimpleItemResponse> data = items.stream().map(this::mapToDTOSimple).toList();
+
+		return ListResponse.<SimpleItemResponse, ItemFilter>builder()
+						   .data(data)
+						   .appPageResponse(AppPageResponse.builder()
+														   .index(page.getPage())
+														   .limit(page.getLimit())
+														   .totalPages(itemPage.getTotalPages())
+														   .totalElements(itemPage.getTotalElements())
+														   .build())
+						   .filter(filter)
+						   .build();
+	}
+
+	private Specification<Item> staffFilterItems(ItemFilter filter) {
 		Specification<Item> spec = Specification.where(null);
 		if (filter.getName() != null) {
-			spec = ItemSpecs.hasName(filter.getName());
+			spec = spec.and(ItemSpecs.hasName(filter.getName()));
+		}
+		if (filter.getGender() != null) {
+		    spec = spec.and(ItemSpecs.hasGender(filter.getGender().name()));
+		}
+		if (filter.getSeason() != null) {
+			spec = spec.and(ItemSpecs.hasGender(filter.getSeason().name()));
+		}
+		if (filter.getCategoryName() != null) {
+			spec = spec.and(ItemSpecs.hasGender(filter.getCategoryName()));
 		}
 		return spec;
 	}

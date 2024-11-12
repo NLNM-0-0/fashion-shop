@@ -9,6 +9,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.lang.NonNull;
 import org.springframework.security.access.AccessDeniedException;
 import org.springframework.security.authentication.BadCredentialsException;
+import org.springframework.security.authentication.InternalAuthenticationServiceException;
 import org.springframework.validation.FieldError;
 import org.springframework.validation.ObjectError;
 import org.springframework.web.bind.MethodArgumentNotValidException;
@@ -42,6 +43,12 @@ public class GlobalExceptionHandler extends ResponseEntityExceptionHandler {
 		return new ResponseEntity<>(errorResponse, status);
 	}
 
+	@ExceptionHandler(AppException.class)
+	public ResponseEntity<ErrorResponse> handleRequestException(AppException exception,
+																WebRequest webRequest) {
+		return createErrorResponse(exception, webRequest, exception.getStatus());
+	}
+
 	@ExceptionHandler(ResourceNotFoundException.class)
 	public ResponseEntity<ErrorResponse> handleResourceNotFoundException(ResourceNotFoundException exception,
 																		 WebRequest webRequest) {
@@ -68,16 +75,22 @@ public class GlobalExceptionHandler extends ResponseEntityExceptionHandler {
 								   HttpStatus.BAD_REQUEST);
 	}
 
-	@ExceptionHandler(AppException.class)
-	public ResponseEntity<ErrorResponse> handleRequestException(AppException exception,
-																WebRequest webRequest) {
-		return createErrorResponse(exception, webRequest, exception.getStatus());
-	}
-
 	@ExceptionHandler(BadCredentialsException.class)
 	public ResponseEntity<ErrorResponse> handleRequestException(BadCredentialsException exception,
 																WebRequest webRequest) {
 		return createErrorResponse(Message.Auth.USER_NOT_CORRECT, webRequest, HttpStatus.BAD_REQUEST);
+	}
+	
+	@ExceptionHandler(InternalAuthenticationServiceException.class)
+	public ResponseEntity<ErrorResponse> handleInternalAuthenticationServiceException(InternalAuthenticationServiceException exception,
+																WebRequest webRequest) {
+		Throwable cause = exception.getCause();
+		if (cause instanceof AppException appException) {
+			if (appException.getStatus() == HttpStatus.FORBIDDEN) {
+			    return createErrorResponse(appException.getMessage(), webRequest, appException.getStatus());
+			}
+		}
+		return createErrorResponse(exception, webRequest, HttpStatus.INTERNAL_SERVER_ERROR);
 	}
 
 	@ExceptionHandler(AccessDeniedException.class)

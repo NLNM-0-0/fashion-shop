@@ -1,10 +1,11 @@
 package com.fashion.backend.controller.admin;
 
-import com.fashion.backend.payload.ListResponse;
+import com.fashion.backend.payload.SimpleListResponse;
 import com.fashion.backend.payload.SimpleResponse;
-import com.fashion.backend.payload.item.*;
-import com.fashion.backend.payload.page.AppPageRequest;
-import com.fashion.backend.service.ItemService;
+import com.fashion.backend.payload.category.CategoryResponse;
+import com.fashion.backend.payload.category.CreateCategoryRequest;
+import com.fashion.backend.payload.category.UpdateCategoryRequest;
+import com.fashion.backend.service.CategoryService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.security.SecurityRequirement;
@@ -18,48 +19,29 @@ import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 
 @RestController
-@RequestMapping("/api/v1/admin/item")
+@RequestMapping("/api/v1/admin/category")
 @RequiredArgsConstructor
 @Tag(
-		name = "Item"
+		name = "Category"
 )
 @Validated
-public class AdminItemController {
-	private final ItemService itemService;
+public class AdminCategoryController {
+	private final CategoryService categoryService;
 
 	@GetMapping
 	@SecurityRequirement(
 			name = "Bearer Authentication"
 	)
 	@Operation(
-			summary = "Fetch items",
-			description = "Note: Fetch all items are not deleted"
+			summary = "Fetch all categories"
 	)
 	@ApiResponse(
 			responseCode = "200",
 			description = "Http Status is 200 OK"
 	)
 	@PreAuthorize("hasAnyAuthority('ADMIN', 'STAFF')")
-	public ResponseEntity<ListResponse<SimpleItemResponse, ItemFilter>> getItems(
-			@Valid AppPageRequest page,
-			@Valid ItemFilter filter) {
-		return new ResponseEntity<>(itemService.staffGetItems(page, filter), HttpStatus.OK);
-	}
-
-	@GetMapping("/{id}")
-	@SecurityRequirement(
-			name = "Bearer Authentication"
-	)
-	@Operation(
-			summary = "Fetch detail item"
-	)
-	@ApiResponse(
-			responseCode = "200",
-			description = "Http Status is 200 OK"
-	)
-	@PreAuthorize("hasAnyAuthority('ADMIN', 'STAFF')")
-	public ResponseEntity<ItemResponse> getItem(@PathVariable Long id) {
-		return new ResponseEntity<>(itemService.getItem(id), HttpStatus.OK);
+	public ResponseEntity<SimpleListResponse<CategoryResponse>> getAllCategories() {
+		return new ResponseEntity<>(categoryService.getCategories(), HttpStatus.OK);
 	}
 
 	@PostMapping
@@ -67,18 +49,17 @@ public class AdminItemController {
 			name = "Bearer Authentication"
 	)
 	@Operation(
-			summary = "Create item",
-			description = "Create new item"
+			summary = "Create category"
 	)
 	@ApiResponse(
 			responseCode = "201",
 			description = "Http Status is 201 CREATED"
 	)
 	@PreAuthorize("hasAnyAuthority('ADMIN', 'STAFF')")
-	public ResponseEntity<ItemResponse> createItem(
-			@Valid @RequestBody CreateItemRequest request
+	public ResponseEntity<CategoryResponse> createCategory(
+			@Valid @RequestBody CreateCategoryRequest request
 	) {
-		return new ResponseEntity<>(itemService.createItem(request), HttpStatus.CREATED);
+		return new ResponseEntity<>(categoryService.createCategory(request), HttpStatus.CREATED);
 	}
 
 	@PutMapping("/{id}")
@@ -86,18 +67,18 @@ public class AdminItemController {
 			name = "Bearer Authentication"
 	)
 	@Operation(
-			summary = "Update item"
+			summary = "Update category"
 	)
 	@ApiResponse(
 			responseCode = "200",
 			description = "Http Status is 200 OK"
 	)
 	@PreAuthorize("hasAnyAuthority('ADMIN', 'STAFF')")
-	public ResponseEntity<ItemResponse> updateItem(
+	public ResponseEntity<CategoryResponse> updateCategory(
 			@PathVariable Long id,
-			@Valid @RequestBody UpdateItemRequest request
+			@Valid @RequestBody UpdateCategoryRequest request
 	) {
-		return new ResponseEntity<>(itemService.updateItem(id, request), HttpStatus.OK);
+		return new ResponseEntity<>(categoryService.updateCategory(id, request), HttpStatus.OK);
 	}
 
 	@DeleteMapping("/{id}")
@@ -105,16 +86,16 @@ public class AdminItemController {
 			name = "Bearer Authentication"
 	)
 	@Operation(
-			summary = "Delete item"
+			summary = "Delete category"
 	)
 	@ApiResponse(
 			responseCode = "200",
 			description = "Http Status is 200 OK"
 	)
 	@PreAuthorize("hasAnyAuthority('ADMIN', 'STAFF')")
-	public ResponseEntity<SimpleResponse> deleteItem(
+	public ResponseEntity<SimpleResponse> deleteCategory(
 			@PathVariable Long id
 	) {
-		return new ResponseEntity<>(itemService.deleteItem(id), HttpStatus.OK);
+		return new ResponseEntity<>(categoryService.deleteCategory(id), HttpStatus.OK);
 	}
 }

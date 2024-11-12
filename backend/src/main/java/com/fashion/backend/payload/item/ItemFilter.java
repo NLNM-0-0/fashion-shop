@@ -38,8 +38,8 @@ public class ItemFilter {
 	private Season season;
 
 	@Schema(
-			name = "category",
+			name = "categoryName",
 			example = "Category name"
 	)
-	private String category;
+	private String categoryName;
 }
