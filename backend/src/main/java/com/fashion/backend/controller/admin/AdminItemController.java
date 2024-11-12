@@ -40,9 +40,9 @@ public class AdminItemController {
 			description = "Http Status is 200 OK"
 	)
 	@PreAuthorize("hasAnyAuthority('ADMIN', 'STAFF')")
-	public ResponseEntity<ListResponse<SimpleItemResponse, ItemFilter>> getItems(
+	public ResponseEntity<ListResponse<SimpleItemResponse, AdminItemFilter>> getItems(
 			@Valid AppPageRequest page,
-			@Valid ItemFilter filter) {
+			@Valid AdminItemFilter filter) {
 		return new ResponseEntity<>(itemService.staffGetItems(page, filter), HttpStatus.OK);
 	}
 
