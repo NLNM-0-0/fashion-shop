@@ -12,7 +12,7 @@ public class ResourceNotFoundException extends RuntimeException {
 	private final String fieldValue;
 
 	public ResourceNotFoundException(String resourceName, String fieldName, String fieldValue) {
-		super(String.format("Không thể tìm thấy %s với %s = %s", resourceName, fieldName, fieldValue));
+		super(String.format("Can not find %s when %s = %s", resourceName, fieldName, fieldValue));
 		this.resourceName = resourceName;
 		this.fieldName    = fieldName;
 		this.fieldValue   = fieldValue;

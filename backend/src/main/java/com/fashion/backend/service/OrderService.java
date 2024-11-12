@@ -26,10 +26,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.util.ArrayList;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Objects;
+import java.util.*;
 
 @Service
 @RequiredArgsConstructor
@@ -146,23 +143,49 @@ public class OrderService {
 	}
 
 	@Transactional
-	public SimpleResponse changeOrderStatus(Long orderId, ChangeOrderStatus request) {
+	public SimpleResponse cancelOrder(Long orderId) {
 		Order order = Common.findOrderById(orderId, orderRepository);
 		if (order.getStatus() == OrderStatus.DONE || order.getStatus() == OrderStatus.CANCELED) {
 			throw new AppException(HttpStatus.BAD_REQUEST, Message.Order.CAN_NOT_BE_REACHED_CLOSED_ORDER);
 		}
 
-		OrderStatus orderStatus = request.getOrderStatus();
-		order.setStatus(orderStatus);
+		order.setStatus(OrderStatus.CANCELED);
 
 		orderRepository.save(order);
 
-		if (orderStatus == OrderStatus.CANCELED) {
-			handlePaybackItem(order);
-		}
+		handlePaybackItem(order);
 
 		User user = Common.findCurrUser(userRepository, userAuthRepository);
-		sendEmailOrderStatusChange(order, user, orderStatus);
+		sendEmailOrderStatusChange(order, user, OrderStatus.CANCELED);
+
+		return new SimpleResponse();
+	}
+
+	@Transactional
+	public SimpleResponse changeOrderStatus(Long orderId) {
+		Order order = Common.findOrderById(orderId, orderRepository);
+		if (order.getStatus() == OrderStatus.DONE || order.getStatus() == OrderStatus.CANCELED) {
+			throw new AppException(HttpStatus.BAD_REQUEST, Message.Order.CAN_NOT_BE_REACHED_CLOSED_ORDER);
+		}
+
+		OrderStatus currStatus = order.getStatus();
+		OrderStatus updatedStatus;
+		if (currStatus == OrderStatus.PENDING) {
+		    order.setConfirmedAt(new Date());
+			updatedStatus = OrderStatus.CONFIRMED;
+		} else if (currStatus == OrderStatus.CONFIRMED) {
+			order.setShippingAt(new Date());
+			updatedStatus = OrderStatus.SHIPPING;
+		} else {
+			order.setShippingAt(new Date());
+			updatedStatus = OrderStatus.DONE;
+		}
+		order.setStatus(updatedStatus);
+
+		orderRepository.save(order);
+
+		User user = Common.findCurrUser(userRepository, userAuthRepository);
+		sendEmailOrderStatusChange(order, user, updatedStatus);
 
 		return new SimpleResponse();
 	}
@@ -304,6 +327,10 @@ public class OrderService {
 							.totalQuantity(order.getTotalQuantity())
 							.orderStatus(order.getStatus())
 							.createdAt(order.getCreatedAt())
+							.confirmedAt(order.getConfirmedAt())
+							.shippingAt(order.getShippingAt())
+							.doneAt(order.getDoneAt())
+							.canceledAt(order.getCancelledAt())
 							.updatedAt(order.getUpdatedAt())
 							.details(order.getOrderDetails().stream().map(this::mapToDTO).toList())
 							.build();

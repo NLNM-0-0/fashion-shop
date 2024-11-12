@@ -95,9 +95,26 @@ public class AdminOrderController {
 	)
 	@PreAuthorize("hasAnyAuthority('ADMIN', 'STAFF')")
 	public ResponseEntity<SimpleResponse> updateOrder(
-			@PathVariable Long id,
-			@Valid @RequestBody ChangeOrderStatus request
+			@PathVariable Long id
 	) {
-		return new ResponseEntity<>(orderService.changeOrderStatus(id, request), HttpStatus.OK);
+		return new ResponseEntity<>(orderService.changeOrderStatus(id), HttpStatus.OK);
+	}
+
+	@DeleteMapping("/{id}")
+	@SecurityRequirement(
+			name = "Bearer Authentication"
+	)
+	@Operation(
+			summary = "Cancel order"
+	)
+	@ApiResponse(
+			responseCode = "200",
+			description = "Http Status is 200 OK"
+	)
+	@PreAuthorize("hasAnyAuthority('ADMIN', 'STAFF')")
+	public ResponseEntity<SimpleResponse> cancelOrder(
+			@PathVariable Long id
+	) {
+		return new ResponseEntity<>(orderService.cancelOrder(id), HttpStatus.OK);
 	}
 }

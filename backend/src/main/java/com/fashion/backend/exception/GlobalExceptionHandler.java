@@ -62,15 +62,15 @@ public class GlobalExceptionHandler extends ResponseEntityExceptionHandler {
 		if (exceptionMessage.contains("Duplicate")) {
 			exceptionMessage = exceptionMessage.substring(exceptionMessage.indexOf("key") + 5);
 			String key = exceptionMessage.substring(exceptionMessage.indexOf(".") + 1, exceptionMessage.indexOf("'"));
-			return createErrorResponse(String.format("%s đã tồn tại trong hệ thống", key),
+			return createErrorResponse(String.format("%s already exists in the system", key),
 									   webRequest,
 									   HttpStatus.BAD_REQUEST);
 		} else if (exceptionMessage.contains("not-null")) {
-			return createErrorResponse("Có trường bị thiếu trong request",
+			return createErrorResponse("A field is missing in the request",
 									   webRequest,
 									   HttpStatus.BAD_REQUEST);
 		}
-		return createErrorResponse("Đã có lỗi xảy ra với database. Xin hãy thử lại",
+		return createErrorResponse("An error occurred with the database. Please try again",
 								   webRequest,
 								   HttpStatus.BAD_REQUEST);
 	}

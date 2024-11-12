@@ -59,8 +59,8 @@ public class AuthenticationController {
 	}
 
 	@Operation(
-			summary = "Send otp to reset password",
-			description = "Send otp to reset password"
+			summary = "Send otp",
+			description = "Send otp"
 	)
 	@ApiResponse(
 			responseCode = "200",
@@ -68,15 +68,31 @@ public class AuthenticationController {
 	)
 	@PostMapping("/send_otp")
 	@PermitAll
-	public ResponseEntity<SimpleResponse> sendOtpToResetPassword(
+	public ResponseEntity<SimpleResponse> sendOtp(
 			@Valid @RequestBody PhoneRequest request
 	) {
-		return ResponseEntity.ok(authService.sendOtpToResetPassword(request));
+			return ResponseEntity.ok(authService.sendOtp(request));
 	}
 
 	@Operation(
-			summary = "Verify otp",
+			summary = "Verify otp when reset password",
 			description = "Verify otp to reset password"
+	)
+	@ApiResponse(
+			responseCode = "200",
+			description = "Http Status is 200 OK"
+	)
+	@PostMapping("/verify-reset-password")
+	@PermitAll
+	public ResponseEntity<SimpleResponse> verifyOtpToResetPassword(
+			@Valid @RequestBody OtpVerifyRequest request
+	) {
+		return ResponseEntity.ok(authService.verifiedOTPToResetPassword(request));
+	}
+
+	@Operation(
+			summary = "Verify otp when register",
+			description = "Verify otp when register"
 	)
 	@ApiResponse(
 			responseCode = "200",
