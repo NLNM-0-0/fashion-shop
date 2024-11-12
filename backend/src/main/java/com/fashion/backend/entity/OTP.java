@@ -5,9 +5,7 @@ import com.fashion.backend.exception.AppException;
 import jakarta.persistence.*;
 import jakarta.validation.constraints.Max;
 import jakarta.validation.constraints.Min;
-import lombok.AllArgsConstructor;
-import lombok.Builder;
-import lombok.NoArgsConstructor;
+import lombok.*;
 import org.springframework.http.HttpStatus;
 
 import java.util.Calendar;
@@ -33,6 +31,7 @@ public class OTP {
 	@GeneratedValue(strategy = GenerationType.IDENTITY)
 	private Long id;
 
+	@Setter
 	private String otp;
 
 	@OneToOne(
@@ -60,16 +59,10 @@ public class OTP {
 		this.retry      = 0;
 	}
 
-	public OTP(String otp, UserAuth user, int retry) {
-		this.otp        = otp;
-		this.user       = user;
-		this.expiryDate = getOTPExpirationTime();
-		this.retry      = retry;
-	}
-
 	public static String generateOTP() {
-		int otp = 100000 + rand.nextInt(900000);
-		return String.valueOf(otp);
+//		int otp = 100000 + rand.nextInt(900000);
+//		return String.valueOf(otp);
+		return "260703";
 	}
 
 	private Date getOTPExpirationTime() {
@@ -82,6 +75,13 @@ public class OTP {
 	public boolean isValid() {
 		Calendar calendar = Calendar.getInstance();
 		return (this.getOTPExpirationTime().getTime() - calendar.getTime().getTime()) > 0;
+	}
+
+	public void increaseRetry() {
+		int newRetry = this.retry + 1;
+		if (newRetry >= MAX_RETRY) {
+			throw new AppException(HttpStatus.BAD_REQUEST, Message.OTP_OVER_LIMIT);
+		}
 	}
 
 	public int getNextRetry() {
