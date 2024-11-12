@@ -9,13 +9,13 @@ import com.fashion.backend.mail.MailSender;
 import com.fashion.backend.payload.ListResponse;
 import com.fashion.backend.payload.SimpleResponse;
 import com.fashion.backend.payload.customer.SimpleCustomerResponse;
+import com.fashion.backend.payload.item.ItemImageDTO;
 import com.fashion.backend.payload.item.SimpleItemResponse;
 import com.fashion.backend.payload.order.*;
 import com.fashion.backend.payload.page.AppPageRequest;
 import com.fashion.backend.payload.page.AppPageResponse;
 import com.fashion.backend.payload.staff.SimpleStaffResponse;
 import com.fashion.backend.repository.*;
-import com.fashion.backend.utils.tuple.Pair;
 import com.fashion.backend.utils.tuple.Triple;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
@@ -191,7 +191,7 @@ public class OrderService {
 						   .staff(isMadeByStaff ? user : null)
 						   .customer(isMadeByStaff ? null : user)
 						   .totalPrice(totalPrice)
-							.totalQuantity(totalQuantity)
+						   .totalQuantity(totalQuantity)
 						   .orderDetails(details)
 						   .status(isMadeByStaff ? OrderStatus.DONE : OrderStatus.PENDING)
 						   .build();
@@ -294,7 +294,7 @@ public class OrderService {
 								  .customer(mapToDTOCustomer(order.getCustomer()))
 								  .staff(mapToDTOStaff(order.getStaff()))
 								  .totalPrice(order.getTotalPrice())
-				.totalQuantity(order.getTotalQuantity())
+								  .totalQuantity(order.getTotalQuantity())
 								  .orderStatus(order.getStatus())
 								  .createdAt(order.getCreatedAt())
 								  .updatedAt(order.getUpdatedAt())
@@ -352,9 +352,15 @@ public class OrderService {
 	private SimpleItemResponse mapToDTO(Item item) {
 		return SimpleItemResponse.builder()
 								 .id(item.getId())
-								 .image(item.getImage())
 								 .name(item.getName())
+								 .images(item.getImages().stream().map(this::mapToDTO).toList())
 								 .isDeleted(item.isDeleted())
 								 .build();
+	}
+
+	private ItemImageDTO mapToDTO(ItemImage image) {
+		return ItemImageDTO.builder()
+						   .image(image.getImage())
+						   .build();
 	}
 }

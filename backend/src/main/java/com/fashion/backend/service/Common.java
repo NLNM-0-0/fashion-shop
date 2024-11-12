@@ -1,6 +1,8 @@
 package com.fashion.backend.service;
 
+import com.fashion.backend.constant.Gender;
 import com.fashion.backend.constant.Message;
+import com.fashion.backend.constant.Season;
 import com.fashion.backend.entity.*;
 import com.fashion.backend.exception.AppException;
 import com.fashion.backend.mail.MailSender;
@@ -12,35 +14,10 @@ import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.core.userdetails.UserDetails;
 
 import java.util.List;
-import java.util.Map;
 import java.util.function.Consumer;
 
 public class Common {
-	public static void updateIfNotNull(String newValue, Consumer<String> setter) {
-		if (newValue != null) {
-			setter.accept(newValue);
-		}
-	}
-
-	public static void updateIfNotNull(Boolean newValue, Consumer<Boolean> setter) {
-		if (newValue != null) {
-			setter.accept(newValue);
-		}
-	}
-
-	public static void updateIfNotNull(Long newValue, Consumer<Long> setter) {
-		if (newValue != null) {
-			setter.accept(newValue);
-		}
-	}
-
-	public static void updateIfNotNull(Integer newValue, Consumer<Integer> setter) {
-		if (newValue != null) {
-			setter.accept(newValue);
-		}
-	}
-
-	public static void updateIfNotNull(Map<String, Object> newValue, Consumer<Map<String, Object>> setter) {
+	public static <T> void updateIfNotNull(T newValue, Consumer<T> setter) {
 		if (newValue != null) {
 			setter.accept(newValue);
 		}
@@ -205,10 +182,24 @@ public class Common {
 		return item;
 	}
 
+	public static Category findCategoryById(Long categoryId, CategoryRepository categoryRepository) {
+		return categoryRepository.findById(categoryId)
+								 .orElseThrow(() -> new AppException(HttpStatus.BAD_REQUEST,
+																	 Message.Category.CATEGORY_NOT_EXIST));
+	}
+
+	public static List<Category> findCategoryByIds(List<Long> categoryIds, CategoryRepository categoryRepository) {
+		List<Category> categories = categoryRepository.findAllById(categoryIds);
+		if (categories.isEmpty() || categories.size() != categoryIds.size()) {
+		    throw new AppException(HttpStatus.BAD_REQUEST,
+									   Message.Category.CATEGORY_NOT_EXIST);
+		}
+		return categories;
+	}
+
 	public static Order findOrderById(Long itemId, OrderRepository orderRepository) {
-		Order order = orderRepository.findById(itemId)
-									 .orElseThrow(() -> new AppException(HttpStatus.BAD_REQUEST,
-																		 Message.Order.ORDER_NOT_EXIST));
-		return order;
+		return orderRepository.findById(itemId)
+							  .orElseThrow(() -> new AppException(HttpStatus.BAD_REQUEST,
+																  Message.Order.ORDER_NOT_EXIST));
 	}
 }

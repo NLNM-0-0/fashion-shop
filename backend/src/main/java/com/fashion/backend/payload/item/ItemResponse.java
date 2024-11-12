@@ -1,9 +1,13 @@
 package com.fashion.backend.payload.item;
 
-import com.fashion.backend.constant.ApplicationConst;
+import com.fashion.backend.constant.Gender;
+import com.fashion.backend.constant.Season;
+import com.fashion.backend.payload.category.CategoryResponse;
 import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.Builder;
 import lombok.Data;
+
+import java.util.List;
 
 @Data
 @Builder
@@ -21,10 +25,40 @@ public class ItemResponse {
 	private String name;
 
 	@Schema(
-			name = "image",
-			example = ApplicationConst.DEFAULT_AVATAR
+			name = "gender"
 	)
-	private String image;
+	private Gender gender;
+
+	@Schema(
+			name = "colors"
+	)
+	private List<ItemColorDTO> colors;
+
+	@Schema(
+			name = "sizes"
+	)
+	private List<ItemSizeDTO> sizes;
+
+	@Schema(
+			name = "categories"
+	)
+	private List<CategoryResponse> categories;
+
+	@Schema(
+			name = "season"
+	)
+	private Season season;
+
+	@Schema(
+			name = "unitPrice",
+			example = "12000"
+	)
+	private Integer unitPrice;
+
+	@Schema(
+			name = "images"
+	)
+	private List<ItemImageDTO> images;
 
 	@Schema(
 			name = "isDeleted",

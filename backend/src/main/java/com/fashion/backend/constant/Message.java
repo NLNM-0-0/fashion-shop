@@ -50,10 +50,24 @@ public class Message {
 		public static final String ITEM_NOT_IN_CART = "Sản phẩm không có trong giỏ hàng";
 	}
 
+	public static class Category {
+		public static final String NAME_VALIDATE = "Tên danh mục không được trống và tối đa 200 ký tự";
+		public static final String CAN_NOT_DELETE_CATEGORY_THAT_EXIST_ITEM_CONTAIN_ONLY_IT = "Có sản phẩm chỉ tồn tại duy nhất danh mục này. Không thể xóa";
+		public static final String CATEGORY_NOT_EXIST = "Danh mục không tồn tại trong hệ thống";
+	}
+
 	public static class Item {
 		public static final String ITEM_NOT_EXIST = "Sản phẩm không tồn tại trong hệ thống";
 		public static final String ITEM_IS_DELETED = "Sản phẩm đã bị xóa khỏi hệ thống";
+		public static final String GENDER_VALIDATE = "Item phải được xác định dành cho đối tượng nào";
 		public static final String NAME_VALIDATE = "Tên sản phẩm không được trống và tối đa 200 ký tự";
+		public static final String SIZE_VALIDATE = "Sản phẩm phải có size";
+		public static final String CATEGORY_VALIDATE = "Sản phẩm cần có danh mục";
+		public static final String SEASON_VALIDATE = "Sản phẩm cần phải xác định mùa";
+		public static final String SIZE_NAME_VALIDATE = "Tên size không được trống và tối đa 20 ký tự";
+		public static final String COLOR_VALIDATE = "Sản phẩm phải có màu";
+		public static final String COLOR_NAME_VALIDATE = "Tên màu sắc không được trống và tối đa 20 ký tự";
+		public static final String COLOR_HEX_VALIDATE = "Mã hex không được để trống và phải đúng 6 kí tự";
 		public static final String NAME_FILTER_VALIDATE = "Tên sản phẩm không được quá 200 ký tự";
 		public static final String UNIT_PRICE_VALIDATE = "Giá sản phẩm không được trống và tối thiểu bằng 0";
 		public static final String QUANTITY_VALIDATE = "Số lượng sản phẩm không được để trống và tối thiểu bằng 0";

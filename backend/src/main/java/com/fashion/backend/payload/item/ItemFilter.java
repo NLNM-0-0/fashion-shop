@@ -1,6 +1,8 @@
 package com.fashion.backend.payload.item;
 
+import com.fashion.backend.constant.Gender;
 import com.fashion.backend.constant.Message;
+import com.fashion.backend.constant.Season;
 import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -22,4 +24,22 @@ public class ItemFilter {
 			message = Message.Item.NAME_FILTER_VALIDATE
 	)
 	private String name;
+
+	@Schema(
+			name = "gender",
+			example = "BOYS"
+	)
+	private Gender gender;
+
+	@Schema(
+			name = "season",
+			example = "SPRING"
+	)
+	private Season season;
+
+	@Schema(
+			name = "category",
+			example = "Category name"
+	)
+	private String category;
 }
