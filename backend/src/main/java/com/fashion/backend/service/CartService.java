@@ -3,7 +3,6 @@ package com.fashion.backend.service;
 import com.fashion.backend.constant.Message;
 import com.fashion.backend.entity.Cart;
 import com.fashion.backend.entity.Item;
-import com.fashion.backend.entity.ItemImage;
 import com.fashion.backend.entity.User;
 import com.fashion.backend.exception.AppException;
 import com.fashion.backend.payload.SimpleListResponse;
@@ -11,7 +10,6 @@ import com.fashion.backend.payload.SimpleResponse;
 import com.fashion.backend.payload.cart.AddToCartRequest;
 import com.fashion.backend.payload.cart.CartDetailResponse;
 import com.fashion.backend.payload.cart.ChangeQuantityRequest;
-import com.fashion.backend.payload.item.ItemImageDTO;
 import com.fashion.backend.payload.item.SimpleItemResponse;
 import com.fashion.backend.payload.notification.NumberNotificationNotSeenResponse;
 import com.fashion.backend.repository.CartRepository;
@@ -139,14 +137,8 @@ public class CartService {
 		return SimpleItemResponse.builder()
 								 .id(item.getId())
 								 .name(item.getName())
-								 .images(item.getImages().stream().map(this::mapToDTO).toList())
+								 .images(item.getImages())
 								 .isDeleted(item.isDeleted())
 								 .build();
-	}
-
-	private ItemImageDTO mapToDTO(ItemImage image) {
-		return ItemImageDTO.builder()
-						   .image(image.getImage())
-						   .build();
 	}
 }

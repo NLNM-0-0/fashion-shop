@@ -6,9 +6,9 @@ import lombok.Data;
 
 @Data
 @Builder
-public class CheckedFilter {
-	@Schema(name = "field")
-	private String name;
+public class CheckedFilter<T> {
+	@Schema(name = "data")
+	private T data;
 
 	@Schema(name = "checked")
 	private boolean checked;

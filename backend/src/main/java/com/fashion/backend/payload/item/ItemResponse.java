@@ -58,7 +58,7 @@ public class ItemResponse {
 	@Schema(
 			name = "images"
 	)
-	private List<ItemImageDTO> images;
+	private List<String> images;
 
 	@Schema(
 			name = "isDeleted",
