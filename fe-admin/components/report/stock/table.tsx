@@ -155,7 +155,7 @@ export function StockReportTable() {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
-  if (isLoading) {
+  if (isLoading || !data) {
     return (
       <TableSkeleton
         isHasExtensionAction={false}
@@ -240,7 +240,7 @@ export function StockReportTable() {
                     <div className="text-right font-semibold">
                       {data?.data
                         ? 0
-                        : data?.data.increase! + data?.data.decrease!}
+                        : data?.data.increase + data?.data.decrease}
                     </div>,
                     unknown
                   )}

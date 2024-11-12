@@ -232,7 +232,7 @@ export interface Order {
   staff: OrderStaff;
   createdAt: string;
   updatedAt: string;
-  orderStatus: string;
+  orderStatus: OrderStatus;
   details: OrderDetail[];
 }
 

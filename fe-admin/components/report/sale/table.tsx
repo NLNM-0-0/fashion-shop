@@ -28,6 +28,7 @@ import ReportFilter, {
 } from "@/components/filter/report-filter";
 import { FilterParams } from "@/hooks/useFilterList";
 import { unknown } from "zod";
+import { toVND } from "@/lib/utils";
 
 export const columns: ColumnDef<SaleReportItem>[] = [
   {
@@ -83,7 +84,7 @@ export const columns: ColumnDef<SaleReportItem>[] = [
     cell: ({ row }) => {
       const totalSales = parseFloat(row.getValue("totalSales"));
 
-      return <div className="text-right font-medium">{totalSales}</div>;
+      return <div className="text-right font-medium">{toVND(totalSales)}</div>;
     },
   },
 ];
@@ -115,7 +116,7 @@ export function SaleReportTable() {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
-  if (isLoading) {
+  if (isLoading || !data) {
     return (
       <TableSkeleton
         isHasExtensionAction={false}
@@ -190,7 +191,7 @@ export function SaleReportTable() {
                 <TableHead key={"header-money"}>
                   {flexRender(
                     <div className="text-right font-semibold">
-                      {data?.data.total}
+                      {toVND(data?.data.total ?? 0)}
                     </div>,
                     unknown
                   )}

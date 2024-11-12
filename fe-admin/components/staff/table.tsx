@@ -8,7 +8,6 @@ import {
   useReactTable,
 } from "@tanstack/react-table";
 
-
 import {
   Table,
   TableBody,
@@ -91,7 +90,7 @@ export function StaffTable() {
     router.push(`?${updatedParams.toString()}`);
   };
 
-  if (isLoading) {
+  if (isLoading || !data) {
     return (
       <TableSkeleton
         isHasExtensionAction={false}
