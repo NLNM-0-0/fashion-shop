@@ -1,5 +1,6 @@
 package com.fashion.backend.config;
 
+import com.fashion.backend.exception.AppException;
 import com.fashion.backend.repository.UserAuthRepository;
 import com.fashion.backend.service.Common;
 import com.fashion.backend.utils.AuthHelper;
@@ -21,7 +22,7 @@ public class ApplicationConfig {
 	private final UserAuthRepository userAuthRepository;
 
 	@Bean
-	public UserDetailsService userDetailsService() throws UsernameNotFoundException {
+	public UserDetailsService userDetailsService() throws UsernameNotFoundException, AppException {
 		return username -> Common.findAvailableUserAuth(
 				username,
 				!AuthHelper.isNormalUser(username),
