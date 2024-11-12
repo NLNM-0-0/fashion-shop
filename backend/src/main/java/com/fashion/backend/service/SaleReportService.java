@@ -2,9 +2,11 @@ package com.fashion.backend.service;
 
 import com.fashion.backend.constant.Message;
 import com.fashion.backend.entity.Item;
+import com.fashion.backend.entity.ItemImage;
 import com.fashion.backend.entity.Order;
 import com.fashion.backend.entity.OrderDetail;
 import com.fashion.backend.exception.AppException;
+import com.fashion.backend.payload.item.ItemImageDTO;
 import com.fashion.backend.payload.item.SimpleItemResponse;
 import com.fashion.backend.payload.salereport.FindSaleReportRequest;
 import com.fashion.backend.payload.salereport.SaleReportDetailResponse;
@@ -100,8 +102,14 @@ public class SaleReportService {
 		return SimpleItemResponse.builder()
 								 .id(item.getId())
 								 .name(item.getName())
-								 .image(item.getImage())
+								 .images(item.getImages().stream().map(this::mapToDTO).toList())
 								 .isDeleted(item.isDeleted())
 								 .build();
+	}
+
+	private ItemImageDTO mapToDTO(ItemImage image) {
+		return ItemImageDTO.builder()
+						   .image(image.getImage())
+						   .build();
 	}
 }

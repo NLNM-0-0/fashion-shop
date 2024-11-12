@@ -1,11 +1,15 @@
 package com.fashion.backend.payload.item;
 
 import com.fashion.backend.constant.ApplicationConst;
+import com.fashion.backend.constant.Gender;
 import com.fashion.backend.constant.Message;
+import com.fashion.backend.constant.Season;
 import io.swagger.v3.oas.annotations.media.Schema;
 import jakarta.validation.constraints.Min;
 import lombok.Data;
 import org.hibernate.validator.constraints.Length;
+
+import java.util.List;
 
 @Data
 public class UpdateItemRequest {
@@ -21,10 +25,36 @@ public class UpdateItemRequest {
 	private String name;
 
 	@Schema(
-			name = "image",
+			name = "gender"
+	)
+	private Gender gender;
+
+	@Schema(
+			name = "images",
 			example = ApplicationConst.DEFAULT_IMAGE
 	)
-	private String image;
+	private List<ItemImageDTO> images;
+
+	@Schema(
+			name = "colors"
+	)
+	private List<CreateItemColorRequest> colors;
+
+	@Schema(
+			name = "sizes"
+	)
+	private List<CreateItemSizeRequest> sizes;
+
+	@Schema(
+			name = "categories",
+			example = "[1, 2]"
+	)
+	private List<Long> categories;
+
+	@Schema(
+			name = "season"
+	)
+	private Season season;
 
 	@Schema(
 			name = "unitPrice",

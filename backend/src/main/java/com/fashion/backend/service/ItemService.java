@@ -2,13 +2,14 @@ package com.fashion.backend.service;
 
 import com.fashion.backend.constant.ApplicationConst;
 import com.fashion.backend.constant.StockChangeType;
-import com.fashion.backend.entity.Item;
-import com.fashion.backend.entity.StockChangeHistory;
+import com.fashion.backend.entity.*;
 import com.fashion.backend.payload.ListResponse;
 import com.fashion.backend.payload.SimpleResponse;
+import com.fashion.backend.payload.category.CategoryResponse;
 import com.fashion.backend.payload.item.*;
 import com.fashion.backend.payload.page.AppPageRequest;
 import com.fashion.backend.payload.page.AppPageResponse;
+import com.fashion.backend.repository.CategoryRepository;
 import com.fashion.backend.repository.ItemRepository;
 import com.fashion.backend.repository.StockChangeHistoryRepository;
 import lombok.RequiredArgsConstructor;
@@ -20,12 +21,14 @@ import org.springframework.data.jpa.domain.Specification;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.util.ArrayList;
 import java.util.List;
 
 @Service
 @RequiredArgsConstructor
 public class ItemService {
 	private final ItemRepository itemRepository;
+	private final CategoryRepository categoryRepository;
 	private final StockChangeHistoryRepository stockChangeHistoryRepository;
 
 	@Transactional
@@ -70,13 +73,19 @@ public class ItemService {
 
 	@Transactional
 	public ItemResponse createItem(CreateItemRequest request) {
+		List<Category> categories = Common.findCategoryByIds(request.getCategories(), categoryRepository);
+
 		handleImage(request);
 		Item item = Item.builder()
 						.name(request.getName())
-						.isDeleted(false)
+						.season(request.getSeason())
+						.sizes(request.getSizes().stream().map(this::mapToEntity).toList())
+						.colors(request.getColors().stream().map(this::mapToEntity).toList())
 						.quantity(request.getQuantity())
+						.categories(categories)
 						.unitPrice(request.getUnitPrice())
-						.image(request.getImage())
+						.images(request.getImages().stream().map(this::mapToEntity).toList())
+						.isDeleted(false)
 						.build();
 
 		item = itemRepository.save(item);
@@ -96,13 +105,17 @@ public class ItemService {
 	}
 
 	private void handleImage(CreateItemRequest request) {
-		if (request.getImage().isEmpty()) {
-			request.setImage(ApplicationConst.DEFAULT_IMAGE);
+		if (request.getImages().isEmpty()) {
+			request.setImages(new ArrayList<>(List.of(ItemImageDTO.builder()
+																  .image(ApplicationConst.DEFAULT_IMAGE)
+																  .build())));
 		}
 	}
 
 	@Transactional
 	public ItemResponse updateItem(Long itemId, UpdateItemRequest request) {
+		List<Category> categories = Common.findCategoryByIds(request.getCategories(), categoryRepository);
+
 		Item item = Common.findItemById(itemId, itemRepository);
 
 		if (item.getQuantity() != request.getQuantity()) {
@@ -120,9 +133,16 @@ public class ItemService {
 		}
 
 		Common.updateIfNotNull(request.getName(), item::setName);
+		Common.updateIfNotNull(request.getGender(), item::setGender);
+		Common.updateIfNotNull(request.getSeason(), item::setSeason);
+		Common.updateIfNotNull(request.getSizes().stream().map(this::mapToEntity).toList(), item::setSizes);
+		Common.updateIfNotNull(request.getColors().stream().map(this::mapToEntity).toList(), item::setColors);
+		Common.updateIfNotNull(categories, item::setCategories);
 		Common.updateIfNotNull(request.getQuantity(), item::setQuantity);
 		Common.updateIfNotNull(request.getUnitPrice(), item::setUnitPrice);
-		Common.updateIfNotNull(request.getImage(), item::setImage);
+
+		List<ItemImage> images = request.getImages().stream().map(this::mapToEntity).toList();
+		Common.updateIfNotNull(images, item::setImages);
 
 		return mapToDTO(itemRepository.save(item));
 	}
@@ -140,7 +160,7 @@ public class ItemService {
 		return SimpleItemResponse.builder()
 								 .id(item.getId())
 								 .name(item.getName())
-								 .image(item.getImage())
+								 .images(item.getImages().stream().map(this::mapToDTO).toList())
 								 .isDeleted(item.isDeleted())
 								 .build();
 	}
@@ -149,8 +169,59 @@ public class ItemService {
 		return ItemResponse.builder()
 						   .id(item.getId())
 						   .name(item.getName())
-						   .image(item.getImage())
+						   .gender(item.getGender())
+						   .season(item.getSeason())
+						   .colors(item.getColors().stream().map(this::mapToDTO).toList())
+						   .sizes(item.getSizes().stream().map(this::mapToDTO).toList())
+						   .categories(item.getCategories().stream().map(this::mapToDTO).toList())
+						   .unitPrice(item.getUnitPrice())
+						   .images(item.getImages().stream().map(this::mapToDTO).toList())
 						   .isDeleted(item.isDeleted())
 						   .build();
+	}
+
+	private ItemImageDTO mapToDTO(ItemImage image) {
+		return ItemImageDTO.builder()
+						   .image(image.getImage())
+						   .build();
+	}
+
+	private ItemImage mapToEntity(ItemImageDTO image) {
+		return ItemImage.builder()
+						.image(image.getImage())
+						.build();
+	}
+
+	private ItemSize mapToEntity(CreateItemSizeRequest size) {
+		return ItemSize.builder()
+					   .name(size.getName())
+					   .build();
+	}
+
+	private ItemColor mapToEntity(CreateItemColorRequest color) {
+		return ItemColor.builder()
+						.name(color.getName())
+						.hex(color.getHex())
+						.build();
+	}
+
+	private ItemSizeDTO mapToDTO(ItemSize size) {
+		return ItemSizeDTO.builder()
+						  .name(size.getName())
+						  .build();
+	}
+
+	private ItemColorDTO mapToDTO(ItemColor color) {
+		return ItemColorDTO.builder()
+						   .name(color.getName())
+						   .hex(color.getHex())
+						   .build();
+	}
+
+	private CategoryResponse mapToDTO(Category category) {
+		return CategoryResponse.builder()
+							   .id(category.getId())
+							   .name(category.getName())
+							   .build();
 	}
 }

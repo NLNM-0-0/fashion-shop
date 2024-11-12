@@ -4,7 +4,6 @@ import com.fashion.backend.payload.ListResponse;
 import com.fashion.backend.payload.SimpleResponse;
 import com.fashion.backend.payload.order.OrderResponse;
 import com.fashion.backend.payload.order.PlaceOrderRequest;
-import com.fashion.backend.payload.order.SimpleOrderResponse;
 import com.fashion.backend.payload.order.UserOrderFilter;
 import com.fashion.backend.payload.page.AppPageRequest;
 import com.fashion.backend.service.OrderService;

@@ -1,9 +1,10 @@
 package com.fashion.backend.payload.item;
 
-import com.fashion.backend.constant.ApplicationConst;
 import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.Builder;
 import lombok.Data;
+
+import java.util.List;
 
 @Data
 @Builder
@@ -21,10 +22,9 @@ public class SimpleItemResponse {
 	private String name;
 
 	@Schema(
-			name = "image",
-			example = ApplicationConst.DEFAULT_AVATAR
+			name = "images"
 	)
-	private String image;
+	private List<ItemImageDTO> images;
 
 	@Schema(
 			name = "isDeleted",

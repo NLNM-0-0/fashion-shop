@@ -1,6 +1,5 @@
 package com.fashion.backend.entity;
 
-import io.swagger.v3.oas.annotations.media.Schema;
 import jakarta.persistence.*;
 import lombok.*;
 import org.springframework.data.annotation.CreatedDate;
@@ -41,6 +40,6 @@ public class Like {
 	private Item item;
 
 	@CreatedDate
-	@Schema(name = "createdAt")
+	@Column(name = "createdAt")
 	private Date createdAt;
 }

@@ -1,17 +1,9 @@
 package com.fashion.backend.payload.notification;
 
-import com.fashion.backend.constant.Message;
 import com.fashion.backend.entity.Notification;
-import com.fashion.backend.exception.AppException;
 import org.springframework.data.jpa.domain.Specification;
-import org.springframework.http.HttpStatus;
 
 import java.sql.Date;
-import java.sql.Timestamp;
-import java.time.LocalDate;
-import java.time.LocalDateTime;
-import java.time.LocalTime;
-import java.time.format.DateTimeFormatter;
 
 public class NotificationSpecs {
 	public static Specification<Notification> hasSeen(Boolean seen) {

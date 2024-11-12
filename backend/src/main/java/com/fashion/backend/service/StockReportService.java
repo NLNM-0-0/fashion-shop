@@ -1,11 +1,9 @@
 package com.fashion.backend.service;
 
 import com.fashion.backend.constant.Message;
-import com.fashion.backend.entity.Item;
-import com.fashion.backend.entity.StockChangeHistory;
-import com.fashion.backend.entity.StockReport;
-import com.fashion.backend.entity.StockReportDetail;
+import com.fashion.backend.entity.*;
 import com.fashion.backend.exception.AppException;
+import com.fashion.backend.payload.item.ItemImageDTO;
 import com.fashion.backend.payload.item.SimpleItemResponse;
 import com.fashion.backend.payload.stockreport.FindStockReportRequest;
 import com.fashion.backend.payload.stockreport.StockReportDetailResponse;
@@ -163,8 +161,14 @@ public class StockReportService {
 		return SimpleItemResponse.builder()
 								 .id(item.getId())
 								 .name(item.getName())
-								 .image(item.getImage())
+								 .images(item.getImages().stream().map(this::mapToDTO).toList())
 								 .isDeleted(item.isDeleted())
 								 .build();
+	}
+
+	private ItemImageDTO mapToDTO(ItemImage image) {
+		return ItemImageDTO.builder()
+						   .image(image.getImage())
+						   .build();
 	}
 }

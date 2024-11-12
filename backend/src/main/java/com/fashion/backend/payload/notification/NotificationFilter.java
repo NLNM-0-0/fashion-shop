@@ -1,7 +1,5 @@
 package com.fashion.backend.payload.notification;
 
-import com.fashion.backend.constant.Message;
-import com.fashion.backend.utils.validation.date.ValidDDMMYYYYFormat;
 import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
