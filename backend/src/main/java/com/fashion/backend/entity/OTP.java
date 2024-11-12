@@ -85,6 +85,7 @@ public class OTP {
 		if (newRetry >= MAX_RETRY) {
 			throw new AppException(HttpStatus.BAD_REQUEST, Message.OTP_OVER_LIMIT);
 		}
+		this.retry = newRetry;
 	}
 
 	public int getNextRetry() {
