@@ -31,6 +31,18 @@ public class OrderResponse {
 	@Schema(name = "createdAt")
 	private Date createdAt;
 
+	@Schema(name = "confirmedAt")
+	private Date confirmedAt;
+
+	@Schema(name = "shippingAt")
+	private Date shippingAt;
+
+	@Schema(name = "doneAt")
+	private Date doneAt;
+
+	@Schema(name = "canceledAt")
+	private Date canceledAt;
+
 	@Schema(name = "updatedAt")
 	private Date updatedAt;
 

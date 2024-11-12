@@ -16,7 +16,7 @@ public class Message {
 			= "Nhận thấy hành vi bất thường. Xin hãy liên hệ chúng tôi để được hỗ trợ thêm";
 	public static final String OTP_VALIDATE = "OTP cần phải gồm 6 số";
 	public static final String OTP_NOT_EXIST
-			= "Số điện thoại này không được sử dụng để gửi OTP. Xin vui lòng kiểm tra lại";
+			= "Mã OTP bạn nhập không chính xác. Vui lòng thử lại";
 	public static final String OTP_EXPIRED = "Mã OTP đã hết hạn. Xin hãy nhập lại số điện thoại để nhận mã OTP mới";
 	public static final String DATE_VALIDATE = "Ngày đặt cần theo định dạng dd/MM/yyyy";
 	public static final String TIME_FROM_TIME_TO_VALIDATE = "Thời gian không đúng qui định";

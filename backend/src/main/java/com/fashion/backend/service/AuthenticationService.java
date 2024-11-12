@@ -151,7 +151,7 @@ public class AuthenticationService {
 	}
 
 	@Transactional
-	public SimpleResponse sendOtpToResetPassword(PhoneRequest request) {
+	public SimpleResponse sendOtp(PhoneRequest request) {
 		UserAuth userAuth = Common.findUserAuthByPhone(request.getPhone(), userAuthRepository);
 		User user = Common.findUserByUserAuth(userAuth.getId(), userRepository);
 
@@ -176,6 +176,24 @@ public class AuthenticationService {
 //		}
 
 		otpRepository.save(newOtp);
+
+		return new SimpleResponse();
+	}
+
+	@Transactional
+	public SimpleResponse verifiedOTPToResetPassword(OtpVerifyRequest request) {
+		UserAuth userAuth = Common.findUserAuthByPhone(request.getPhone(), userAuthRepository);
+		User user = Common.findUserByUserAuth(userAuth.getId(), userRepository);
+
+		OTP otp = otpRepository.findByUserAndOtp(user.getId(), request.getOtp())
+							   .orElseThrow(() -> new AppException(HttpStatus.BAD_REQUEST, Message.OTP_NOT_EXIST));
+
+		if (!otp.isValid()) {
+			throw new AppException(HttpStatus.BAD_REQUEST, Message.OTP_EXPIRED);
+		}
+
+		userAuth.setVerified(true);
+		userAuthRepository.save(userAuth);
 
 		return new SimpleResponse();
 	}
@@ -216,6 +234,8 @@ public class AuthenticationService {
 		userAuth.setVerified(true);
 
 		userAuthRepository.save(userAuth);
+
+		otpRepository.delete(otp);
 
 		return new SimpleResponse();
 	}

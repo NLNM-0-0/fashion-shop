@@ -67,6 +67,34 @@ public class Order {
 	)
 	private Date createdAt;
 
+	@Column(
+			name = "confirmed_at",
+			nullable = false,
+			updatable = false
+	)
+	private Date confirmedAt;
+
+	@Column(
+			name = "shipping_at",
+			nullable = false,
+			updatable = false
+	)
+	private Date shippingAt;
+
+	@Column(
+			name = "done_at",
+			nullable = false,
+			updatable = false
+	)
+	private Date doneAt;
+
+	@Column(
+			name = "canceled_at",
+			nullable = false,
+			updatable = false
+	)
+	private Date cancelledAt;
+
 	@LastModifiedDate
 	@Schema(name = "updated_at")
 	private Date updatedAt;
