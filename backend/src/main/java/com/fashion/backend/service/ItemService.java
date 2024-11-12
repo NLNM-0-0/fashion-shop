@@ -287,15 +287,6 @@ public class ItemService {
 		if (filter.getName() != null) {
 			spec = spec.and(ItemSpecs.hasName(filter.getName()));
 		}
-//		if (filter.getGender() != null) {
-//		    spec = spec.and(ItemSpecs.hasGender(filter.getGender().name()));
-//		}
-//		if (filter.getSeason() != null) {
-//			spec = spec.and(ItemSpecs.hasGender(filter.getSeason().name()));
-//		}
-//		if (filter.getCategoryName() != null) {
-//			spec = spec.and(ItemSpecs.hasGender(filter.getCategoryName()));
-//		}
 		return spec;
 	}
 
