@@ -20,7 +20,6 @@ export interface User {
 }
 export interface UserInfo extends User {
   id: number;
-  admin: boolean;
 }
 export interface SignupPayload extends User {
   password: string;

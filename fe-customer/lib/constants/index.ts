@@ -1,47 +1,7 @@
-import { FormFilterType, OrderStatusValue, SidebarItem } from "../types";
-import { GoPeople, GoPerson } from "react-icons/go";
+import { FormFilterType, OrderStatusValue } from "../types";
 import { FilterInputType, OrderStatus } from "./enum";
-import { PiDress } from "react-icons/pi";
-import { LuClipboardList } from "react-icons/lu";
-import { AiOutlineLineChart } from "react-icons/ai";
 import { LucideIcon } from "lucide-react";
 import { Menu, PackageCheck, PackageX, Truck, Receipt } from "lucide-react";
-export const sidebarItems: SidebarItem[] = [
-  {
-    title: "Products",
-    href: "/admin/products",
-    icon: PiDress,
-    submenu: false,
-  },
-  {
-    title: "Orders",
-    href: "/admin/order",
-    icon: LuClipboardList,
-    submenu: false,
-  },
-  {
-    title: "Report",
-    href: "/admin/report",
-    icon: AiOutlineLineChart,
-    submenu: true,
-    subMenuItems: [
-      { title: "Sale Report", href: "/admin/report/sale" },
-      { title: "Stock Report", href: "/admin/report/stock" },
-    ],
-  },
-  {
-    title: "Customers",
-    href: "/admin/customer",
-    icon: GoPerson,
-    submenu: false,
-  },
-  {
-    title: "Staffs",
-    href: "/admin/staff",
-    icon: GoPeople,
-    submenu: false,
-  },
-];
 
 export const customerFilterValues: FormFilterType[] = [
   { type: "name", title: "Name", inputType: FilterInputType.TEXT },
