@@ -14,6 +14,7 @@ import com.fashion.backend.payload.item.*;
 import com.fashion.backend.payload.page.AppPageRequest;
 import com.fashion.backend.payload.page.AppPageResponse;
 import com.fashion.backend.repository.CategoryRepository;
+import com.fashion.backend.repository.ItemQuantityRepository;
 import com.fashion.backend.repository.ItemRepository;
 import com.fashion.backend.repository.StockChangeHistoryRepository;
 import com.fashion.backend.utils.tuple.Pair;
@@ -36,6 +37,7 @@ public class ItemService {
 	private final ItemRepository itemRepository;
 	private final CategoryRepository categoryRepository;
 	private final StockChangeHistoryRepository stockChangeHistoryRepository;
+	private final ItemQuantityRepository itemQuantityRepository;
 
 	@Transactional
 	public ListResponse<SimpleItemResponse, UserItemFilter> userGetItems(AppPageRequest page, UserItemFilter filter) {
@@ -154,7 +156,7 @@ public class ItemService {
 	private Pair<Boolean, List<CheckedFilter<ItemSizeDTO>>> getFilteredSizes(List<Item> items,
 																			 List<CheckedFilter<ItemSizeDTO>> filter) {
 		List<ItemSizeDTO> itemSizes = items.stream()
-										   .flatMap(item -> item.getQuantities().stream())
+										   .flatMap(item -> itemQuantityRepository.findAllByItemId(item.getId()).stream())
 										   .map(this::mapToSizeDTO)
 										   .distinct()
 										   .toList();
@@ -295,7 +297,9 @@ public class ItemService {
 		return mapToDTO(item);
 	}
 
-	private int calcTotalQuantityFromEntities(List<ItemQuantity> quantities) {
+	private int calcTotalQuantityFromItemId(Long itemId) {
+		List<ItemQuantity> quantities = itemQuantityRepository.findAllByItemId(itemId);
+
 		return quantities
 				.stream()
 				.mapToInt(ItemQuantity::getQuantity)
@@ -314,11 +318,11 @@ public class ItemService {
 		List<Category> categories = Common.findCategoryByIds(request.getCategories(), categoryRepository);
 
 		handleImage(request);
+
 		Item item = Item.builder()
 						.name(request.getName())
 						.gender(request.getGender())
 						.season(request.getSeason())
-						.quantities(request.getQuantities().stream().map(this::mapToEntity).toList())
 						.categories(categories)
 						.unitPrice(request.getUnitPrice())
 						.images(request.getImages())
@@ -327,7 +331,16 @@ public class ItemService {
 
 		item = itemRepository.save(item);
 
-		int totalQuantity = this.calcTotalQuantityFromEntities(item.getQuantities());
+		List<ItemQuantity> quantities = new ArrayList<>();
+		for (ItemQuantityRequest quantity : request.getQuantities()) {
+			ItemQuantity quantityEntity = mapToEntity(quantity);
+			quantityEntity.setItem(item);
+
+			quantities.add(quantityEntity);
+		}
+		itemQuantityRepository.saveAll(quantities);
+
+		int totalQuantity = this.calcTotalQuantityFromItemId(item.getId());
 
 		if (totalQuantity != 0) {
 			StockChangeHistory stockChangeHistory = StockChangeHistory.builder()
@@ -355,7 +368,7 @@ public class ItemService {
 
 		Item item = Common.findItemById(itemId, itemRepository);
 
-		int totalItemQuantity = this.calcTotalQuantityFromEntities(item.getQuantities());
+		int totalItemQuantity = this.calcTotalQuantityFromItemId(itemId);
 		int totalUpdatedQuantity = calcTotalQuantityFromDTOs(request.getQuantities());
 
 		if (totalItemQuantity != totalUpdatedQuantity) {
@@ -376,9 +389,11 @@ public class ItemService {
 		Common.updateIfNotNull(request.getGender(), item::setGender);
 		Common.updateIfNotNull(request.getSeason(), item::setSeason);
 		Common.updateIfNotNull(categories, item::setCategories);
-		Common.updateIfNotNull(request.getQuantities().stream().map(this::mapToEntity).toList(), item::setQuantities);
 		Common.updateIfNotNull(request.getUnitPrice(), item::setUnitPrice);
 		Common.updateIfNotNull(request.getImages(), item::setImages);
+
+		itemQuantityRepository.deleteAllByItemId(itemId);
+		itemQuantityRepository.saveAll(request.getQuantities().stream().map(this::mapToEntity).toList());
 
 		return mapToDTO(itemRepository.save(item));
 	}
@@ -402,7 +417,7 @@ public class ItemService {
 	}
 
 	private ItemResponse mapToDTO(Item item) {
-		List<ItemQuantity> quantities = item.getQuantities();
+		List<ItemQuantity> quantities = itemQuantityRepository.findAllByItemId(item.getId());
 
 		Set<String> sizes = new HashSet<>();
 		Set<Color> colors = new HashSet<>();

@@ -20,6 +20,7 @@ public class Message {
 	public static final String OTP_EXPIRED
 			= "The OTP has expired. Please enter your phone number again to receive a new OTP";
 	public static final String TIME_FROM_TIME_TO_VALIDATE = "Time is not within the valid range";
+
 	public static class ItemQuantity {
 		public static String ITEM_QUANTITY_NOT_EXIST = "Product with that color and size does not exist in the system";
 	}

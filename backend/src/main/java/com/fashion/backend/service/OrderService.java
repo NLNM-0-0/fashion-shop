@@ -272,7 +272,7 @@ public class OrderService {
 																orderDetail.getSize(),
 																itemQuantityRepository);
 
-			int quantityLeft = itemQuantity.getQuantity() + orderDetail.getQuantity();
+			int quantityLeft = itemQuantity.getQuantity() - orderDetail.getQuantity();
 			if (quantityLeft < 0) {
 				throw new AppException(HttpStatus.BAD_REQUEST, Message.Item.QUANTITY_MIN);
 			}

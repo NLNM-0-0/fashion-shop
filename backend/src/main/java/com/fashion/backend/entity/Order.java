@@ -1,6 +1,8 @@
 package com.fashion.backend.entity;
 
 import com.fashion.backend.constant.OrderStatus;
+import com.fasterxml.jackson.annotation.JsonBackReference;
+import com.fasterxml.jackson.annotation.JsonManagedReference;
 import io.swagger.v3.oas.annotations.media.Schema;
 import jakarta.persistence.*;
 import lombok.*;
@@ -25,7 +27,6 @@ public class Order {
 	@ManyToOne
 	@JoinColumn(
 			name = "customer_id",
-			nullable = true,
 			updatable = false
 	)
 	private User customer;
@@ -33,7 +34,6 @@ public class Order {
 	@ManyToOne
 	@JoinColumn(
 			name = "staff_id",
-			nullable = true,
 			updatable = false
 	)
 	private User staff;
@@ -50,6 +50,7 @@ public class Order {
 			orphanRemoval = true,
 			targetEntity = OrderDetail.class
 	)
+	@JsonManagedReference
 	private List<OrderDetail> orderDetails;
 
 	@Enumerated(EnumType.STRING)
@@ -68,30 +69,22 @@ public class Order {
 	private Date createdAt;
 
 	@Column(
-			name = "confirmed_at",
-			nullable = false,
-			updatable = false
+			name = "confirmed_at"
 	)
 	private Date confirmedAt;
 
 	@Column(
-			name = "shipping_at",
-			nullable = false,
-			updatable = false
+			name = "shipping_at"
 	)
 	private Date shippingAt;
 
 	@Column(
-			name = "done_at",
-			nullable = false,
-			updatable = false
+			name = "done_at"
 	)
 	private Date doneAt;
 
 	@Column(
-			name = "canceled_at",
-			nullable = false,
-			updatable = false
+			name = "canceled_at"
 	)
 	private Date cancelledAt;
 
