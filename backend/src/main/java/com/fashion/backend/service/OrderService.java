@@ -171,7 +171,7 @@ public class OrderService {
 		OrderStatus currStatus = order.getStatus();
 		OrderStatus updatedStatus;
 		if (currStatus == OrderStatus.PENDING) {
-		    order.setConfirmedAt(new Date());
+			order.setConfirmedAt(new Date());
 			updatedStatus = OrderStatus.CONFIRMED;
 		} else if (currStatus == OrderStatus.CONFIRMED) {
 			order.setShippingAt(new Date());

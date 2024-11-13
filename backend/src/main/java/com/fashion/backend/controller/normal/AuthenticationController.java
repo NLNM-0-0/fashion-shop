@@ -71,7 +71,7 @@ public class AuthenticationController {
 	public ResponseEntity<SimpleResponse> sendOtp(
 			@Valid @RequestBody PhoneRequest request
 	) {
-			return ResponseEntity.ok(authService.sendOtp(request));
+		return ResponseEntity.ok(authService.sendOtp(request));
 	}
 
 	@Operation(

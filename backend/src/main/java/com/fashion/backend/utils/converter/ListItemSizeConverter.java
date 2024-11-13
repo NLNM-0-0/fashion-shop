@@ -7,30 +7,32 @@ import jakarta.persistence.AttributeConverter;
 import jakarta.persistence.Converter;
 
 import java.io.IOException;
+import java.util.ArrayList;
 import java.util.List;
 
 @Converter
-public class ItemSizeListConverter implements AttributeConverter<List<ItemSize>, String> {
-
+public class ListItemSizeConverter implements AttributeConverter<List<ItemSize>, String> {
 	private final ObjectMapper objectMapper = new ObjectMapper();
 
 	@Override
-	public String convertToDatabaseColumn(List<ItemSize> itemSizes) {
+	public String convertToDatabaseColumn(List<ItemSize> attribute) {
 		try {
-			return objectMapper.writeValueAsString(itemSizes);
+			return attribute == null ? "[]" : objectMapper.writeValueAsString(attribute);
 		} catch (JsonProcessingException e) {
-			throw new IllegalArgumentException("Error converting list of ItemSize to JSON", e);
+			throw new RuntimeException("Error converting list to JSON", e);
 		}
 	}
 
 	@Override
 	public List<ItemSize> convertToEntityAttribute(String dbData) {
 		try {
-			return objectMapper.readValue(dbData,
+			return dbData == null || dbData.isEmpty() ?
+				   new ArrayList<>() :
+				   objectMapper.readValue(dbData,
 										  objectMapper.getTypeFactory()
 													  .constructCollectionType(List.class, ItemSize.class));
 		} catch (IOException e) {
-			throw new IllegalArgumentException("Error converting JSON to list of ItemSize", e);
+			throw new RuntimeException("Error converting JSON to list", e);
 		}
 	}
 }

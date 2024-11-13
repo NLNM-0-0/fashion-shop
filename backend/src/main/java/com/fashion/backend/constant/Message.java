@@ -17,7 +17,8 @@ public class Message {
 	public static final String OTP_VALIDATE = "OTP must consist of 6 digits";
 	public static final String OTP_NOT_EXIST
 			= "The OTP you entered is incorrect. Please try again";
-	public static final String OTP_EXPIRED = "The OTP has expired. Please enter your phone number again to receive a new OTP";
+	public static final String OTP_EXPIRED
+			= "The OTP has expired. Please enter your phone number again to receive a new OTP";
 	public static final String TIME_FROM_TIME_TO_VALIDATE = "Time is not within the valid range";
 
 	public static class Order {
@@ -53,7 +54,8 @@ public class Message {
 	}
 
 	public static class Category {
-		public static final String NAME_VALIDATE = "Category name cannot be empty and must be a maximum of 200 characters";
+		public static final String NAME_VALIDATE
+				= "Category name cannot be empty and must be a maximum of 200 characters";
 		public static final String CAN_NOT_DELETE_CATEGORY_THAT_EXIST_ITEM_CONTAIN_ONLY_IT
 				= "There are products that only belong to this category. Cannot delete";
 		public static final String CATEGORY_NOT_EXIST = "Category does not exist in the system";
@@ -63,13 +65,16 @@ public class Message {
 		public static final String ITEM_NOT_EXIST = "Product does not exist in the system";
 		public static final String ITEM_IS_DELETED = "Product has been deleted from the system";
 		public static final String GENDER_VALIDATE = "Item must be identified for a specific gender";
-		public static final String NAME_VALIDATE = "Product name cannot be empty and must be a maximum of 200 characters";
+		public static final String NAME_VALIDATE
+				= "Product name cannot be empty and must be a maximum of 200 characters";
 		public static final String SIZE_VALIDATE = "Product must have a size";
 		public static final String CATEGORY_VALIDATE = "Product must have a category";
 		public static final String SEASON_VALIDATE = "Product must have a season";
-		public static final String SIZE_NAME_VALIDATE = "Size name cannot be empty and must be a maximum of 20 characters";
+		public static final String SIZE_NAME_VALIDATE
+				= "Size name cannot be empty and must be a maximum of 20 characters";
 		public static final String COLOR_VALIDATE = "Product must have a color";
-		public static final String COLOR_NAME_VALIDATE = "Color name cannot be empty and must be a maximum of 20 characters";
+		public static final String COLOR_NAME_VALIDATE
+				= "Color name cannot be empty and must be a maximum of 20 characters";
 		public static final String COLOR_HEX_VALIDATE = "Hex code cannot be empty and must be exactly 6 characters";
 		public static final String NAME_FILTER_VALIDATE = "Product name cannot exceed 200 characters";
 		public static final String UNIT_PRICE_VALIDATE = "Product price cannot be empty and must be at least 0";
@@ -105,11 +110,13 @@ public class Message {
 	}
 
 	public static class SMS {
-		public static final String SMS_SEND_FAIL = "An error occurred while sending the message. Please try again later";
+		public static final String SMS_SEND_FAIL
+				= "An error occurred while sending the message. Please try again later";
 	}
 
 	public static class File {
-		public static final String FILE_UPLOAD_FAIL = "An error occurred while uploading the file. Please try again later";
+		public static final String FILE_UPLOAD_FAIL
+				= "An error occurred while uploading the file. Please try again later";
 		public static final String FILE_INVALID_FORMAT = "Invalid file format. Please try a different file";
 	}
 
@@ -118,8 +125,10 @@ public class Message {
 	}
 
 	public static class Notification {
-		public static final String TITLE_VALIDATE = "Notification title cannot be empty and must be a maximum of 100 characters";
-		public static final String DESCRIPTION_VALIDATE = "Notification description must be a maximum of 200 characters";
+		public static final String TITLE_VALIDATE
+				= "Notification title cannot be empty and must be a maximum of 100 characters";
+		public static final String DESCRIPTION_VALIDATE
+				= "Notification description must be a maximum of 200 characters";
 		public static final String NOTIFICATION_NOT_EXIST = "Notification does not exist";
 		public static final String CAN_NOT_READ_OTHER_S_NOTIFICATION = "Cannot read another user's notifications";
 	}
