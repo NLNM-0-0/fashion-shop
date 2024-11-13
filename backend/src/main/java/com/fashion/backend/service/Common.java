@@ -1,5 +1,6 @@
 package com.fashion.backend.service;
 
+import com.fashion.backend.constant.Color;
 import com.fashion.backend.constant.Message;
 import com.fashion.backend.entity.*;
 import com.fashion.backend.exception.AppException;
@@ -199,5 +200,11 @@ public class Common {
 		return orderRepository.findById(itemId)
 							  .orElseThrow(() -> new AppException(HttpStatus.BAD_REQUEST,
 																  Message.Order.ORDER_NOT_EXIST));
+	}
+
+	public static ItemQuantity findItemQuantity(Long itemId, Color color, String size, ItemQuantityRepository repository) {
+		return repository.findFirstByItemIdAndColorAndAndSize(itemId, color, size)
+						 .orElseThrow(() -> new AppException(HttpStatus.BAD_REQUEST,
+															 Message.ItemQuantity.ITEM_QUANTITY_NOT_EXIST));
 	}
 }

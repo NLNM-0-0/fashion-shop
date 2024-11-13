@@ -16,7 +16,7 @@ import lombok.NoArgsConstructor;
 @Table(
 		name = "item_quantity",
 		uniqueConstraints = {@UniqueConstraint(
-				columnNames = {"name"},
+				columnNames = {"size", "color", "item"},
 				name = "Item's name"
 		)}
 )
