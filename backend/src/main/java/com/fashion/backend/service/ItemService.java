@@ -304,6 +304,7 @@ public class ItemService {
 		handleImage(request);
 		Item item = Item.builder()
 						.name(request.getName())
+						.gender(request.getGender())
 						.season(request.getSeason())
 						.sizes(request.getSizes().stream().map(this::mapToEntity).toList())
 						.colors(request.getColors())

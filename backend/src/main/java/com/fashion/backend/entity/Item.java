@@ -3,8 +3,9 @@ package com.fashion.backend.entity;
 import com.fashion.backend.constant.Color;
 import com.fashion.backend.constant.Gender;
 import com.fashion.backend.constant.Season;
-import com.fashion.backend.utils.converter.ItemSizeListConverter;
-import com.fashion.backend.utils.converter.ListConverter;
+import com.fashion.backend.utils.converter.ListColorConverter;
+import com.fashion.backend.utils.converter.ListItemSizeConverter;
+import com.fashion.backend.utils.converter.ListStringConverter;
 import jakarta.persistence.*;
 import jakarta.validation.constraints.Min;
 import lombok.AllArgsConstructor;
@@ -46,21 +47,21 @@ public class Item {
 			name = "images",
 			columnDefinition = "text"
 	)
-	@Convert(converter = ListConverter.class)
+	@Convert(converter = ListStringConverter.class)
 	private List<String> images;
 
 	@Column(
 			name = "sizes",
 			columnDefinition = "text"
 	)
-	@Convert(converter = ItemSizeListConverter.class)
+	@Convert(converter = ListItemSizeConverter.class)
 	private List<ItemSize> sizes;
 
 	@Column(
 			name = "colors",
 			columnDefinition = "text"
 	)
-	@Convert(converter = ListConverter.class)
+	@Convert(converter = ListColorConverter.class)
 	private List<Color> colors;
 
 	@ManyToMany(
