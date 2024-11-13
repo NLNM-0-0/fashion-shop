@@ -1,6 +1,5 @@
 package com.fashion.backend.payload.item;
 
-import com.fashion.backend.constant.Color;
 import com.fashion.backend.constant.Gender;
 import com.fashion.backend.constant.Message;
 import com.fashion.backend.constant.Season;
@@ -38,16 +37,10 @@ public class CreateItemRequest {
 	private List<String> images;
 
 	@Schema(
-			name = "colors"
+			name = "quantities"
 	)
-	@NotNull(message = Message.Item.COLOR_VALIDATE)
-	private List<Color> colors;
-
-	@Schema(
-			name = "sizes"
-	)
-	@NotNull(message = Message.Item.SIZE_VALIDATE)
-	private List<CreateItemSizeRequest> sizes;
+	@NotNull(message = Message.Item.QUANTITY_VALIDATE)
+	private List<ItemQuantityRequest> quantities;
 
 	@Schema(
 			name = "categories",
@@ -72,15 +65,4 @@ public class CreateItemRequest {
 	)
 	@NotNull(message = Message.Item.SEASON_VALIDATE)
 	private Season season;
-
-	@Schema(
-			name = "quantity",
-			example = "10"
-	)
-	@Min(
-			value = 0,
-			message = Message.Item.QUANTITY_VALIDATE
-	)
-	@NotNull(message = Message.Item.QUANTITY_VALIDATE)
-	private Integer quantity;
 }
