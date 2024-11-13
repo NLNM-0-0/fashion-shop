@@ -22,3 +22,17 @@ export enum Gender {
   WOMEN = "WOMEN",
   UNISEX = "UNISEX",
 }
+
+export enum Color {
+  BLACK = "BLACK",
+  BLUE = "BLUE",
+  BROWN = "BROWN",
+  GREEN = "GREEN",
+  GREY = "GREY",
+  ORANGE = "ORANGE",
+  PINK = "PINK",
+  PURPLE = "PURPLE",
+  RED = "RED",
+  WHITE = "WHITE",
+  YELLOW = "YELLOW",
+}

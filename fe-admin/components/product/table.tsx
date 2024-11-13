@@ -29,7 +29,7 @@ import Filter from "../filter/filter";
 import TableSkeleton from "../table-skeleton";
 import { useProductList } from "@/hooks/useProductList";
 import { Avatar, AvatarFallback, AvatarImage } from "../ui/avatar";
-import { FaPlus } from "react-icons/fa";
+import { FaPen, FaPlus } from "react-icons/fa";
 import Link from "next/link";
 import { cn } from "@/lib/utils";
 
@@ -47,7 +47,7 @@ export const columns: ColumnDef<Product>[] = [
     cell: ({ row }) => (
       <div className="flex justify-end">
         <Avatar>
-          <AvatarImage src={row.getValue("image")} alt="img" />
+          <AvatarImage src={row.original.images[0] ?? ""} alt="img" />
           <AvatarFallback>{row.original.name.substring(0, 2)}</AvatarFallback>
         </Avatar>
       </div>
@@ -67,6 +67,13 @@ export const columns: ColumnDef<Product>[] = [
       );
     },
     cell: ({ row }) => <div className="capitalize">{row.getValue("name")}</div>,
+  },
+  {
+    accessorKey: "actions",
+    header: () => {
+      return <div className="font-semibold">Actions</div>;
+    },
+    cell: () => <></>,
   },
 ];
 
@@ -175,14 +182,30 @@ export function ProductTable() {
                     key={row.id}
                     data-state={row.getIsSelected() && "selected"}
                   >
-                    {row.getVisibleCells().map((cell) => (
-                      <TableCell key={cell.id}>
-                        {flexRender(
-                          cell.column.columnDef.cell,
-                          cell.getContext()
-                        )}
-                      </TableCell>
-                    ))}
+                    {row.getVisibleCells().map((cell) =>
+                      cell.id.includes("actions") ? (
+                        <div key={cell.id} className="flex py-2 gap-2">
+                          <Link
+                            href={`/admin/products/${row.original.id}`}
+                            className={cn(
+                              "lg:px-4 px-2 whitespace-nowrap rounded-full text-gray-500 hover:text-gray-500",
+                              buttonVariants({ variant: "default" })
+                            )}
+                          >
+                            <div className="flex flex-wrap gap-1 items-center">
+                              <FaPen />
+                            </div>
+                          </Link>
+                        </div>
+                      ) : (
+                        <TableCell key={cell.id}>
+                          {flexRender(
+                            cell.column.columnDef.cell,
+                            cell.getContext()
+                          )}
+                        </TableCell>
+                      )
+                    )}
                   </TableRow>
                 ))
               ) : (

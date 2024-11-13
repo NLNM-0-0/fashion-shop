@@ -65,14 +65,15 @@ const ChangeImage = ({
   return (
     <Dialog open={open} onOpenChange={handleOpen}>
       <DialogTrigger asChild>
-        <Button variant={"ghost"} className="rounded-none w-full justify-start">
-          <div className="flex gap-2 items-center text-primary">
-            <PiPencilSimpleBold className="h-6 w-6 " />
-            Change avatar
-          </div>
+        <Button
+          variant={"outline"}
+          size={"icon"}
+          className="rounded-full absolute bottom-0 right-0"
+        >
+          <PiPencilSimpleBold className="h-6 w-6 " />
         </Button>
       </DialogTrigger>
-      <DialogContent className="max-w-[472px] p-0 bg-white">s
+      <DialogContent className="max-w-[472px] p-0 bg-white">
         <DialogHeader>
           <DialogTitle className="p-6 pb-0">Choose image</DialogTitle>
         </DialogHeader>

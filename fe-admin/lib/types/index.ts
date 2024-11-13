@@ -66,11 +66,19 @@ export interface CreateStaffPayload {
   admin: boolean;
 }
 
+export interface QuantityPayload {
+  size: string;
+  color: string;
+  quantity: number;
+}
 export interface CreateProductPayload {
   name: string;
-  image: string;
+  gender: string;
+  season: string;
+  images: string[];
+  categories: number[];
+  quantities: QuantityPayload[];
   unitPrice: number;
-  quantity: number;
 }
 
 export interface CreateNotificationPayload {
@@ -216,12 +224,25 @@ export interface Notification {
   createdAt: number;
   seen: boolean;
 }
-
+export interface Size {
+  name: string;
+}
+export interface Color {
+  name: string;
+  hex: string;
+}
 export interface Product {
   id: number;
   name: string;
-  image: string;
-  deleted: boolean;
+  gender: string;
+  season: string;
+  images: string[];
+  sizes: Size[];
+  colors: Color[];
+  categories: Category[];
+  quantities: Record<string, number>;
+  unitPrice: number;
+  delete: boolean;
 }
 
 export interface Order {
@@ -234,6 +255,19 @@ export interface Order {
   updatedAt: string;
   orderStatus: OrderStatus;
   details: OrderDetail[];
+  confirmedAt: string | null;
+  shippingAt: string | null;
+  doneAt: string | null;
+  canceledAt: string | null;
+}
+
+export interface Category {
+  id: number;
+  name: string;
+}
+
+export interface CategoryData {
+  data: Category[];
 }
 
 export interface OrderDetail {
