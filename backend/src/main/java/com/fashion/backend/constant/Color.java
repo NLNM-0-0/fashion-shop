@@ -15,7 +15,7 @@ public enum Color {
 	PURPLE("#800080"),
 	RED("#FF0000"),
 	WHITE("#FFFFFF"),
-	YELLOW("#FFFF00");
+	YELLOW("#FACC15");
 
 	private final String hexValue;
 
