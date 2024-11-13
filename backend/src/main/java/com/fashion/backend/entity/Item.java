@@ -50,19 +50,14 @@ public class Item {
 	@Convert(converter = ListStringConverter.class)
 	private List<String> images;
 
-	@Column(
-			name = "sizes",
-			columnDefinition = "text"
+	@OneToMany(
+			mappedBy = "item",
+			fetch = FetchType.LAZY,
+			cascade = CascadeType.ALL,
+			orphanRemoval = true,
+			targetEntity = ItemQuantity.class
 	)
-	@Convert(converter = ListItemSizeConverter.class)
-	private List<ItemSize> sizes;
-
-	@Column(
-			name = "colors",
-			columnDefinition = "text"
-	)
-	@Convert(converter = ListColorConverter.class)
-	private List<Color> colors;
+	private List<ItemQuantity> quantities;
 
 	@ManyToMany(
 			fetch = FetchType.LAZY,
@@ -78,10 +73,6 @@ public class Item {
 
 	@Column(nullable = false)
 	private Season season;
-
-	@Column(name = "quantity")
-	@Min(value = 0)
-	private int quantity;
 
 	@Column(nullable = false)
 	private boolean isDeleted = false;

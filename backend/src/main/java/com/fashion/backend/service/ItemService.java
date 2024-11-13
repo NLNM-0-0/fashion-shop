@@ -3,7 +3,7 @@ package com.fashion.backend.service;
 import com.fashion.backend.constant.*;
 import com.fashion.backend.entity.Category;
 import com.fashion.backend.entity.Item;
-import com.fashion.backend.entity.ItemSize;
+import com.fashion.backend.entity.ItemQuantity;
 import com.fashion.backend.entity.StockChangeHistory;
 import com.fashion.backend.exception.AppException;
 import com.fashion.backend.payload.CheckedFilter;
@@ -27,9 +27,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Set;
+import java.util.*;
 import java.util.stream.Collectors;
 
 @Service
@@ -156,8 +154,8 @@ public class ItemService {
 	private Pair<Boolean, List<CheckedFilter<ItemSizeDTO>>> getFilteredSizes(List<Item> items,
 																			 List<CheckedFilter<ItemSizeDTO>> filter) {
 		List<ItemSizeDTO> itemSizes = items.stream()
-										   .flatMap(item -> item.getSizes().stream())
-										   .map(this::mapToDTO)
+										   .flatMap(item -> item.getQuantities().stream())
+										   .map(this::mapToSizeDTO)
 										   .distinct()
 										   .toList();
 
@@ -297,6 +295,20 @@ public class ItemService {
 		return mapToDTO(item);
 	}
 
+	private int calcTotalQuantityFromEntities(List<ItemQuantity> quantities) {
+		return quantities
+				.stream()
+				.mapToInt(ItemQuantity::getQuantity)
+				.sum();
+	}
+
+	private int calcTotalQuantityFromDTOs(List<ItemQuantityRequest> quantities) {
+		return quantities
+				.stream()
+				.mapToInt(ItemQuantityRequest::getQuantity)
+				.sum();
+	}
+
 	@Transactional
 	public ItemResponse createItem(CreateItemRequest request) {
 		List<Category> categories = Common.findCategoryByIds(request.getCategories(), categoryRepository);
@@ -306,9 +318,7 @@ public class ItemService {
 						.name(request.getName())
 						.gender(request.getGender())
 						.season(request.getSeason())
-						.sizes(request.getSizes().stream().map(this::mapToEntity).toList())
-						.colors(request.getColors())
-						.quantity(request.getQuantity())
+						.quantities(request.getQuantities().stream().map(this::mapToEntity).toList())
 						.categories(categories)
 						.unitPrice(request.getUnitPrice())
 						.images(request.getImages())
@@ -317,12 +327,14 @@ public class ItemService {
 
 		item = itemRepository.save(item);
 
-		if (request.getQuantity() != 0) {
+		int totalQuantity = this.calcTotalQuantityFromEntities(item.getQuantities());
+
+		if (totalQuantity != 0) {
 			StockChangeHistory stockChangeHistory = StockChangeHistory.builder()
 																	  .item(item)
 																	  .type(StockChangeType.INCREASE)
-																	  .quantity(request.getQuantity())
-																	  .quantityLeft(request.getQuantity())
+																	  .quantity(totalQuantity)
+																	  .quantityLeft(totalQuantity)
 																	  .build();
 
 			stockChangeHistoryRepository.save(stockChangeHistory);
@@ -343,15 +355,18 @@ public class ItemService {
 
 		Item item = Common.findItemById(itemId, itemRepository);
 
-		if (item.getQuantity() != request.getQuantity()) {
-			int diff = request.getQuantity() - item.getQuantity();
+		int totalItemQuantity = this.calcTotalQuantityFromEntities(item.getQuantities());
+		int totalUpdatedQuantity = calcTotalQuantityFromDTOs(request.getQuantities());
+
+		if (totalItemQuantity != totalUpdatedQuantity) {
+			int diff = totalUpdatedQuantity - totalItemQuantity;
 			StockChangeType type = diff > 0 ? StockChangeType.INCREASE : StockChangeType.DECREASE;
 
 			StockChangeHistory stockChangeHistory = StockChangeHistory.builder()
 																	  .item(item)
 																	  .type(type)
 																	  .quantity(diff)
-																	  .quantityLeft(request.getQuantity())
+																	  .quantityLeft(totalUpdatedQuantity)
 																	  .build();
 
 			stockChangeHistoryRepository.save(stockChangeHistory);
@@ -360,10 +375,8 @@ public class ItemService {
 		Common.updateIfNotNull(request.getName(), item::setName);
 		Common.updateIfNotNull(request.getGender(), item::setGender);
 		Common.updateIfNotNull(request.getSeason(), item::setSeason);
-		Common.updateIfNotNull(request.getSizes().stream().map(this::mapToEntity).toList(), item::setSizes);
-		Common.updateIfNotNull(request.getColors(), item::setColors);
 		Common.updateIfNotNull(categories, item::setCategories);
-		Common.updateIfNotNull(request.getQuantity(), item::setQuantity);
+		Common.updateIfNotNull(request.getQuantities().stream().map(this::mapToEntity).toList(), item::setQuantities);
 		Common.updateIfNotNull(request.getUnitPrice(), item::setUnitPrice);
 		Common.updateIfNotNull(request.getImages(), item::setImages);
 
@@ -389,13 +402,31 @@ public class ItemService {
 	}
 
 	private ItemResponse mapToDTO(Item item) {
+		List<ItemQuantity> quantities = item.getQuantities();
+
+		Set<String> sizes = new HashSet<>();
+		Set<Color> colors = new HashSet<>();
+		Map<String, Integer> quantitiesDTO = new HashMap<>();
+
+		for (ItemQuantity quantity : quantities) {
+			String size = quantity.getSize();
+			Color color = quantity.getColor();
+
+			String key = size + "-" + color.name();
+			quantitiesDTO.put(key, quantity.getQuantity());
+
+			sizes.add(size);
+			colors.add(color);
+		}
+
 		return ItemResponse.builder()
 						   .id(item.getId())
 						   .name(item.getName())
 						   .gender(item.getGender())
 						   .season(item.getSeason())
-						   .colors(item.getColors().stream().map(this::mapToDTO).toList())
-						   .sizes(item.getSizes().stream().map(this::mapToDTO).toList())
+						   .colors(colors.stream().map(this::mapToDTO).toList())
+						   .sizes(sizes.stream().map(this::mapToDTO).toList())
+						   .quantities(quantitiesDTO)
 						   .categories(item.getCategories().stream().map(this::mapToDTO).toList())
 						   .unitPrice(item.getUnitPrice())
 						   .images(item.getImages())
@@ -403,15 +434,23 @@ public class ItemService {
 						   .build();
 	}
 
-	private ItemSize mapToEntity(CreateItemSizeRequest size) {
-		return ItemSize.builder()
-					   .name(size.getName())
-					   .build();
+	private ItemQuantity mapToEntity(ItemQuantityRequest request) {
+		return ItemQuantity.builder()
+						   .color(request.getColor())
+						   .quantity(request.getQuantity())
+						   .size(request.getSize())
+						   .build();
 	}
 
-	private ItemSizeDTO mapToDTO(ItemSize size) {
+	private ItemSizeDTO mapToSizeDTO(ItemQuantity quantityEntity) {
 		return ItemSizeDTO.builder()
-						  .name(size.getName())
+						  .name(quantityEntity.getSize())
+						  .build();
+	}
+
+	private ItemSizeDTO mapToDTO(String size) {
+		return ItemSizeDTO.builder()
+						  .name(size)
 						  .build();
 	}
 

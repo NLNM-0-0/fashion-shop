@@ -8,6 +8,7 @@ import lombok.Builder;
 import lombok.Data;
 
 import java.util.List;
+import java.util.Map;
 
 @Data
 @Builder
@@ -38,6 +39,11 @@ public class ItemResponse {
 			name = "sizes"
 	)
 	private List<ItemSizeDTO> sizes;
+
+	@Schema(
+			name = "quantities"
+	)
+	private Map<String, Integer> quantities;
 
 	@Schema(
 			name = "categories"

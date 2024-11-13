@@ -1,6 +1,5 @@
 package com.fashion.backend.payload.item;
 
-import com.fashion.backend.constant.Color;
 import com.fashion.backend.constant.Gender;
 import com.fashion.backend.constant.Message;
 import com.fashion.backend.constant.Season;
@@ -35,14 +34,9 @@ public class UpdateItemRequest {
 	private List<String> images;
 
 	@Schema(
-			name = "colors"
+			name = "quantities"
 	)
-	private List<Color> colors;
-
-	@Schema(
-			name = "sizes"
-	)
-	private List<CreateItemSizeRequest> sizes;
+	private List<ItemQuantityRequest> quantities;
 
 	@Schema(
 			name = "categories",
@@ -64,14 +58,4 @@ public class UpdateItemRequest {
 			message = Message.Item.UNIT_PRICE_VALIDATE
 	)
 	private Integer unitPrice;
-
-	@Schema(
-			name = "quantity",
-			example = "10"
-	)
-	@Min(
-			value = 0,
-			message = Message.Item.QUANTITY_VALIDATE
-	)
-	private Integer quantity;
 }

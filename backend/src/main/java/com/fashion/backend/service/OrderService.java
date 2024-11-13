@@ -244,12 +244,12 @@ public class OrderService {
 		List<OrderDetail> details = new ArrayList<>();
 		for (OrderDetailRequest requestDetail : requestDetails) {
 			Item item = Common.findItemById(requestDetail.getItemId(), itemRepository);
-			if (item.getSizes().stream().noneMatch(size -> size.getName().equals(requestDetail.getSize()))) {
-				throw new AppException(HttpStatus.BAD_REQUEST, Message.Order.CAN_NOT_PLACE_ORDER_ITEM_SIZE_NOT_EXIST);
-			}
-			if (item.getColors().stream().noneMatch(color -> color.equals(requestDetail.getColor()))) {
-				throw new AppException(HttpStatus.BAD_REQUEST, Message.Order.CAN_NOT_PLACE_ORDER_ITEM_COLOR_NOT_EXIST);
-			}
+//			if (item.getSizes().stream().noneMatch(size -> size.getName().equals(requestDetail.getSize()))) {
+//				throw new AppException(HttpStatus.BAD_REQUEST, Message.Order.CAN_NOT_PLACE_ORDER_ITEM_SIZE_NOT_EXIST);
+//			}
+//			if (item.getColors().stream().noneMatch(color -> color.equals(requestDetail.getColor()))) {
+//				throw new AppException(HttpStatus.BAD_REQUEST, Message.Order.CAN_NOT_PLACE_ORDER_ITEM_COLOR_NOT_EXIST);
+//			}
 
 			OrderDetail orderDetail = OrderDetail.builder()
 												 .unitPrice(item.getUnitPrice())
@@ -273,18 +273,18 @@ public class OrderService {
 		for (OrderDetail orderDetail : order.getOrderDetails()) {
 			Item item = orderDetail.getItem();
 
-			int quantityLeft = item.getQuantity() - orderDetail.getQuantity();
-			if (quantityLeft < 0) {
-				throw new AppException(HttpStatus.BAD_REQUEST, Message.Item.QUANTITY_MIN);
-			}
+//			int quantityLeft = item.getQuantity() - orderDetail.getQuantity();
+//			if (quantityLeft < 0) {
+//				throw new AppException(HttpStatus.BAD_REQUEST, Message.Item.QUANTITY_MIN);
+//			}
 
-			item.setQuantity(quantityLeft);
+//			item.setQuantity(quantityLeft);
 			savedItems.add(item);
 
 			StockChangeHistory history = StockChangeHistory.builder()
 														   .item(item)
 														   .type(StockChangeType.SELL)
-														   .quantityLeft(quantityLeft)
+//														   .quantityLeft(quantityLeft)
 														   .quantity(-orderDetail.getQuantity())
 														   .build();
 			savedHistories.add(history);
@@ -300,15 +300,15 @@ public class OrderService {
 		for (OrderDetail orderDetail : order.getOrderDetails()) {
 			Item item = orderDetail.getItem();
 
-			int quantityLeft = item.getQuantity() + orderDetail.getQuantity();
-
-			item.setQuantity(quantityLeft);
-			savedItems.add(item);
+//			int quantityLeft = item.getQuantity() + orderDetail.getQuantity();
+//
+//			item.setQuantity(quantityLeft);
+//			savedItems.add(item);
 
 			StockChangeHistory history = StockChangeHistory.builder()
 														   .item(item)
 														   .type(StockChangeType.PAYBACK)
-														   .quantityLeft(quantityLeft)
+//														   .quantityLeft(quantityLeft)
 														   .quantity(orderDetail.getQuantity())
 														   .build();
 			savedHistories.add(history);
