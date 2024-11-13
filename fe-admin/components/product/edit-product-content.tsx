@@ -14,7 +14,7 @@ import QuantityForm from "./quantity-form";
 import { Separator } from "../ui/separator";
 import SizeRadioButton from "../ui/size-button";
 import CategoryForm from "./category-form";
-import { useEffect, useState } from "react";
+import { useCallback, useEffect, useState } from "react";
 import uploadFile from "@/lib/api/uploadFile";
 import { ProductSchema } from "./add-new-product";
 import { updateProduct } from "@/lib/api/product/updateProduct";
@@ -45,11 +45,11 @@ const EditProductContent = ({ product }: { product: Product }) => {
       gender: Gender.MEN,
       season: Season.SPRING,
     },
+    shouldUnregister: false,
   });
 
   const handleUpload = (files: File[]) => {
     setFileList(files);
-    console.log(files);
   };
 
   const onSubmit: SubmitHandler<z.infer<typeof ProductSchema>> = async (
@@ -89,7 +89,7 @@ const EditProductContent = ({ product }: { product: Product }) => {
     }
   };
 
-  useEffect(() => {
+  const resetForm = useCallback(() => {
     if (product) {
       reset({
         ...product,
@@ -105,6 +105,7 @@ const EditProductContent = ({ product }: { product: Product }) => {
         quantity: Object.entries(product.quantities).map(([key, value]) => {
           const [sizeName, colorName] = key.split("-");
           return {
+            quantityKey: key,
             size: sizeName,
             color: colorName,
             quantity: value,
@@ -114,6 +115,10 @@ const EditProductContent = ({ product }: { product: Product }) => {
       setImageList(product.images);
     }
   }, [product, reset]);
+
+  useEffect(() => {
+    resetForm();
+  }, [resetForm]);
 
   return (
     <form
@@ -219,10 +224,15 @@ const EditProductContent = ({ product }: { product: Product }) => {
         </div>
       </div>
       <Separator className="my-10 bg-fs-gray-light" />
-      <QuantityForm control={control} watch={watch} />
+      <QuantityForm control={control} watch={watch} errors={errors} />
 
-      <div className="flex mt-16 w-full justify-center gap-4">
-        <Button className="sm:w-3/5 w-full min-w-48">Create</Button>
+      <div className="mt-16 w-full flex justify-center">
+        <div className="flex sm:w-3/5 w-full gap-4">
+          <Button className="flex-1" variant={"outline"} onClick={resetForm}>
+            Reset
+          </Button>
+          <Button className="flex-1">Update</Button>
+        </div>
       </div>
     </form>
   );

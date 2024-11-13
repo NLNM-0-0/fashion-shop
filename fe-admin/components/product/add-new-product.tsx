@@ -35,11 +35,23 @@ export const ProductSchema = z.object({
       quantity: z.coerce.number(),
     })
   ),
-  colors: z.array(z.object({ colorName: z.string() })),
-  sizes: z.array(z.object({ sizeName: z.string() })),
-  categories: z.array(
-    z.object({ categoryId: z.coerce.number(), categoryName: z.string() })
-  ),
+  colors: z
+    .array(z.object({ colorName: z.string() }))
+    .refine((array) => array.length > 0, {
+      message: "Choose at least one color",
+    }),
+  sizes: z
+    .array(z.object({ sizeName: z.string() }))
+    .refine((array) => array.length > 0, {
+      message: "Choose at least one size",
+    }),
+  categories: z
+    .array(
+      z.object({ categoryId: z.coerce.number(), categoryName: z.string() })
+    )
+    .refine((category) => category.length > 0, {
+      message: "Choose at least one category",
+    }),
   gender: required,
   season: required,
 });
@@ -61,7 +73,6 @@ const AddNewProduct = () => {
     defaultValues: {
       name: "",
       unitPrice: 0,
-      quantity: [],
       colors: [],
       sizes: [],
       categories: [],
@@ -193,6 +204,11 @@ const AddNewProduct = () => {
                 <span className="error___message"> *</span>
               </div>
               <CategoryForm control={control} />
+              {errors.categories && (
+                <span className="error___message">
+                  {errors.categories.message}
+                </span>
+              )}
             </div>
           </div>
         </div>
@@ -211,9 +227,11 @@ const AddNewProduct = () => {
         </div>
       </div>
       <Separator className="my-10 bg-fs-gray-light" />
-      <QuantityForm control={control} watch={watch} />
+      <QuantityForm control={control} watch={watch} errors={errors} />
 
-      <Button className="w-52">Create</Button>
+      <div className="flex mt-16 w-full justify-center gap-4">
+        <Button className="sm:w-3/5 w-full min-w-48">Create</Button>
+      </div>
     </form>
   );
 };

@@ -8,6 +8,7 @@ export const metadata: Metadata = {
 const EditProductPage = ({ params }: { params: { id: string } }) => {
   return (
     <SWRProvider>
+      <h1 className="table___title">Update Product</h1>
       <EditProduct params={params} />
     </SWRProvider>
   );
