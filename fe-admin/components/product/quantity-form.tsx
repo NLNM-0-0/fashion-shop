@@ -1,6 +1,7 @@
 import {
   Control,
   Controller,
+  FieldErrors,
   useFieldArray,
   UseFormWatch,
 } from "react-hook-form";
@@ -13,9 +14,10 @@ import { Input } from "../ui/input";
 export interface QuantityFormProps {
   control: Control<z.infer<typeof ProductSchema>>;
   watch: UseFormWatch<z.infer<typeof ProductSchema>>;
+  errors: FieldErrors<z.infer<typeof ProductSchema>>;
 }
 
-const QuantityForm = ({ control, watch }: QuantityFormProps) => {
+const QuantityForm = ({ control, watch, errors }: QuantityFormProps) => {
   const { fields, replace } = useFieldArray({
     control: control,
     name: "quantity",
@@ -24,73 +26,96 @@ const QuantityForm = ({ control, watch }: QuantityFormProps) => {
   const colors = watch("colors");
 
   useEffect(() => {
-    const currentQuatities = sizes.flatMap((size) =>
-      colors.map((color) => ({
-        quantityKey: `${size.sizeName}-${color.colorName}`,
-        size: size.sizeName,
-        color: color.colorName,
-        quantity:
-          fields.find(
-            (q) => (q.quantityKey = `${size.sizeName}-${color.colorName}`)
-          )?.quantity || 0,
-      }))
-    );
-    if (JSON.stringify(currentQuatities) !== JSON.stringify(fields)) {
-      replace(currentQuatities);
+    if (sizes && colors) {
+      const currentQuatities = sizes.flatMap((size) =>
+        colors.map((color) => {
+          return {
+            quantityKey: `${size.sizeName}-${color.colorName}`,
+            size: size.sizeName,
+            color: color.colorName,
+            quantity:
+              fields.find(
+                (q) => q.quantityKey === `${size.sizeName}-${color.colorName}`
+              )?.quantity || 0,
+          };
+        })
+      );
+      if (JSON.stringify(currentQuatities) !== JSON.stringify(fields)) {
+        replace(currentQuatities);
+      }
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [sizes, colors]);
 
   return (
     <div className="flex flex-col gap-7">
-      <ColorForm control={control} />
-      <SizeForm control={control} />
+      <div>
+        <ColorForm control={control} />
+        {errors.colors && (
+          <span className="error___message">{errors.colors.message}</span>
+        )}
+      </div>
+      <div>
+        <SizeForm control={control} />
+        {errors.sizes && (
+          <span className="error___message">{errors.sizes.message}</span>
+        )}
+      </div>
       <div>
         <div className="font-medium mb-2">Quantity</div>
         <table className="min-w-full bg-white border">
           <thead>
             <tr>
               <th className="border px-4 py-2">Size \ Color</th>
-              {colors.map((column) => (
-                <th key={column.colorName} className="border px-4 py-2">
-                  {column.colorName}
-                </th>
-              ))}
+              {colors &&
+                colors.map((column) => (
+                  <th key={column.colorName} className="border px-4 py-2">
+                    {column.colorName}
+                  </th>
+                ))}
             </tr>
           </thead>
           <tbody>
-            {sizes.map((size) => (
-              <tr key={size.sizeName}>
-                <td className="border px-4 py-2 font-semibold">
-                  {size.sizeName}
-                </td>
-                {colors.map((column) => {
-                  const index = fields.findIndex(
-                    (quantity) =>
-                      quantity.quantityKey ===
-                      `${size.sizeName}-${column.colorName}`
-                  );
-                  if (index === -1)
+            {sizes &&
+              sizes.map((size) => (
+                <tr key={size.sizeName}>
+                  <td className="border px-4 py-2 font-semibold">
+                    {size.sizeName}
+                  </td>
+                  {colors.map((column) => {
+                    const index = fields.findIndex(
+                      (quantity) =>
+                        quantity.quantityKey ===
+                        `${size.sizeName}-${column.colorName}`
+                    );
+                    if (index === -1)
+                      return (
+                        <td
+                          key={`${size.sizeName}-${column.colorName}`}
+                          className="border px-4 py-2"
+                        >
+                          N/A
+                        </td>
+                      );
+
                     return (
-                      <td key={column.colorName} className="border px-4 py-2">
-                        N/A
+                      <td
+                        key={`${size.sizeName}-${column.colorName}`}
+                        className="border px-4 py-2"
+                      >
+                        <Controller
+                          key={`${size.sizeName}-${column.colorName}`}
+                          control={control}
+                          name={`quantity.${index}.quantity`}
+                          render={({ field }) => (
+                            <Input type="number" {...field} />
+                          )}
+                        />
                       </td>
                     );
-
-                  return (
-                    <td key={column.colorName} className="border px-4 py-2">
-                      <Controller
-                        control={control}
-                        name={`quantity.${index}.quantity`}
-                        render={({ field }) => (
-                          <Input type="number" {...field} />
-                        )}
-                      />
-                    </td>
-                  );
-                })}
-              </tr>
-            ))}
+                  })}
+                </tr>
+              ))}
           </tbody>
         </table>
       </div>

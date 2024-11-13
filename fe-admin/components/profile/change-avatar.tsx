@@ -18,7 +18,6 @@ const ChangeAvatar = ({ currentImage, onChanged }: ChangeAvatarProps) => {
       return;
     }
     const formData = new FormData();
-    console.log("image", image);
     formData.append("file", image);
     uploadImage(formData)
       .then((imgRes) => {

@@ -32,10 +32,8 @@ const ChangeImage = ({
     if (file) {
       if (file && file.type.includes("image")) {
         setImage(file);
-        console.log(file.type);
         const reader = new FileReader();
         reader.onload = () => {
-          console.log("Reader result:", reader.result); // Add a log to confirm reader result
           if (reader.result) {
             setImagePreviews(reader.result as string);
           }
@@ -48,7 +46,6 @@ const ChangeImage = ({
           title: "Có lỗi",
           description: "File không hợp lệ",
         });
-        console.log("file không hợp lệ");
       }
     } else {
       setImage(null);

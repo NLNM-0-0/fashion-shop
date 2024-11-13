@@ -64,7 +64,6 @@ const ProfileForm = () => {
       return;
     }
     const formData = new FormData();
-    console.log("image", image);
     formData.append("file", image);
     uploadImage(formData)
       .then((imgRes) => {
@@ -102,7 +101,6 @@ const ProfileForm = () => {
   const onSubmit: SubmitHandler<z.infer<typeof ProfileScheme>> = async (
     data
   ) => {
-    console.log(data);
     updateUserInfo({
       ...data,
       dob: format(data.dob, "dd/MM/yyyy", {

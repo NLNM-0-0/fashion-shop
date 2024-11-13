@@ -13,7 +13,6 @@ export default async function sendEmailForgotPassword({
   const res = axios
     .post(url, data)
     .then((response) => {
-      console.log(response);
       if (response) return response.data;
     })
     .catch((error) => {

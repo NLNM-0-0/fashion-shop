@@ -161,7 +161,7 @@ export function StaffTable() {
                   >
                     {row.getVisibleCells().map((cell) =>
                       cell.id.includes("actions") ? (
-                        <div key={cell.id} className="flex py-2 gap-2">
+                        <TableCell key={cell.id} className="flex py-2 gap-2">
                           <EditStaffDialog
                             staff={row.original}
                             onAdded={() => void mutate()}
@@ -170,7 +170,7 @@ export function StaffTable() {
                             id={row.original.id}
                             onDelete={() => void mutate()}
                           />
-                        </div>
+                        </TableCell>
                       ) : (
                         <TableCell key={cell.id}>
                           {flexRender(
