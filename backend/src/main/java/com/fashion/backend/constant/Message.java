@@ -20,6 +20,9 @@ public class Message {
 	public static final String OTP_EXPIRED
 			= "The OTP has expired. Please enter your phone number again to receive a new OTP";
 	public static final String TIME_FROM_TIME_TO_VALIDATE = "Time is not within the valid range";
+	public static class ItemQuantity {
+		public static String ITEM_QUANTITY_NOT_EXIST = "Product with that color and size does not exist in the system";
+	}
 
 	public static class Order {
 		public static final String ORDER_NOT_EXIST = "Order does not exist in the system";
@@ -30,10 +33,6 @@ public class Message {
 		public static final String ORDER_ITEM_MUST_HAVE_COLOR = "Order information must include color";
 		public static final String ORDER_ITEM_MUST_HAVE_SIZE = "Order information must include size";
 		public static final String ORDER_CAN_NOT_HAVE_SAME_ITEM = "Order cannot have two identical products";
-		public static final String CAN_NOT_PLACE_ORDER_ITEM_SIZE_NOT_EXIST
-				= "Cannot place an order with a non-existent size";
-		public static final String CAN_NOT_PLACE_ORDER_ITEM_COLOR_NOT_EXIST
-				= "Cannot place an order with a non-existent color";
 	}
 
 	public static class StockReport {
@@ -67,7 +66,6 @@ public class Message {
 		public static final String GENDER_VALIDATE = "Item must be identified for a specific gender";
 		public static final String NAME_VALIDATE
 				= "Product name cannot be empty and must be a maximum of 200 characters";
-		public static final String SIZE_VALIDATE = "Product must have a size";
 		public static final String CATEGORY_VALIDATE = "Product must have a category";
 		public static final String SEASON_VALIDATE = "Product must have a season";
 		public static final String SIZE_NAME_VALIDATE
