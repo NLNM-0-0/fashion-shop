@@ -40,7 +40,7 @@ const VerifyOTPForm = () => {
     resolver: zodResolver(VerifyOTPScheme),
     mode: "onChange",
   });
-  const { remainingTime, startCountdown } = useCountDown();
+  const { remainingTime, startCountdown, stopCountdown } = useCountDown();
 
   const [verified, setVerified] = useState(false);
   const phoneValue = watch("phone");
@@ -56,6 +56,7 @@ const VerifyOTPForm = () => {
       })
       .catch((err: AxiosError<ApiError>) => {
         setVerified(false);
+        stopCountdown();
         toast({
           variant: "destructive",
           title: "Error",
@@ -73,6 +74,7 @@ const VerifyOTPForm = () => {
       })
       .catch((err: AxiosError<ApiError>) => {
         setVerified(false);
+        stopCountdown();
         toast({
           variant: "destructive",
           title: "Error",

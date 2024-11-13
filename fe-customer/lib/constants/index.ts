@@ -1,5 +1,5 @@
-import { FormFilterType, OrderStatusValue } from "../types";
-import { FilterInputType, OrderStatus } from "./enum";
+import { Category, FormFilterType, OrderStatusValue, Product } from "../types";
+import { FilterInputType, Gender, OrderStatus } from "./enum";
 import { LucideIcon } from "lucide-react";
 import { Menu, PackageCheck, PackageX, Truck, Receipt } from "lucide-react";
 
@@ -91,4 +91,27 @@ export const orderStatusIcons: Record<OrderStatus, LucideIcon> = {
   [OrderStatus.SHIPPING]: Truck,
   [OrderStatus.DONE]: PackageCheck,
   [OrderStatus.CANCELED]: PackageX,
+};
+
+const categories: Category[] = [
+  {
+    id: 1,
+    name: "Shorts",
+  },
+];
+export const sampleProduct: Product = {
+  id: 1,
+  name: "This is a sample product",
+  gender: Gender.UNISEX,
+  colors: [
+    { name: "BLUE", hex: "#0000FF" },
+    { name: "BLACK", hex: "#000" },
+    { name: "GREY", hex: "#808080" },
+  ],
+  categories: categories,
+  sizes: [{ name: "S" }, { name: "M" }],
+  season: "SPRING",
+  images: ["/images/1.png", "/images/2.png", "/images/3.png"],
+  price: 3675000,
+  deleted: false,
 };

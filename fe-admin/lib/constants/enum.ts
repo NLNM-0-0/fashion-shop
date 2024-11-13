@@ -15,3 +15,31 @@ export enum OrderStatus {
   DONE = "DONE",
   CANCELED = "CANCELED",
 }
+
+export enum Gender {
+  BOYS = "KIDS",
+  MEN = "MEN",
+  WOMEN = "WOMEN",
+  UNISEX = "UNISEX",
+}
+
+export enum Season {
+  SPRING = "SPRING",
+  SUMMER = "SUMMER",
+  FALL = "FALL",
+  WINTER = "WINTER",
+}
+
+export enum Color {
+  BLACK = "BLACK",
+  BLUE = "BLUE",
+  BROWN = "BROWN",
+  GREEN = "GREEN",
+  GREY = "GREY",
+  ORANGE = "ORANGE",
+  PINK = "PINK",
+  PURPLE = "PURPLE",
+  RED = "RED",
+  WHITE = "WHITE",
+  YELLOW = "YELLOW",
+}
