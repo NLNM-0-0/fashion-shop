@@ -66,7 +66,7 @@ const NotificationList = () => {
     <div>
       <div className="pb-5 mb-7 border-b w-full flex flex-row justify-between items-center">
         <h1 className="table___title">Notifications</h1>
-        {user?.address && <CreateNotification onCreated={() => mutate()} />}
+        {user?.admin && <CreateNotification onCreated={() => mutate()} />}
       </div>
       <div className="w-full flex flex-col overflow-x-auto">
         <div className="mb-4 flex gap-3">

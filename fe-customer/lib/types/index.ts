@@ -242,10 +242,24 @@ export interface Notification {
   seen: boolean;
 }
 
+export interface ProductColor {
+  name: string;
+  hex: string;
+}
+export interface Size {
+  name: string;
+}
+
 export interface Product {
   id: number;
   name: string;
-  image: string;
+  gender: string;
+  sizes: Size[];
+  colors: ProductColor[];
+  categories: Category[];
+  season: string;
+  images: string[];
+  price:number;
   deleted: boolean;
 }
 

@@ -21,7 +21,7 @@ const OrderContent = ({ orderId }: { orderId: string }) => {
             <OrderStatusView status={order.orderStatus} />
           </div>
           <Separator />
-          <OrderSteps />
+          <OrderSteps order={order} />
           {order.details.map((detail, index) => (
             <OrderDetailItem key={`order-detail-${index}`} detail={detail} />
           ))}

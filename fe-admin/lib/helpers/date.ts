@@ -26,3 +26,10 @@ export const stringNumberToDate = (value: string) => {
   const dateObject = new Date(seconds * 1000);
   return dateObject;
 };
+
+export const toVNTime = (value: string) => {
+  const date = new Date(value);
+  return format(date, "dd/MM/yyyy", {
+    locale: vi,
+  });
+};

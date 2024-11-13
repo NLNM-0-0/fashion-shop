@@ -1,6 +1,6 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
 import { toast } from "@/hooks/use-toast";
-import { updateAvatar } from "@/lib/api/profile/updateAvatar";
+import { updateUserInfo } from "@/lib/api/profile/updateUserInfo";
 import { uploadImage } from "@/lib/api/profile/uploadImage";
 import { useState } from "react";
 import ChangeImage from "./change-image";
@@ -22,7 +22,7 @@ const ChangeAvatar = ({ currentImage, onChanged }: ChangeAvatarProps) => {
     formData.append("file", image);
     uploadImage(formData)
       .then((imgRes) => {
-        updateAvatar({ image: imgRes.data.file })
+        updateUserInfo({ image: imgRes.data.file })
           .then(() => {
             onChanged();
             toast({
