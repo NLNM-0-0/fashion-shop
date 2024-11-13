@@ -202,7 +202,10 @@ public class Common {
 																  Message.Order.ORDER_NOT_EXIST));
 	}
 
-	public static ItemQuantity findItemQuantity(Long itemId, Color color, String size, ItemQuantityRepository repository) {
+	public static ItemQuantity findItemQuantity(Long itemId,
+												Color color,
+												String size,
+												ItemQuantityRepository repository) {
 		return repository.findFirstByItemIdAndColorAndAndSize(itemId, color, size)
 						 .orElseThrow(() -> new AppException(HttpStatus.BAD_REQUEST,
 															 Message.ItemQuantity.ITEM_QUANTITY_NOT_EXIST));

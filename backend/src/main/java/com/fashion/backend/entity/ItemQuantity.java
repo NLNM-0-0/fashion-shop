@@ -1,6 +1,7 @@
 package com.fashion.backend.entity;
 
 import com.fashion.backend.constant.Color;
+import com.fasterxml.jackson.annotation.JsonBackReference;
 import jakarta.persistence.*;
 import jakarta.validation.constraints.Min;
 import lombok.AllArgsConstructor;
@@ -20,11 +21,15 @@ import lombok.NoArgsConstructor;
 				name = "Item's name"
 		)}
 )
-@Embeddable
 public class ItemQuantity {
 	@Id @GeneratedValue(strategy = GenerationType.IDENTITY) private Long id;
 
-	@ManyToOne()
+	@ManyToOne(fetch = FetchType.LAZY)
+	@JoinColumn(
+			name = "item_id",
+			nullable = false,
+			updatable = false
+	)
 	private Item item;
 
 	@Column(

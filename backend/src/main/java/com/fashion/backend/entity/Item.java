@@ -1,11 +1,9 @@
 package com.fashion.backend.entity;
 
-import com.fashion.backend.constant.Color;
 import com.fashion.backend.constant.Gender;
 import com.fashion.backend.constant.Season;
-import com.fashion.backend.utils.converter.ListColorConverter;
-import com.fashion.backend.utils.converter.ListItemSizeConverter;
 import com.fashion.backend.utils.converter.ListStringConverter;
+import com.fasterxml.jackson.annotation.JsonManagedReference;
 import jakarta.persistence.*;
 import jakarta.validation.constraints.Min;
 import lombok.AllArgsConstructor;
@@ -14,6 +12,7 @@ import lombok.Data;
 import lombok.NoArgsConstructor;
 import org.hibernate.validator.constraints.Length;
 
+import java.util.ArrayList;
 import java.util.List;
 
 @Data
@@ -50,15 +49,6 @@ public class Item {
 	@Convert(converter = ListStringConverter.class)
 	private List<String> images;
 
-	@OneToMany(
-			mappedBy = "item",
-			fetch = FetchType.LAZY,
-			cascade = CascadeType.ALL,
-			orphanRemoval = true,
-			targetEntity = ItemQuantity.class
-	)
-	private List<ItemQuantity> quantities;
-
 	@ManyToMany(
 			fetch = FetchType.LAZY,
 			targetEntity = Category.class
@@ -71,6 +61,7 @@ public class Item {
 	@Min(0)
 	private int unitPrice;
 
+	@Enumerated(EnumType.STRING)
 	@Column(nullable = false)
 	private Season season;
 
