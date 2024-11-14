@@ -393,7 +393,14 @@ public class ItemService {
 		Common.updateIfNotNull(request.getImages(), item::setImages);
 
 		itemQuantityRepository.deleteAllByItemId(itemId);
-		itemQuantityRepository.saveAll(request.getQuantities().stream().map(this::mapToEntity).toList());
+
+		List<ItemQuantity> quantities = request.getQuantities().stream().map(dto->{
+			ItemQuantity itemQuantity = mapToEntity(dto);
+			itemQuantity.setItem(item);
+			return itemQuantity;
+		}).toList();
+
+		itemQuantityRepository.saveAll(quantities);
 
 		return mapToDTO(itemRepository.save(item));
 	}
