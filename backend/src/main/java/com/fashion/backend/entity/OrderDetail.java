@@ -1,7 +1,6 @@
 package com.fashion.backend.entity;
 
 import com.fashion.backend.constant.Color;
-import com.fasterxml.jackson.annotation.JsonBackReference;
 import jakarta.persistence.*;
 import jakarta.validation.constraints.Min;
 import lombok.AllArgsConstructor;

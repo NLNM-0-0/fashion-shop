@@ -1,5 +1,6 @@
 package com.fashion.backend.service;
 
+import com.fashion.backend.constant.Color;
 import com.fashion.backend.constant.Message;
 import com.fashion.backend.entity.Cart;
 import com.fashion.backend.entity.Item;
@@ -21,6 +22,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 
@@ -41,10 +43,26 @@ public class CartService {
 				user.getId(),
 				Sort.by(Sort.Direction.DESC, "createdAt"));
 
-		List<CartDetailResponse> data = cartDetails.stream().map(this::mapToDTO).toList();
+		List<CartDetailResponse> responses = new ArrayList<>();
+		for (Cart cartDetail : cartDetails) {
+			CartDetailResponse response;
+
+			Optional<ItemQuantity> itemQuantity
+					= itemQuantityRepository.findFirstByItemIdAndColorAndAndSize(cartDetail.getItem().getId(),
+																				 cartDetail.getColor(),
+																				 cartDetail.getSize());
+
+			if (itemQuantity.isEmpty()) {
+				response = mapToDTO(cartDetail, 0, false);
+			} else {
+				response = mapToDTO(cartDetail, itemQuantity.get().getQuantity(), true);
+			}
+
+			responses.add(response);
+		}
 
 		return SimpleListResponse.<CartDetailResponse>builder()
-								 .data(data)
+								 .data(responses)
 								 .build();
 	}
 
@@ -69,6 +87,13 @@ public class CartService {
 		return new SimpleResponse();
 	}
 
+	private Optional<Cart> findOptionalCart(Long userId, Long itemId, String size, Color color) {
+		return cartRepository.findFirstByUserIdAndItemIdAndSizeAndColor(userId,
+																		itemId,
+																		size,
+																		color);
+	}
+
 	@Transactional
 	public SimpleResponse addCartItem(AddToCartRequest request) {
 		User user = Common.findCurrUser(userRepository, userAuthRepository);
@@ -79,10 +104,10 @@ public class CartService {
 															request.getColor(),
 															itemQuantityRepository);
 
-		Optional<Cart> cartItemOptional = cartRepository.findFirstByUserIdAndItemIdAndSizeAndColor(user.getId(),
-																								   item.getId(),
-																								   request.getSize(),
-																								   request.getColor());
+		Optional<Cart> cartItemOptional = findOptionalCart(user.getId(),
+														   item.getId(),
+														   request.getSize(),
+														   request.getColor());
 
 		Cart cartItem;
 		int currentQuantityInCart = request.getQuantity();
@@ -100,7 +125,7 @@ public class CartService {
 			cartItem.setQuantity(currentQuantityInCart);
 		}
 
-		if (itemQuantity.getQuantity() < currentQuantityInCart) {
+		if (currentQuantityInCart > itemQuantity.getQuantity()) {
 			throw new AppException(HttpStatus.BAD_REQUEST, Message.Cart.CAN_NOT_ADD_OVER_CURRENT_QUANTITY);
 		}
 
@@ -113,21 +138,24 @@ public class CartService {
 	public SimpleResponse updateCartItem(Long cartId, UpdateCartRequest request) {
 		Cart cart = Common.findCartById(cartId, cartRepository);
 		User user = Common.findCurrUser(userRepository, userAuthRepository);
-		Optional<Cart> requestedCartItemOptional
-				= cartRepository.findFirstByUserIdAndItemIdAndSizeAndColor(user.getId(),
-																		   cart.getItem().getId(),
-																		   request.getSize(),
-																		   request.getColor());
 
 		ItemQuantity itemQuantity = Common.findItemQuantity(cart.getItem().getId(),
 															request.getSize(),
 															request.getColor(),
 															itemQuantityRepository);
-		if (itemQuantity.getQuantity() < request.getQuantity()) {
+
+		if (request.getQuantity() > itemQuantity.getQuantity()) {
 			throw new AppException(HttpStatus.BAD_REQUEST, Message.Cart.CAN_NOT_ADD_OVER_CURRENT_QUANTITY);
 		}
 
+		Optional<Cart> requestedCartItemOptional = this.findOptionalCart(user.getId(),
+																		 cart.getItem().getId(),
+																		 request.getSize(),
+																		 request.getColor());
+
 		if (requestedCartItemOptional.isEmpty()) {
+			cart.setSize(request.getSize());
+			cart.setColor(request.getColor());
 			cart.setQuantity(request.getQuantity());
 			cartRepository.save(cart);
 		} else {
@@ -156,9 +184,16 @@ public class CartService {
 			throw new AppException(HttpStatus.BAD_REQUEST, Message.Item.ITEM_IS_DELETED);
 		}
 
+		ItemQuantity itemQuantity = Common.findItemQuantity(cart.getItem().getId(),
+															cart.getSize(),
+															cart.getColor(),
+															itemQuantityRepository);
+
 		cart.setQuantity(cart.getQuantity() + request.getQuantityChange());
 		if (cart.getQuantity() < 0) {
 			throw new AppException(HttpStatus.BAD_REQUEST, Message.Cart.QUANTITY_MIN_VALIDATE);
+		} else if (cart.getQuantity() > itemQuantity.getQuantity()) {
+			throw new AppException(HttpStatus.BAD_REQUEST, Message.Cart.CAN_NOT_ADD_OVER_CURRENT_QUANTITY);
 		} else if (cart.getQuantity() == 0) {
 			cartRepository.delete(cart);
 			return new SimpleResponse();
@@ -169,7 +204,7 @@ public class CartService {
 		return new SimpleResponse();
 	}
 
-	private CartDetailResponse mapToDTO(Cart cart) {
+	private CartDetailResponse mapToDTO(Cart cart, int itemQuantity, boolean isExist) {
 		return CartDetailResponse.builder()
 								 .id(cart.getId())
 								 .createdAt(cart.getCreatedAt())
@@ -177,6 +212,8 @@ public class CartService {
 								 .item(mapToDTO(cart.getItem()))
 								 .size(cart.getSize())
 								 .color(cart.getColor())
+								 .itemQuantity(itemQuantity)
+								 .isExist(isExist)
 								 .build();
 	}
 

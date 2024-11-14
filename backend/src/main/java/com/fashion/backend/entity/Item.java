@@ -3,7 +3,6 @@ package com.fashion.backend.entity;
 import com.fashion.backend.constant.Gender;
 import com.fashion.backend.constant.Season;
 import com.fashion.backend.utils.converter.ListStringConverter;
-import com.fasterxml.jackson.annotation.JsonManagedReference;
 import jakarta.persistence.*;
 import jakarta.validation.constraints.Min;
 import lombok.AllArgsConstructor;
@@ -12,7 +11,6 @@ import lombok.Data;
 import lombok.NoArgsConstructor;
 import org.hibernate.validator.constraints.Length;
 
-import java.util.ArrayList;
 import java.util.List;
 
 @Data
