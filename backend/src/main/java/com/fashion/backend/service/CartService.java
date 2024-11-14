@@ -89,6 +89,8 @@ public class CartService {
 			cartItem = Cart.builder()
 						   .item(item)
 						   .user(user)
+						   .size(request.getSize())
+						   .color(request.getColor())
 						   .quantity(currentQuantityInCart)
 						   .build();
 		} else {
