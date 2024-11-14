@@ -79,7 +79,7 @@ public class CartController {
 		return new ResponseEntity<>(cartService.addCartItem(request), HttpStatus.OK);
 	}
 
-	@DeleteMapping("/{itemId}")
+	@DeleteMapping("/{cartId}")
 	@SecurityRequirement(
 			name = "Bearer Authentication"
 	)
@@ -93,11 +93,11 @@ public class CartController {
 	)
 	@PreAuthorize("hasAnyAuthority('USER')")
 	public ResponseEntity<SimpleResponse> deleteCartItem(
-			@PathVariable Long itemId) {
-		return new ResponseEntity<>(cartService.deleteCartItem(itemId), HttpStatus.OK);
+			@PathVariable Long cartId) {
+		return new ResponseEntity<>(cartService.deleteCartItem(cartId), HttpStatus.OK);
 	}
 
-	@PostMapping("/{itemId}")
+	@PostMapping("/{cartId}")
 	@SecurityRequirement(
 			name = "Bearer Authentication"
 	)
@@ -111,8 +111,8 @@ public class CartController {
 	)
 	@PreAuthorize("hasAnyAuthority('USER')")
 	public ResponseEntity<SimpleResponse> changeQuantityCartItem(
-			@PathVariable Long itemId,
+			@PathVariable Long cartId,
 			@Valid ChangeQuantityRequest request) {
-		return new ResponseEntity<>(cartService.changeQuantityCartItem(itemId, request), HttpStatus.OK);
+		return new ResponseEntity<>(cartService.changeQuantityCartItem(cartId, request), HttpStatus.OK);
 	}
 }
