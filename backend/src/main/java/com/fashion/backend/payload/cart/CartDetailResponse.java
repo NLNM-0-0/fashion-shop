@@ -40,6 +40,6 @@ public class CartDetailResponse {
 	)
 	private int quantity;
 
-	@Schema(name = "updatedAt")
-	private Date updatedAt;
+	@Schema(name = "createdAt")
+	private Date createdAt;
 }

@@ -11,6 +11,7 @@ import com.fashion.backend.payload.SimpleResponse;
 import com.fashion.backend.payload.cart.AddToCartRequest;
 import com.fashion.backend.payload.cart.CartDetailResponse;
 import com.fashion.backend.payload.cart.ChangeQuantityRequest;
+import com.fashion.backend.payload.cart.UpdateCartRequest;
 import com.fashion.backend.payload.item.SimpleItemResponse;
 import com.fashion.backend.payload.notification.NumberNotificationNotSeenResponse;
 import com.fashion.backend.repository.*;
@@ -21,6 +22,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
+import java.util.Objects;
 import java.util.Optional;
 
 @Service
@@ -38,7 +40,7 @@ public class CartService {
 
 		List<Cart> cartDetails = cartRepository.findAllByUserId(
 				user.getId(),
-				Sort.by(Sort.Direction.DESC, "updatedAt"));
+				Sort.by(Sort.Direction.DESC, "createdAt"));
 
 		List<CartDetailResponse> data = cartDetails.stream().map(this::mapToDTO).toList();
 
@@ -109,6 +111,38 @@ public class CartService {
 	}
 
 	@Transactional
+	public SimpleResponse updateCartItem(Long cartId, UpdateCartRequest request) {
+		Cart cart = Common.findCartById(cartId, cartRepository);
+		User user = Common.findCurrUser(userRepository, userAuthRepository);
+		Optional<Cart> requestedCartItemOptional = cartRepository.findFirstByUserIdAndItemIdAndSizeAndColor(user.getId(),
+																								   cart.getItem().getId(),
+																								   request.getSize(),
+																								   request.getColor());
+
+		ItemQuantity itemQuantity = Common.findItemQuantity(cart.getItem().getId(),
+															request.getSize(),
+															request.getColor(),
+															itemQuantityRepository);
+		if (itemQuantity.getQuantity() < request.getQuantity()) {
+			throw new AppException(HttpStatus.BAD_REQUEST, Message.Cart.CAN_NOT_ADD_OVER_CURRENT_QUANTITY);
+		}
+
+		if (requestedCartItemOptional.isEmpty()) {
+			cart.setQuantity(request.getQuantity());
+			cartRepository.save(cart);
+		} else {
+			Cart requestedCartItem = requestedCartItemOptional.get();
+
+			requestedCartItem.setQuantity(request.getQuantity() + requestedCartItem.getQuantity());
+
+			cartRepository.save(requestedCartItem);
+			cartRepository.delete(cart);
+		}
+
+		return new SimpleResponse();
+	}
+
+	@Transactional
 	public SimpleResponse changeQuantityCartItem(Long cartId, ChangeQuantityRequest request) {
 		if (request.getQuantityChange() == 0) {
 			return new SimpleResponse();
@@ -138,7 +172,7 @@ public class CartService {
 	private CartDetailResponse mapToDTO(Cart cart) {
 		return CartDetailResponse.builder()
 								 .id(cart.getId())
-								 .updatedAt(cart.getUpdatedAt())
+								 .createdAt(cart.getCreatedAt())
 								 .quantity(cart.getQuantity())
 								 .item(mapToDTO(cart.getItem()))
 								 .size(cart.getSize())
