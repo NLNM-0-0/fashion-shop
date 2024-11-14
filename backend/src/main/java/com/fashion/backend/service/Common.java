@@ -210,4 +210,10 @@ public class Common {
 						 .orElseThrow(() -> new AppException(HttpStatus.BAD_REQUEST,
 															 Message.ItemQuantity.ITEM_QUANTITY_NOT_EXIST));
 	}
+
+	public static Cart findCartById(Long cartId, CartRepository cartRepository) {
+		return cartRepository.findById(cartId)
+							  .orElseThrow(() -> new AppException(HttpStatus.BAD_REQUEST,
+																  Message.Cart.ITEM_NOT_IN_CART));
+	}
 }
