@@ -27,6 +27,11 @@ public class SimpleItemResponse {
 	private List<String> images;
 
 	@Schema(
+			name = "unitPrice"
+	)
+	private int unitPrice;
+
+	@Schema(
 			name = "isDeleted",
 			example = "false"
 	)

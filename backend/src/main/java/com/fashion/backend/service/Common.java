@@ -213,7 +213,7 @@ public class Common {
 
 	public static Cart findCartById(Long cartId, CartRepository cartRepository) {
 		return cartRepository.findById(cartId)
-							  .orElseThrow(() -> new AppException(HttpStatus.BAD_REQUEST,
-																  Message.Cart.ITEM_NOT_IN_CART));
+							 .orElseThrow(() -> new AppException(HttpStatus.BAD_REQUEST,
+																 Message.Cart.ITEM_NOT_IN_CART));
 	}
 }

@@ -98,6 +98,24 @@ public class CartController {
 		return new ResponseEntity<>(cartService.deleteCartItem(cartId), HttpStatus.OK);
 	}
 
+	@PostMapping("/{cartId}")
+	@SecurityRequirement(
+			name = "Bearer Authentication"
+	)
+	@Operation(
+			summary = "Update cart item"
+	)
+	@ApiResponse(
+			responseCode = "200",
+			description = "Http Status is 200 OK"
+	)
+	@PreAuthorize("hasAnyAuthority('USER')")
+	public ResponseEntity<SimpleResponse> updateCartItem(
+			@PathVariable Long cartId,
+			@Valid @RequestBody UpdateCartRequest request) {
+		return new ResponseEntity<>(cartService.updateCartItem(cartId, request), HttpStatus.OK);
+	}
+
 	@PostMapping("/{cartId}/quantity")
 	@SecurityRequirement(
 			name = "Bearer Authentication"
@@ -115,23 +133,5 @@ public class CartController {
 			@PathVariable Long cartId,
 			@Valid @RequestBody ChangeQuantityRequest request) {
 		return new ResponseEntity<>(cartService.changeQuantityCartItem(cartId, request), HttpStatus.OK);
-	}
-
-	@PostMapping("/{cartId}")
-	@SecurityRequirement(
-			name = "Bearer Authentication"
-	)
-	@Operation(
-			summary = "Update cart item"
-	)
-	@ApiResponse(
-			responseCode = "200",
-			description = "Http Status is 200 OK"
-	)
-	@PreAuthorize("hasAnyAuthority('USER')")
-	public ResponseEntity<SimpleResponse> updateCartItem(
-			@PathVariable Long cartId,
-			@Valid @RequestBody UpdateCartRequest request) {
-		return new ResponseEntity<>(cartService.updateCartItem(cartId, request), HttpStatus.OK);
 	}
 }

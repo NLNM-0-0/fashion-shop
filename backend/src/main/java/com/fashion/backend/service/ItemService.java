@@ -156,7 +156,8 @@ public class ItemService {
 	private Pair<Boolean, List<CheckedFilter<ItemSizeDTO>>> getFilteredSizes(List<Item> items,
 																			 List<CheckedFilter<ItemSizeDTO>> filter) {
 		List<ItemSizeDTO> itemSizes = items.stream()
-										   .flatMap(item -> itemQuantityRepository.findAllByItemId(item.getId()).stream())
+										   .flatMap(item -> itemQuantityRepository.findAllByItemId(item.getId())
+																				  .stream())
 										   .map(this::mapToSizeDTO)
 										   .distinct()
 										   .toList();
@@ -394,7 +395,7 @@ public class ItemService {
 
 		itemQuantityRepository.deleteAllByItemId(itemId);
 
-		List<ItemQuantity> quantities = request.getQuantities().stream().map(dto->{
+		List<ItemQuantity> quantities = request.getQuantities().stream().map(dto -> {
 			ItemQuantity itemQuantity = mapToEntity(dto);
 			itemQuantity.setItem(item);
 			return itemQuantity;
@@ -418,6 +419,7 @@ public class ItemService {
 		return SimpleItemResponse.builder()
 								 .id(item.getId())
 								 .name(item.getName())
+								 .unitPrice(item.getUnitPrice())
 								 .images(item.getImages())
 								 .isDeleted(item.isDeleted())
 								 .build();

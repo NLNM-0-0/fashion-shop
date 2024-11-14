@@ -50,7 +50,8 @@ public class Message {
 	public static class Cart {
 		public static final String QUANTITY_MIN_VALIDATE = "Cart item quantity must be at least 1";
 		public static final String ITEM_NOT_IN_CART = "Item is not in the cart";
-		public static final String CART_UPDATE_NEED_TO_CHANGE_QUANTITY = "Update card request must have changed quantity";
+		public static final String CART_UPDATE_NEED_TO_CHANGE_QUANTITY
+				= "Update card request must have changed quantity";
 		public static final String CART_CAN_NOT_HAVE_NO_ITEM = "Cart item cannot be empty";
 		public static final String CART_REQUEST_MUST_HAVE_CART_ITEM = "Add to card request must have item";
 		public static final String CART_ITEM_MUST_HAVE_COLOR = "Cart item must include color";

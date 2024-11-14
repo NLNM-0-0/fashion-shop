@@ -40,6 +40,15 @@ public class CartDetailResponse {
 	)
 	private int quantity;
 
+	@Schema(
+			name = "itemQuantity",
+			example = "2"
+	)
+	private int itemQuantity;
+
+	@Schema(name = "isExist")
+	private boolean isExist;
+
 	@Schema(name = "createdAt")
 	private Date createdAt;
 }
