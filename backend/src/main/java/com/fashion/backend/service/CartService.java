@@ -3,6 +3,7 @@ package com.fashion.backend.service;
 import com.fashion.backend.constant.Message;
 import com.fashion.backend.entity.Cart;
 import com.fashion.backend.entity.Item;
+import com.fashion.backend.entity.ItemQuantity;
 import com.fashion.backend.entity.User;
 import com.fashion.backend.exception.AppException;
 import com.fashion.backend.payload.SimpleListResponse;
@@ -12,10 +13,7 @@ import com.fashion.backend.payload.cart.CartDetailResponse;
 import com.fashion.backend.payload.cart.ChangeQuantityRequest;
 import com.fashion.backend.payload.item.SimpleItemResponse;
 import com.fashion.backend.payload.notification.NumberNotificationNotSeenResponse;
-import com.fashion.backend.repository.CartRepository;
-import com.fashion.backend.repository.ItemRepository;
-import com.fashion.backend.repository.UserAuthRepository;
-import com.fashion.backend.repository.UserRepository;
+import com.fashion.backend.repository.*;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Sort;
 import org.springframework.http.HttpStatus;
@@ -32,6 +30,7 @@ public class CartService {
 	private final UserRepository userRepository;
 	private final CartRepository cartRepository;
 	private final ItemRepository itemRepository;
+	private final ItemQuantityRepository itemQuantityRepository;
 
 	@Transactional
 	public SimpleListResponse<CartDetailResponse> getCart() {
@@ -59,10 +58,8 @@ public class CartService {
 	}
 
 	@Transactional
-	public SimpleResponse deleteCartItem(Long itemId) {
-		User user = Common.findCurrUser(userRepository, userAuthRepository);
-
-		Cart cart = cartRepository.findFirstByUserIdAndItemId(user.getId(), itemId)
+	public SimpleResponse deleteCartItem(Long cartId) {
+		Cart cart = cartRepository.findById(cartId)
 								  .orElseThrow(() -> new AppException(HttpStatus.BAD_REQUEST,
 																	  Message.Cart.ITEM_NOT_IN_CART));
 
@@ -76,19 +73,32 @@ public class CartService {
 		User user = Common.findCurrUser(userRepository, userAuthRepository);
 
 		Item item = Common.findItemById(request.getItemId(), itemRepository);
+		ItemQuantity itemQuantity = Common.findItemQuantity(item.getId(),
+															request.getSize(),
+															request.getColor(),
+															itemQuantityRepository);
 
-		Optional<Cart> cartItemOptional = cartRepository.findFirstByUserIdAndItemId(user.getId(), item.getId());
+		Optional<Cart> cartItemOptional = cartRepository.findFirstByUserIdAndItemIdAndSizeAndColor(user.getId(),
+																								   item.getId(),
+																								   request.getSize(),
+																								   request.getColor());
 
 		Cart cartItem;
+		int currentQuantityInCart = request.getQuantity();
 		if (cartItemOptional.isEmpty()) {
 			cartItem = Cart.builder()
 						   .item(item)
 						   .user(user)
-						   .quantity(request.getQuantity())
+						   .quantity(currentQuantityInCart)
 						   .build();
 		} else {
 			cartItem = cartItemOptional.get();
-			cartItem.setQuantity(request.getQuantity() + cartItem.getQuantity());
+			currentQuantityInCart += cartItem.getQuantity();
+			cartItem.setQuantity(currentQuantityInCart);
+		}
+
+		if (itemQuantity.getQuantity() < currentQuantityInCart) {
+			throw new AppException(HttpStatus.BAD_REQUEST, Message.Cart.CAN_NOT_ADD_OVER_CURRENT_QUANTITY);
 		}
 
 		cartRepository.save(cartItem);
@@ -97,16 +107,15 @@ public class CartService {
 	}
 
 	@Transactional
-	public SimpleResponse changeQuantityCartItem(Long itemId, ChangeQuantityRequest request) {
+	public SimpleResponse changeQuantityCartItem(Long cartId, ChangeQuantityRequest request) {
 		if (request.getQuantityChange() == 0) {
 			return new SimpleResponse();
 		}
 
-		User user = Common.findCurrUser(userRepository, userAuthRepository);
-
-		Cart cart = cartRepository.findFirstByUserIdAndItemId(user.getId(), itemId)
+		Cart cart = cartRepository.findById(cartId)
 								  .orElseThrow(() -> new AppException(HttpStatus.BAD_REQUEST,
 																	  Message.Cart.ITEM_NOT_IN_CART));
+
 		if (cart.getItem().isDeleted()) {
 			throw new AppException(HttpStatus.BAD_REQUEST, Message.Item.ITEM_IS_DELETED);
 		}
@@ -130,6 +139,8 @@ public class CartService {
 								 .updatedAt(cart.getUpdatedAt())
 								 .quantity(cart.getQuantity())
 								 .item(mapToDTO(cart.getItem()))
+								 .size(cart.getSize())
+								 .color(cart.getColor())
 								 .build();
 	}
 

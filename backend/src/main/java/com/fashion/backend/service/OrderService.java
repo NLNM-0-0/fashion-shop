@@ -268,8 +268,8 @@ public class OrderService {
 		for (OrderDetail orderDetail : order.getOrderDetails()) {
 			Item item = orderDetail.getItem();
 			ItemQuantity itemQuantity = Common.findItemQuantity(item.getId(),
-																orderDetail.getColor(),
 																orderDetail.getSize(),
+																orderDetail.getColor(),
 																itemQuantityRepository);
 
 			int quantityLeft = itemQuantity.getQuantity() - orderDetail.getQuantity();
@@ -299,8 +299,8 @@ public class OrderService {
 		for (OrderDetail orderDetail : order.getOrderDetails()) {
 			Item item = orderDetail.getItem();
 			ItemQuantity itemQuantity = Common.findItemQuantity(item.getId(),
-																orderDetail.getColor(),
 																orderDetail.getSize(),
+																orderDetail.getColor(),
 																itemQuantityRepository);
 
 			int quantityLeft = itemQuantity.getQuantity() + orderDetail.getQuantity();

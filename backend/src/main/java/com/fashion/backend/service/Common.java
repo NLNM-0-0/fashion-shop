@@ -203,8 +203,8 @@ public class Common {
 	}
 
 	public static ItemQuantity findItemQuantity(Long itemId,
-												Color color,
 												String size,
+												Color color,
 												ItemQuantityRepository repository) {
 		return repository.findFirstByItemIdAndColorAndAndSize(itemId, color, size)
 						 .orElseThrow(() -> new AppException(HttpStatus.BAD_REQUEST,
