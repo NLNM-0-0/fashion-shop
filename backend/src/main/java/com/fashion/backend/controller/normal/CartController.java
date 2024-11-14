@@ -75,7 +75,7 @@ public class CartController {
 	)
 	@PreAuthorize("hasAnyAuthority('USER')")
 	public ResponseEntity<SimpleResponse> addCartItem(
-			@Valid AddToCartRequest request) {
+			@Valid @RequestBody AddToCartRequest request) {
 		return new ResponseEntity<>(cartService.addCartItem(request), HttpStatus.OK);
 	}
 
@@ -112,7 +112,7 @@ public class CartController {
 	@PreAuthorize("hasAnyAuthority('USER')")
 	public ResponseEntity<SimpleResponse> changeQuantityCartItem(
 			@PathVariable Long cartId,
-			@Valid ChangeQuantityRequest request) {
+			@Valid @RequestBody ChangeQuantityRequest request) {
 		return new ResponseEntity<>(cartService.changeQuantityCartItem(cartId, request), HttpStatus.OK);
 	}
 }
