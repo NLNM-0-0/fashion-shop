@@ -1,5 +1,6 @@
 package com.fashion.backend.entity;
 
+import com.fashion.backend.constant.Color;
 import io.swagger.v3.oas.annotations.media.Schema;
 import jakarta.persistence.*;
 import jakarta.validation.constraints.Min;
@@ -17,7 +18,7 @@ import java.util.Date;
 @Table(
 		name = "cart",
 		uniqueConstraints = {@UniqueConstraint(
-				columnNames = {"user_id", "item_id"},
+				columnNames = {"user_id", "item_id", "color", "size"},
 				name = "Cart item"
 		)}
 )
@@ -40,6 +41,16 @@ public class Cart {
 			updatable = false
 	)
 	private Item item;
+
+	@Column(
+			name = "size",
+			columnDefinition = "text"
+	)
+	private String size;
+
+	@Enumerated(EnumType.STRING)
+	@Column(name = "color")
+	private Color color;
 
 	@Column(name = "quantity")
 	@Min(0)

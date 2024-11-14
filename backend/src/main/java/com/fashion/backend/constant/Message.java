@@ -11,7 +11,6 @@ public class Message {
 	public static final String TOKEN_EXPIRED = "Token has expired. Please fill out the forgot password form again";
 	public static final String COMMON_ERR = "An error occurred. Please try again later";
 	public static final String JSON_ERR = "Invalid JSON format";
-	public static final String TIME_INVALID_FORMAT_DD_MM_YYYY = "Time must be in the format dd/MM/yyyy";
 	public static final String OTP_OVER_LIMIT
 			= "Abnormal behavior detected. Please contact us for further assistance";
 	public static final String OTP_VALIDATE = "OTP must consist of 6 digits";
@@ -49,8 +48,14 @@ public class Message {
 	}
 
 	public static class Cart {
-		public static final String QUANTITY_MIN_VALIDATE = "Product quantity must be at least 1";
+		public static final String QUANTITY_MIN_VALIDATE = "Cart item quantity must be at least 1";
 		public static final String ITEM_NOT_IN_CART = "Item is not in the cart";
+		public static final String CART_UPDATE_NEED_TO_CHANGE_QUANTITY = "Update card request must have changed quantity";
+		public static final String CART_CAN_NOT_HAVE_NO_ITEM = "Cart item cannot be empty";
+		public static final String CART_REQUEST_MUST_HAVE_CART_ITEM = "Add to card request must have item";
+		public static final String CART_ITEM_MUST_HAVE_COLOR = "Cart item must include color";
+		public static final String CART_ITEM_MUST_HAVE_SIZE = "Cart item must include size";
+		public static final String CAN_NOT_ADD_OVER_CURRENT_QUANTITY = "Can not buy over current item's quantity";
 	}
 
 	public static class Category {
