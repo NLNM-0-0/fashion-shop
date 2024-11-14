@@ -163,6 +163,7 @@ public class StockReportService {
 		return SimpleItemResponse.builder()
 								 .id(item.getId())
 								 .name(item.getName())
+								 .unitPrice(item.getUnitPrice())
 								 .images(item.getImages())
 								 .isDeleted(item.isDeleted())
 								 .build();

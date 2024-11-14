@@ -22,7 +22,6 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
-import java.util.Objects;
 import java.util.Optional;
 
 @Service
@@ -114,10 +113,11 @@ public class CartService {
 	public SimpleResponse updateCartItem(Long cartId, UpdateCartRequest request) {
 		Cart cart = Common.findCartById(cartId, cartRepository);
 		User user = Common.findCurrUser(userRepository, userAuthRepository);
-		Optional<Cart> requestedCartItemOptional = cartRepository.findFirstByUserIdAndItemIdAndSizeAndColor(user.getId(),
-																								   cart.getItem().getId(),
-																								   request.getSize(),
-																								   request.getColor());
+		Optional<Cart> requestedCartItemOptional
+				= cartRepository.findFirstByUserIdAndItemIdAndSizeAndColor(user.getId(),
+																		   cart.getItem().getId(),
+																		   request.getSize(),
+																		   request.getColor());
 
 		ItemQuantity itemQuantity = Common.findItemQuantity(cart.getItem().getId(),
 															request.getSize(),
@@ -184,6 +184,7 @@ public class CartService {
 		return SimpleItemResponse.builder()
 								 .id(item.getId())
 								 .name(item.getName())
+								 .unitPrice(item.getUnitPrice())
 								 .images(item.getImages())
 								 .isDeleted(item.isDeleted())
 								 .build();
