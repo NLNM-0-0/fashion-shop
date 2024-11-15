@@ -29,6 +29,7 @@ import CreateStaffDialog from "./create-staff";
 import EditStaffDialog from "./edit-staff";
 import DeleteStaff from "./delete-staff";
 import TableSkeleton from "../table-skeleton";
+import { Avatar, AvatarFallback, AvatarImage } from "../ui/avatar";
 
 export const columns: ColumnDef<Staff>[] = [
   {
@@ -37,6 +38,18 @@ export const columns: ColumnDef<Staff>[] = [
       return <span className="font-semibold">ID</span>;
     },
     cell: ({ row }) => <div>{row.getValue("id")}</div>,
+  },
+  {
+    accessorKey: "image",
+    header: () => {},
+    cell: ({ row }) => (
+      <div className="flex justify-end">
+        <Avatar>
+          <AvatarImage src={row.original.image ?? ""} alt="img" />
+          <AvatarFallback>{row.original.name.substring(0, 2)}</AvatarFallback>
+        </Avatar>
+      </div>
+    ),
   },
   {
     accessorKey: "name",
@@ -51,10 +64,35 @@ export const columns: ColumnDef<Staff>[] = [
       return <div className="font-semibold">Email</div>;
     },
     cell: ({ row }) => (
-      <div className="lg:max-w-[16rem] max-w-[3rem] truncate">
+      <div className="lg:max-w-[16rem] max-w-[4rem] truncate">
         {row.getValue("email")}
       </div>
     ),
+  },
+  {
+    accessorKey: "dob",
+    header: () => {
+      return <div className="font-semibold">Date of birth</div>;
+    },
+    cell: ({ row }) => <div>{row.getValue("dob")}</div>,
+  },
+  {
+    accessorKey: "address",
+    header: () => {
+      return <div className="font-semibold">Address</div>;
+    },
+    cell: ({ row }) => (
+      <div className="lg:max-w-[10rem] max-w-[3rem] truncate">
+        {row.getValue("address")}
+      </div>
+    ),
+  },
+  {
+    accessorKey: "male",
+    header: () => {
+      return <div className="font-semibold">Gender</div>;
+    },
+    cell: ({ row }) => <div>{row.original.male ? "Male" : "Female"}</div>,
   },
   {
     accessorKey: "actions",

@@ -31,7 +31,7 @@ import { useProductList } from "@/hooks/useProductList";
 import { Avatar, AvatarFallback, AvatarImage } from "../ui/avatar";
 import { FaPen, FaPlus } from "react-icons/fa";
 import Link from "next/link";
-import { cn } from "@/lib/utils";
+import { cn, toVND } from "@/lib/utils";
 
 export const columns: ColumnDef<Product>[] = [
   {
@@ -67,6 +67,19 @@ export const columns: ColumnDef<Product>[] = [
       );
     },
     cell: ({ row }) => <div className="capitalize">{row.getValue("name")}</div>,
+  },
+  {
+    accessorKey: "unitPrice",
+    header: () => (
+      <div className="flex justify-end">
+        <span className="font-semibold">Price</span>
+      </div>
+    ),
+    cell: ({ row }) => {
+      const unitPrice = parseFloat(row.getValue("unitPrice"));
+
+      return <div className="text-right font-medium">{toVND(unitPrice)}</div>;
+    },
   },
   {
     accessorKey: "actions",
@@ -184,17 +197,18 @@ export function ProductTable() {
                   >
                     {row.getVisibleCells().map((cell) =>
                       cell.id.includes("actions") ? (
-                        <div key={cell.id} className="flex py-2 gap-2">
+                        <div
+                          key={cell.id}
+                          className="flex pl-6 py-2 gap-2"
+                        >
                           <Link
                             href={`/admin/products/${row.original.id}`}
                             className={cn(
-                              "lg:px-4 px-2 whitespace-nowrap rounded-full text-gray-500 hover:text-gray-500",
-                              buttonVariants({ variant: "default" })
+                              buttonVariants(),
+                              "whitespace-nowrap rounded-full text-gray-500 hover:text-gray-500"
                             )}
                           >
-                            <div className="flex flex-wrap gap-1 items-center">
-                              <FaPen />
-                            </div>
+                            <FaPen />
                           </Link>
                         </div>
                       ) : (
