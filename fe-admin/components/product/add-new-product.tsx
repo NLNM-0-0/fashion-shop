@@ -5,7 +5,7 @@ import { zodResolver } from "@hookform/resolvers/zod";
 import { Controller, SubmitHandler, useForm } from "react-hook-form";
 import { Input } from "../ui/input";
 import ImageUpload from "../ui/choose-image";
-import { Button } from "../ui/button";
+import { Button, buttonVariants } from "../ui/button";
 import { createProduct } from "@/lib/api/product/createProduct";
 import { toast } from "@/hooks/use-toast";
 import { AxiosError } from "axios";
@@ -18,6 +18,8 @@ import SizeRadioButton from "../ui/size-button";
 import CategoryForm from "./category-form";
 import { useState } from "react";
 import uploadFile from "@/lib/api/uploadFile";
+import Link from "next/link";
+import { cn } from "@/lib/utils";
 
 export const ProductSchema = z.object({
   name: required,
@@ -229,8 +231,20 @@ const AddNewProduct = () => {
       <Separator className="my-10 bg-fs-gray-light" />
       <QuantityForm control={control} watch={watch} errors={errors} />
 
-      <div className="flex mt-16 w-full justify-center gap-4">
-        <Button className="sm:w-3/5 w-full min-w-48">Create</Button>
+      <div className="flex mt-16 justify-end gap-4">
+        <Link
+          href={"/admin/products"}
+          className={cn(
+            buttonVariants({
+              variant: "outline",
+              size: "icon",
+            }),
+            "sm:w-48 w-full"
+          )}
+        >
+          Cancel
+        </Link>
+        <Button className="sm:w-48 w-full">Create</Button>
       </div>
     </form>
   );

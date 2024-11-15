@@ -8,7 +8,6 @@ import { Button } from "../ui/button";
 import { toast } from "@/hooks/use-toast";
 import { AxiosError } from "axios";
 import { ApiError, Product } from "@/lib/types";
-import { useRouter } from "next/navigation";
 import { Gender, Season } from "@/lib/constants/enum";
 import QuantityForm from "./quantity-form";
 import { Separator } from "../ui/separator";
@@ -18,9 +17,11 @@ import { useCallback, useEffect, useState } from "react";
 import uploadFile from "@/lib/api/uploadFile";
 import { ProductSchema } from "./add-new-product";
 import { updateProduct } from "@/lib/api/product/updateProduct";
+import { useSWRConfig } from "swr";
 
 const EditProductContent = ({ product }: { product: Product }) => {
-  const router = useRouter();
+  const { mutate } = useSWRConfig();
+
   const genderList = Object.values(Gender);
   const seasonList = Object.values(Season);
   const [fileList, setFileList] = useState<File[]>([]);
@@ -72,11 +73,11 @@ const EditProductContent = ({ product }: { product: Product }) => {
         images: [...imageList, ...imageUrls],
       })
         .then(() => {
-          router.push("/admin/products");
+          mutate(`product-detail-${product.id}`);
           toast({
             variant: "success",
             title: "Success",
-            description: "Create product successfully",
+            description: "Update product successfully",
           });
         })
         .catch((err: AxiosError<ApiError>) => {

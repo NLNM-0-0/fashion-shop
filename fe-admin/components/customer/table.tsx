@@ -28,6 +28,8 @@ import { useCustomerList } from "@/hooks/useCustomerList";
 import { customerFilterValues } from "@/lib/constants";
 import Filter from "../filter/filter";
 import TableSkeleton from "../table-skeleton";
+import { Avatar, AvatarFallback, AvatarImage } from "../ui/avatar";
+import DeleteCustomer from "./delete-customer";
 
 export const columns: ColumnDef<Customer>[] = [
   {
@@ -36,6 +38,18 @@ export const columns: ColumnDef<Customer>[] = [
       return <span className="font-semibold">ID</span>;
     },
     cell: ({ row }) => <div>{row.getValue("id")}</div>,
+  },
+  {
+    accessorKey: "image",
+    header: () => {},
+    cell: ({ row }) => (
+      <div className="flex justify-end">
+        <Avatar>
+          <AvatarImage src={row.original.image ?? ""} alt="img" />
+          <AvatarFallback>{row.original.name.substring(0, 2)}</AvatarFallback>
+        </Avatar>
+      </div>
+    ),
   },
   {
     accessorKey: "name",
@@ -72,11 +86,43 @@ export const columns: ColumnDef<Customer>[] = [
       <div className="text-right">{row.getValue("phone")}</div>
     ),
   },
+  {
+    accessorKey: "dob",
+    header: () => {
+      return <div className="font-semibold">Date of birth</div>;
+    },
+    cell: ({ row }) => <div>{row.getValue("dob")}</div>,
+  },
+  {
+    accessorKey: "address",
+    header: () => {
+      return <div className="font-semibold">Address</div>;
+    },
+    cell: ({ row }) => (
+      <div className="lg:max-w-[10rem] max-w-[4rem] truncate">
+        {row.getValue("address")}
+      </div>
+    ),
+  },
+  {
+    accessorKey: "male",
+    header: () => {
+      return <div className="font-semibold">Gender</div>;
+    },
+    cell: ({ row }) => <div>{row.original.male ? "Male" : "Female"}</div>,
+  },
+  {
+    accessorKey: "actions",
+    header: () => {
+      return <div className="font-semibold">Actions</div>;
+    },
+    cell: () => <></>,
+  },
 ];
 
 export function CustomerTable() {
   const router = useRouter();
-  const { filters, data, isLoading, error } = useCustomerList();
+  const { filters, data, isLoading, error, mutate } = useCustomerList();
 
   const customers: Customer[] = data?.data.data || [];
   const table = useReactTable({
@@ -167,14 +213,23 @@ export function CustomerTable() {
                     key={row.id}
                     data-state={row.getIsSelected() && "selected"}
                   >
-                    {row.getVisibleCells().map((cell) => (
-                      <TableCell key={cell.id}>
-                        {flexRender(
-                          cell.column.columnDef.cell,
-                          cell.getContext()
-                        )}
-                      </TableCell>
-                    ))}
+                    {row.getVisibleCells().map((cell) =>
+                      cell.id.includes("actions") ? (
+                        <TableCell key={cell.id} className="flex py-2 gap-2">
+                          <DeleteCustomer
+                            id={row.original.id}
+                            onDelete={() => void mutate()}
+                          />
+                        </TableCell>
+                      ) : (
+                        <TableCell key={cell.id}>
+                          {flexRender(
+                            cell.column.columnDef.cell,
+                            cell.getContext()
+                          )}
+                        </TableCell>
+                      )
+                    )}
                   </TableRow>
                 ))
               ) : (

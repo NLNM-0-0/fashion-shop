@@ -68,14 +68,18 @@ const OrderList = () => {
           </div>
         </div>
         <div className="flex flex-col mt-4 gap-4">
-          {orders.map((item, index) => (
-            <div
-              key={item.id}
-              ref={index === orders.length - 1 ? lastItemRef : null}
-            >
-              <OrderItem order={item} />
-            </div>
-          ))}
+          {orders.length > 0 ? (
+            orders.map((item, index) => (
+              <div
+                key={item.id}
+                ref={index === orders.length - 1 ? lastItemRef : null}
+              >
+                <OrderItem order={item} />
+              </div>
+            ))
+          ) : (
+            <>There are no orders.</>
+          )}
         </div>
       </div>
     </div>
