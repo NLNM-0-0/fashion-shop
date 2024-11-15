@@ -24,6 +24,7 @@ import org.springframework.transaction.annotation.Transactional;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Objects;
 import java.util.Optional;
 
 @Service
@@ -164,7 +165,10 @@ public class CartService {
 			requestedCartItem.setQuantity(request.getQuantity() + requestedCartItem.getQuantity());
 
 			cartRepository.save(requestedCartItem);
-			cartRepository.delete(cart);
+
+			if (!Objects.equals(requestedCartItem.getId(), cartId)) {
+				cartRepository.delete(cart);
+			}
 		}
 
 		return new SimpleResponse();
