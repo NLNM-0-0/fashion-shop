@@ -43,7 +43,7 @@ export const columns: ColumnDef<StockReportItem>[] = [
     cell: ({ row }) => (
       <div className="flex justify-end">
         <Avatar>
-          <AvatarImage src={row.getValue("image")} alt="img" />
+          <AvatarImage src={row.original.item.images.at(0)} alt="img" />
           <AvatarFallback>
             {row.original.item.name.substring(0, 2)}
           </AvatarFallback>

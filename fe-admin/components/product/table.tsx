@@ -197,20 +197,20 @@ export function ProductTable() {
                   >
                     {row.getVisibleCells().map((cell) =>
                       cell.id.includes("actions") ? (
-                        <div
-                          key={cell.id}
-                          className="flex pl-6 py-2 gap-2"
-                        >
+                        <TableCell key={cell.id}>
                           <Link
                             href={`/admin/products/${row.original.id}`}
                             className={cn(
-                              buttonVariants(),
+                              buttonVariants({
+                                variant: "outline",
+                                size: "icon",
+                              }),
                               "whitespace-nowrap rounded-full text-gray-500 hover:text-gray-500"
                             )}
                           >
                             <FaPen />
                           </Link>
-                        </div>
+                        </TableCell>
                       ) : (
                         <TableCell key={cell.id}>
                           {flexRender(
