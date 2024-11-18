@@ -229,7 +229,7 @@ const EditProductContent = ({ product }: { product: Product }) => {
 
       <div className="mt-16 w-full flex justify-center">
         <div className="flex sm:w-3/5 w-full gap-4">
-          <Button className="flex-1" variant={"outline"} onClick={resetForm}>
+          <Button className="flex-1" type="button" variant={"outline"} onClick={resetForm}>
             Reset
           </Button>
           <Button className="flex-1">Update</Button>

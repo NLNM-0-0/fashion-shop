@@ -22,8 +22,7 @@ import { changePassword } from "@/lib/api/auth/changePassword";
 import { toast } from "@/hooks/use-toast";
 import { AxiosError } from "axios";
 import { ApiError } from "@/lib/types";
-import ChangeAvatar from "./change-avatar";
-import { GoBell } from "react-icons/go";
+import { GoBell, GoPerson } from "react-icons/go";
 import { useRouter } from "next/navigation";
 import { useUnseenNumber } from "@/hooks/useUnseenNumber";
 
@@ -39,7 +38,7 @@ const PasswordSchema = z
   });
 
 const Profile = () => {
-  const { user, logout, mutate } = useAuth();
+  const { user, logout } = useAuth();
   const { data: unseenNoti } = useUnseenNumber();
   const router = useRouter();
 
@@ -120,10 +119,19 @@ const Profile = () => {
           <div className="flex flex-col px-4 pt-2">
             <h1 className="text-lg font-semibold">{user?.name}</h1>
           </div>
-          <ChangeAvatar
-            onChanged={() => void mutate()}
-            currentImage={user?.image || ""}
-          />
+          <Button
+            variant={"ghost"}
+            className="rounded-none w-full justify-start"
+            onClick={() => {
+              router.push("/fa/profile");
+              setOpen(false);
+            }}
+          >
+            <div className="flex gap-2 items-center text-primary">
+              <GoPerson className="w-6 h-6" />
+              Account
+            </div>
+          </Button>
           <Button
             variant={"ghost"}
             className="rounded-none w-full justify-start"

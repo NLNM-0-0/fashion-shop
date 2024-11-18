@@ -1,11 +1,10 @@
 import DetailContent from "@/components/product/detail-content";
-import { sampleProduct } from "@/lib/constants";
 import React from "react";
 
-const ProductDetailPage = () => {
+const ProductDetailPage = ({ params }: { params: { id: string } }) => {
   return (
     <>
-      <DetailContent product={sampleProduct}/>
+      <DetailContent id={params.id} />
     </>
   );
 };

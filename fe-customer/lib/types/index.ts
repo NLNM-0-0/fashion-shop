@@ -254,13 +254,14 @@ export interface Product {
   id: number;
   name: string;
   gender: string;
+  season: string;
+  images: string[];
   sizes: Size[];
   colors: ProductColor[];
   categories: Category[];
-  season: string;
-  images: string[];
-  price:number;
-  deleted: boolean;
+  quantities: Record<string, number>;
+  unitPrice: number;
+  delete: boolean;
 }
 
 export interface Order {
@@ -281,34 +282,31 @@ export interface OrderDetail {
   unitPrice: number;
   totalSubPrice: number;
 }
-export interface SaleReportItem {
-  item: Product;
-  amount: number;
-  totalSales: number;
+
+export interface AddToCartPayload {
+  itemId: number;
+  size: string;
+  color: string;
+  quantity: number;
 }
 
-export interface StockReportItem {
-  item: Product;
-  initial: number;
-  sell: number;
-  increase: number;
-  decrease: number;
-  payback: number;
-  final: number;
+export interface CartItemDetail {
+  id: number;
+  name: string;
+  images: string[];
+  unitPrice: number;
+  delete: boolean;
 }
 
-export interface SaleReportData {
-  total: number;
-  amount: number;
-  details: SaleReportItem[];
+export interface CartItem {
+  id: number;
+  item: CartItemDetail;
+  size: string;
+  color: string;
+  quantity: number;
+  exist: true;
 }
 
-export interface StockReportData {
-  initial: number;
-  sell: number;
-  increase: number;
-  decrease: number;
-  payback: number;
-  final: number;
-  details: StockReportItem[];
+export interface CartListData {
+  data: CartItem[];
 }

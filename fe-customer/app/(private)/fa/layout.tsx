@@ -32,9 +32,7 @@ export default function PrivateLayout({
               <Header />
             </AuthProvider>
           </SWRProvider>
-          <div className="md:p-10 p-4 md:mt-0 mt-12 overflow-auto">
-            {children}
-          </div>
+          <div className="md:p-10 p-6 overflow-auto">{children}</div>
           <Toaster />
         </div>
       </main>

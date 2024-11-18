@@ -3,8 +3,8 @@ import Image from "next/image";
 
 const LogoButton = () => {
   return (
-    <Link href="/">
-      <div className="p-2">
+    <Link href="/fa">
+      <div>
         <Image
           src="/android-chrome-192x192.png"
           alt="logo"
