@@ -5,10 +5,10 @@ import { debounce } from "lodash";
 import { AxiosError } from "axios";
 import { ApiError, CartItem } from "@/lib/types";
 import { toast } from "@/hooks/use-toast";
-import { updateCartItem } from "@/lib/api/cart/updateCartItem";
 import { deleteCartItem } from "@/lib/api/cart/deleteCartItem";
 import { CART_KEY } from "@/hooks/cart/useCartList";
 import { useSWRConfig } from "swr";
+import { updateCartQuantity } from "@/lib/api/cart/updateQuantity";
 
 const CartQuantityButton = ({
   itemId,
@@ -38,10 +38,8 @@ const CartQuantityButton = ({
     () =>
       debounce(async (quantity: number) => {
         if (quantity > 0) {
-          updateCartItem(itemId, {
-            quantity: quantity,
-            size: product.size,
-            color: product.color,
+          updateCartQuantity(itemId, {
+            quantityChange: quantity - product.quantity,
           })
             .then(() => {
               mutate(CART_KEY);
@@ -58,7 +56,7 @@ const CartQuantityButton = ({
           handleDeleteCartItem();
         }
       }, 500),
-    [itemId, product.color, product.size, mutate, handleDeleteCartItem]
+    [itemId, product.quantity, mutate, handleDeleteCartItem]
   );
 
   const handleButtonClick = (value: number) => {
@@ -91,6 +89,7 @@ const CartQuantityButton = ({
         variant={"ghost"}
         size={"icon"}
         className="rounded-full"
+        disabled={newQuantity === product.itemQuantity}
         onClick={() => handleButtonClick(1)}
       >
         <LuPlus className="!h-5 !w-5" />

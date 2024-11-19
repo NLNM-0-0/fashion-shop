@@ -304,6 +304,7 @@ export interface CartItem {
   size: string;
   color: string;
   quantity: number;
+  itemQuantity: number;
   exist: true;
 }
 

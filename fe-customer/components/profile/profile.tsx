@@ -25,6 +25,7 @@ import { ApiError } from "@/lib/types";
 import { GoBell, GoPerson } from "react-icons/go";
 import { useRouter } from "next/navigation";
 import { useUnseenNumber } from "@/hooks/useUnseenNumber";
+import { CgMenuBoxed } from "react-icons/cg";
 
 const PasswordSchema = z
   .object({
@@ -129,7 +130,20 @@ const Profile = () => {
           >
             <div className="flex gap-2 items-center text-primary">
               <GoPerson className="w-6 h-6" />
-              Account
+              My Account
+            </div>
+          </Button>
+          <Button
+            variant={"ghost"}
+            className="rounded-none w-full justify-start"
+            onClick={() => {
+              router.push("/fa/order");
+              setOpen(false);
+            }}
+          >
+            <div className="flex gap-2 items-center text-primary">
+              <CgMenuBoxed className="w-6 h-6" />
+              My Order
             </div>
           </Button>
           <Button
