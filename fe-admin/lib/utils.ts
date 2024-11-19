@@ -17,6 +17,7 @@ export function toVND(value: number) {
 export interface StatusTimeLine {
   label: OrderStatus;
   time: string | null;
+  title: string;
 }
 
 export function statusToTimeMap(order: Order): StatusTimeLine[] {
@@ -24,25 +25,27 @@ export function statusToTimeMap(order: Order): StatusTimeLine[] {
     {
       label: OrderStatus.CONFIRMED,
       time: order.confirmedAt,
+      title: "Confirmed at",
     },
     {
       label: OrderStatus.SHIPPING,
       time: order.shippingAt,
+      title: "Start shipping at",
     },
     {
       label: OrderStatus.DONE,
       time: order.doneAt,
+      title: "Order completed at",
     },
     {
       label: OrderStatus.CANCELED,
       time: order.canceledAt,
+      title: "Cancelled order at",
     },
   ];
 }
 
 export const getStatusTimeline = (order: Order): StatusTimeLine[] => {
   const statusTimeline = statusToTimeMap(order);
-
   return statusTimeline.filter(({ time }) => time !== null);
 };
-

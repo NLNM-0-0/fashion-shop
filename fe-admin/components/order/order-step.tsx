@@ -8,15 +8,13 @@ interface OrderStepProps {
 }
 const OrderStep = ({ status, isCurrent }: OrderStepProps) => {
   const IconComponent = orderStatusIcons[status];
-
   return (
     <div
       className={clsx(
-        "lg:h-[100px] h-20 lg:w-[100px] w-20 flex justify-center items-center rounded-full",
+        "lg:h-[100px] h-20 lg:w-[100px] w-20 flex justify-center items-center rounded-full mb-4",
         isCurrent && "bg-fs-success",
         !isCurrent && "bg-white border-4 border-fs-success"
       )}
-      style={{ color: "blue" }}
     >
       <IconComponent
         className={clsx(

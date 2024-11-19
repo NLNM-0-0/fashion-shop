@@ -11,11 +11,11 @@ export const useOrderList = () => {
     return getAllOrder(filters, +page + 1);
   };
   const { data, error, isValidating, setSize, size } = useSWRInfinite(
-    (index) => `orders-${JSON.stringify(filters)}-${index}`, // Include filters in the key
+    (index) => `orders-${JSON.stringify(filters)}-${index}`,
     (key) => fetcher(key.split("-").pop() ?? "1"),
     {
-      revalidateFirstPage: false, // Only fetch first page initially
       persistSize: true,
+      revalidateAll: true,
     }
   );
   const orders = data ? data.flatMap((page) => page.data.data) : [];

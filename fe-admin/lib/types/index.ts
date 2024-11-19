@@ -275,6 +275,8 @@ export interface OrderDetail {
   quantity: number;
   unitPrice: number;
   totalSubPrice: number;
+  color: string;
+  size: string;
 }
 export interface SaleReportItem {
   item: Product;
