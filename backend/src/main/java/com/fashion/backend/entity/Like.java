@@ -15,7 +15,7 @@ import java.util.Date;
 @Table(
 		name = "like_item",
 		uniqueConstraints = {@UniqueConstraint(
-				columnNames = {"user_id, item_id"},
+				columnNames = {"user_id", "item_id"},
 				name = "Item in liked list"
 		)}
 )

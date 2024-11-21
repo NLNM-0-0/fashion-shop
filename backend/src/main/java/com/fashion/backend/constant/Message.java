@@ -33,6 +33,7 @@ public class Message {
 		public static final String ORDER_ITEM_MUST_HAVE_COLOR = "Order information must include color";
 		public static final String ORDER_ITEM_MUST_HAVE_SIZE = "Order information must include size";
 		public static final String ORDER_CAN_NOT_HAVE_SAME_ITEM = "Order cannot have two identical products";
+		public static final String ORDER_CAN_NOT_HAVE_NOT_EXISTED_CART_ITEM = "Order cannot have not existed cart item";
 	}
 
 	public static class StockReport {

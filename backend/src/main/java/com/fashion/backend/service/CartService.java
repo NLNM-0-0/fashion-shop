@@ -2,10 +2,7 @@ package com.fashion.backend.service;
 
 import com.fashion.backend.constant.Color;
 import com.fashion.backend.constant.Message;
-import com.fashion.backend.entity.Cart;
-import com.fashion.backend.entity.Item;
-import com.fashion.backend.entity.ItemQuantity;
-import com.fashion.backend.entity.User;
+import com.fashion.backend.entity.*;
 import com.fashion.backend.exception.AppException;
 import com.fashion.backend.payload.SimpleListResponse;
 import com.fashion.backend.payload.SimpleResponse;
@@ -13,7 +10,8 @@ import com.fashion.backend.payload.cart.AddToCartRequest;
 import com.fashion.backend.payload.cart.CartDetailResponse;
 import com.fashion.backend.payload.cart.ChangeQuantityRequest;
 import com.fashion.backend.payload.cart.UpdateCartRequest;
-import com.fashion.backend.payload.item.SimpleItemResponse;
+import com.fashion.backend.payload.category.CategoryResponse;
+import com.fashion.backend.payload.item.*;
 import com.fashion.backend.payload.notification.NumberNotificationNotSeenResponse;
 import com.fashion.backend.repository.*;
 import lombok.RequiredArgsConstructor;
@@ -22,10 +20,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Objects;
-import java.util.Optional;
+import java.util.*;
 
 @Service
 @RequiredArgsConstructor
@@ -221,13 +216,70 @@ public class CartService {
 								 .build();
 	}
 
-	private SimpleItemResponse mapToDTO(Item item) {
-		return SimpleItemResponse.builder()
-								 .id(item.getId())
-								 .name(item.getName())
-								 .unitPrice(item.getUnitPrice())
-								 .images(item.getImages())
-								 .isDeleted(item.isDeleted())
-								 .build();
+	private ItemResponse mapToDTO(Item item) {
+		List<ItemQuantity> quantities = itemQuantityRepository.findAllByItemId(item.getId());
+
+		Set<String> sizes = new HashSet<>();
+		Set<Color> colors = new HashSet<>();
+		Map<String, Integer> quantitiesDTO = new HashMap<>();
+
+		for (ItemQuantity quantity : quantities) {
+			String size = quantity.getSize();
+			Color color = quantity.getColor();
+
+			String key = size + "-" + color.name();
+			quantitiesDTO.put(key, quantity.getQuantity());
+
+			sizes.add(size);
+			colors.add(color);
+		}
+
+		return ItemResponse.builder()
+						   .id(item.getId())
+						   .name(item.getName())
+						   .gender(item.getGender())
+						   .season(item.getSeason())
+						   .colors(colors.stream().map(this::mapToDTO).toList())
+						   .sizes(sizes.stream().map(this::mapToDTO).toList())
+						   .quantities(quantitiesDTO)
+						   .categories(item.getCategories().stream().map(this::mapToDTO).toList())
+						   .unitPrice(item.getUnitPrice())
+						   .images(item.getImages())
+						   .isDeleted(item.isDeleted())
+						   .build();
+	}
+
+	private ItemQuantity mapToEntity(ItemQuantityRequest request) {
+		return ItemQuantity.builder()
+						   .color(request.getColor())
+						   .quantity(request.getQuantity())
+						   .size(request.getSize())
+						   .build();
+	}
+
+	private ItemSizeDTO mapToSizeDTO(ItemQuantity quantityEntity) {
+		return ItemSizeDTO.builder()
+						  .name(quantityEntity.getSize())
+						  .build();
+	}
+
+	private ItemSizeDTO mapToDTO(String size) {
+		return ItemSizeDTO.builder()
+						  .name(size)
+						  .build();
+	}
+
+	private ItemColorDTO mapToDTO(Color color) {
+		return ItemColorDTO.builder()
+						   .name(color.name())
+						   .hex(color.getHexValue())
+						   .build();
+	}
+
+	private CategoryResponse mapToDTO(Category category) {
+		return CategoryResponse.builder()
+							   .id(category.getId())
+							   .name(category.getName())
+							   .build();
 	}
 }

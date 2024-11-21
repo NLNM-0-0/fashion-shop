@@ -1,8 +1,8 @@
 package com.fashion.backend.controller.normal;
 
 import com.fashion.backend.payload.ListResponse;
-import com.fashion.backend.payload.item.ItemResponse;
-import com.fashion.backend.payload.item.SimpleItemResponse;
+import com.fashion.backend.payload.item.ItemWithLikedStatusResponse;
+import com.fashion.backend.payload.item.SimpleItemWithLikedStatusResponse;
 import com.fashion.backend.payload.item.UserItemFilter;
 import com.fashion.backend.payload.page.AppPageRequest;
 import com.fashion.backend.service.ItemService;
@@ -44,7 +44,7 @@ public class ItemController {
 			description = "Http Status is 200 OK"
 	)
 	@PreAuthorize("hasAnyAuthority('USER')")
-	public ResponseEntity<ListResponse<SimpleItemResponse, UserItemFilter>> getItems(
+	public ResponseEntity<ListResponse<SimpleItemWithLikedStatusResponse, UserItemFilter>> getItems(
 			@Valid AppPageRequest page,
 			@Valid UserItemFilter filter) {
 		return new ResponseEntity<>(itemService.userGetItems(page, filter), HttpStatus.OK);
@@ -62,7 +62,7 @@ public class ItemController {
 			description = "Http Status is 200 OK"
 	)
 	@PreAuthorize("hasAnyAuthority('USER')")
-	public ResponseEntity<ItemResponse> getItem(@PathVariable Long id) {
-		return new ResponseEntity<>(itemService.getItem(id), HttpStatus.OK);
+	public ResponseEntity<ItemWithLikedStatusResponse> getItem(@PathVariable Long id) {
+		return new ResponseEntity<>(itemService.userGetItem(id), HttpStatus.OK);
 	}
 }

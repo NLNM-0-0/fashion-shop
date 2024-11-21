@@ -59,7 +59,7 @@ public class AdminItemController {
 	)
 	@PreAuthorize("hasAnyAuthority('ADMIN', 'STAFF')")
 	public ResponseEntity<ItemResponse> getItem(@PathVariable Long id) {
-		return new ResponseEntity<>(itemService.getItem(id), HttpStatus.OK);
+		return new ResponseEntity<>(itemService.staffGetItem(id), HttpStatus.OK);
 	}
 
 	@PostMapping

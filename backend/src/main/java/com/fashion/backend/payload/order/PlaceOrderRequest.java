@@ -8,7 +8,7 @@ import java.util.List;
 @Data
 public class PlaceOrderRequest {
 	@Schema(
-			name = "details"
+			name = "cardIds"
 	)
-	private List<OrderDetailRequest> details;
+	private List<Long> cardIds;
 }

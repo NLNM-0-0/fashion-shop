@@ -1,7 +1,9 @@
 package com.fashion.backend.payload.cart;
 
 import com.fashion.backend.constant.Color;
+import com.fashion.backend.payload.item.ItemResponse;
 import com.fashion.backend.payload.item.SimpleItemResponse;
+import com.fashion.backend.payload.item.SimpleItemWithLikedStatusResponse;
 import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.Builder;
 import lombok.Data;
@@ -20,7 +22,7 @@ public class CartDetailResponse {
 	@Schema(
 			name = "item"
 	)
-	private SimpleItemResponse item;
+	private ItemResponse item;
 
 	@Schema(
 			name = "size",

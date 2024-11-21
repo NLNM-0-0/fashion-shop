@@ -28,23 +28,23 @@ public class OrderResponse {
 	@Schema(name = "staff")
 	private SimpleStaffResponse staff;
 
-	@Schema(name = "createdAt")
-	private Date createdAt;
+	@Schema(name = "createdAt", example = "")
+	private String createdAt;
 
 	@Schema(name = "confirmedAt")
-	private Date confirmedAt;
+	private String confirmedAt;
 
 	@Schema(name = "shippingAt")
-	private Date shippingAt;
+	private String shippingAt;
 
 	@Schema(name = "doneAt")
-	private Date doneAt;
+	private String doneAt;
 
 	@Schema(name = "canceledAt")
-	private Date canceledAt;
+	private String canceledAt;
 
 	@Schema(name = "updatedAt")
-	private Date updatedAt;
+	private String updatedAt;
 
 	@Schema(name = "orderStatus")
 	private OrderStatus orderStatus;
