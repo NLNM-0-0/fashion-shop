@@ -14,7 +14,7 @@ const FavoriteButton = () => {
         "rounded-full w-9 h-9 p-0"
       )}
     >
-      <Image src={Heart.src} alt="cart" height={20} width={20} />
+      <Image src={Heart.src} alt="heart" height={20} width={20} />
     </Link>
   );
 };
