@@ -15,6 +15,7 @@ import com.fashion.backend.payload.page.AppPageRequest;
 import com.fashion.backend.payload.page.AppPageResponse;
 import com.fashion.backend.payload.staff.SimpleStaffResponse;
 import com.fashion.backend.repository.*;
+import com.fashion.backend.utils.TimeHelper;
 import com.fashion.backend.utils.tuple.Triple;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
@@ -31,8 +32,8 @@ import java.util.*;
 @Service
 @RequiredArgsConstructor
 public class OrderService {
+	private final CartRepository cartRepository;
 	private final OrderRepository orderRepository;
-	private final ItemRepository itemRepository;
 	private final UserRepository userRepository;
 	private final UserAuthRepository userAuthRepository;
 	private final StockChangeHistoryRepository stockChangeHistoryRepository;
@@ -205,7 +206,7 @@ public class OrderService {
 
 		User user = Common.findCurrUser(userRepository, userAuthRepository);
 
-		Triple<Integer, Integer, List<OrderDetail>> orderInfo = handleOrder(request.getDetails());
+		Triple<Integer, Integer, List<OrderDetail>> orderInfo = handleOrder(request.getCardIds());
 		int totalPrice = orderInfo.first();
 		int totalQuantity = orderInfo.second();
 		List<OrderDetail> details = orderInfo.third();
@@ -223,41 +224,49 @@ public class OrderService {
 
 		handleOrderItem(order);
 
+		cartRepository.deleteAllById(request.getCardIds());
+
 		return mapToDTO(order);
 	}
 
 	private void validateOrderDetails(PlaceOrderRequest request) {
-		if (request.getDetails() == null || request.getDetails().isEmpty()) {
+		if (request.getCardIds() == null || request.getCardIds().isEmpty()) {
 			throw new AppException(HttpStatus.BAD_REQUEST, Message.Order.ORDER_CAN_NOT_HAVE_NO_ITEM);
 		}
-		if (isContainOnlyUnique(request.getDetails().stream().map(OrderDetailRequest::getItemId).toList())) {
+		if (isContainOnlyUnique(request.getCardIds())) {
 			throw new AppException(HttpStatus.BAD_REQUEST, Message.Order.ORDER_CAN_NOT_HAVE_SAME_ITEM);
 		}
 	}
 
-	private boolean isContainOnlyUnique(List<Long> itemIds) {
-		return new HashSet<>(itemIds).stream().toList().size() != itemIds.size();
+	private boolean isContainOnlyUnique(List<Long> cardIds) {
+		return new HashSet<>(cardIds).stream().toList().size() != cardIds.size();
 	}
 
-	private Triple<Integer, Integer, List<OrderDetail>> handleOrder(List<OrderDetailRequest> requestDetails) {
+	private Triple<Integer, Integer, List<OrderDetail>> handleOrder(List<Long> cartIds) {
+		List<Cart> carts = cartRepository.findAllById(cartIds);
+
+		if (cartIds.size() != carts.size()) {
+		    throw new AppException(HttpStatus.BAD_REQUEST, Message.Order.ORDER_CAN_NOT_HAVE_NOT_EXISTED_CART_ITEM);
+		}
+
 		int totalPrice = 0;
 		int totalQuantity = 0;
 		List<OrderDetail> details = new ArrayList<>();
-		for (OrderDetailRequest requestDetail : requestDetails) {
-			Item item = Common.findItemById(requestDetail.getItemId(), itemRepository);
+		for (Cart cart : carts) {
+			Item item = cart.getItem();
 
 			OrderDetail orderDetail = OrderDetail.builder()
 												 .unitPrice(item.getUnitPrice())
-												 .color(requestDetail.getColor())
-												 .size(requestDetail.getSize())
-												 .quantity(requestDetail.getQuantity())
+												 .color(cart.getColor())
+												 .size(cart.getSize())
+												 .quantity(cart.getQuantity())
 												 .item(item)
 												 .build();
 
 			details.add(orderDetail);
 
-			totalPrice += item.getUnitPrice() * requestDetail.getQuantity();
-			totalQuantity += requestDetail.getQuantity();
+			totalPrice += item.getUnitPrice() * cart.getQuantity();
+			totalQuantity += cart.getQuantity();
 		}
 		return new Triple<>(totalPrice, totalQuantity, details);
 	}
@@ -329,12 +338,12 @@ public class OrderService {
 							.totalPrice(order.getTotalPrice())
 							.totalQuantity(order.getTotalQuantity())
 							.orderStatus(order.getStatus())
-							.createdAt(order.getCreatedAt())
-							.confirmedAt(order.getConfirmedAt())
-							.shippingAt(order.getShippingAt())
-							.doneAt(order.getDoneAt())
-							.canceledAt(order.getCancelledAt())
-							.updatedAt(order.getUpdatedAt())
+							.createdAt(TimeHelper.formatDate(order.getCreatedAt()))
+							.confirmedAt(TimeHelper.formatDate(order.getConfirmedAt()))
+							.shippingAt(TimeHelper.formatDate(order.getShippingAt()))
+							.doneAt(TimeHelper.formatDate(order.getDoneAt()))
+							.canceledAt(TimeHelper.formatDate(order.getCancelledAt()))
+							.updatedAt(TimeHelper.formatDate(order.getUpdatedAt()))
 							.details(order.getOrderDetails().stream().map(this::mapToDTO).toList())
 							.build();
 	}
@@ -364,7 +373,7 @@ public class OrderService {
 								  .build();
 	}
 
-	private OrderDetailResponse mapToDTO(OrderDetail detail) {
+		private OrderDetailResponse mapToDTO(OrderDetail detail) {
 		return OrderDetailResponse.builder()
 								  .item(mapToDTO(detail.getItem()))
 								  .color(detail.getColor())

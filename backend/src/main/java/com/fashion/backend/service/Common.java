@@ -33,18 +33,6 @@ public class Common {
 															 Message.User.USER_NOT_EXIST));
 	}
 
-	public static UserAuth findUserAuthById(Long userId, UserAuthRepository repository) {
-		UserAuth userAuth = repository.findById(userId)
-									  .orElseThrow(() -> new AppException(
-											  HttpStatus.BAD_REQUEST,
-											  Message.User.USER_NOT_EXIST));
-		if (userAuth.isDeleted()) {
-			throw new AppException(HttpStatus.BAD_REQUEST, Message.User.USER_IS_DELETED);
-		}
-
-		return userAuth;
-	}
-
 	private static UserAuth findUserAuth(String userName, boolean isByEmail, UserAuthRepository repository) {
 		UserAuth userAuth;
 		if (isByEmail) {

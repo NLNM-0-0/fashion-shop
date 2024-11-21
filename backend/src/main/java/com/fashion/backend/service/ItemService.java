@@ -1,10 +1,7 @@
 package com.fashion.backend.service;
 
 import com.fashion.backend.constant.*;
-import com.fashion.backend.entity.Category;
-import com.fashion.backend.entity.Item;
-import com.fashion.backend.entity.ItemQuantity;
-import com.fashion.backend.entity.StockChangeHistory;
+import com.fashion.backend.entity.*;
 import com.fashion.backend.exception.AppException;
 import com.fashion.backend.payload.CheckedFilter;
 import com.fashion.backend.payload.ListResponse;
@@ -13,10 +10,7 @@ import com.fashion.backend.payload.category.CategoryResponse;
 import com.fashion.backend.payload.item.*;
 import com.fashion.backend.payload.page.AppPageRequest;
 import com.fashion.backend.payload.page.AppPageResponse;
-import com.fashion.backend.repository.CategoryRepository;
-import com.fashion.backend.repository.ItemQuantityRepository;
-import com.fashion.backend.repository.ItemRepository;
-import com.fashion.backend.repository.StockChangeHistoryRepository;
+import com.fashion.backend.repository.*;
 import com.fashion.backend.utils.tuple.Pair;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
@@ -38,9 +32,24 @@ public class ItemService {
 	private final CategoryRepository categoryRepository;
 	private final StockChangeHistoryRepository stockChangeHistoryRepository;
 	private final ItemQuantityRepository itemQuantityRepository;
+	private final LikeRepository likeRepository;
+	private final UserRepository userRepository;
+	private final UserAuthRepository userAuthRepository;
+
+	private Optional<Long> getUserLoginId() {
+		try {
+			User user = Common.findCurrUser(userRepository, userAuthRepository);
+			return user.getId().describeConstable();
+		} catch (Exception e) {
+			return Optional.empty();
+		}
+	}
 
 	@Transactional
-	public ListResponse<SimpleItemResponse, UserItemFilter> userGetItems(AppPageRequest page, UserItemFilter filter) {
+	public ListResponse<SimpleItemWithLikedStatusResponse, UserItemFilter> userGetItems(AppPageRequest page,
+																						UserItemFilter filter) {
+
+
 		Pageable pageable = PageRequest.of(page.getPage() - 1,
 										   page.getLimit(),
 										   Sort.by(Sort.Direction.ASC, "name"));
@@ -50,9 +59,20 @@ public class ItemService {
 
 		List<Item> items = itemPage.getContent();
 
-		List<SimpleItemResponse> data = items.stream().map(this::mapToDTOSimple).toList();
+		List<SimpleItemWithLikedStatusResponse> data;
+		Optional<Long> userId = getUserLoginId();
+		data = userId.map(aLong -> items.stream()
+										.map(item -> {
+											Optional<Like> like = likeRepository.findFirstByUserIdAndItemId(aLong,
+																											item.getId());
+											return mapToDTOSimple(item, like.isPresent());
+										})
+										.toList()).orElseGet(() -> items.stream()
+																		.map(item -> mapToDTOSimple(item, false))
+																		.toList());
 
-		return ListResponse.<SimpleItemResponse, UserItemFilter>builder()
+
+		return ListResponse.<SimpleItemWithLikedStatusResponse, UserItemFilter>builder()
 						   .data(data)
 						   .appPageResponse(AppPageResponse.builder()
 														   .index(page.getPage())
@@ -292,10 +312,25 @@ public class ItemService {
 	}
 
 	@Transactional
-	public ItemResponse getItem(Long itemId) {
+	public ItemResponse staffGetItem(Long itemId) {
 		Item item = Common.findItemById(itemId, itemRepository);
 
 		return mapToDTO(item);
+	}
+
+	@Transactional
+	public ItemWithLikedStatusResponse userGetItem(Long itemId) {
+		Optional<Long> userId = getUserLoginId();
+
+		Item item = Common.findItemById(itemId, itemRepository);
+
+		boolean liked = false;
+		if (userId.isPresent()) {
+			Optional<Like> like = likeRepository.findFirstByUserIdAndItemId(userId.get(), itemId);
+			liked = like.isPresent();
+		}
+
+		return mapToDTO(item, liked);
 	}
 
 	private int calcTotalQuantityFromItemId(Long itemId) {
@@ -415,6 +450,18 @@ public class ItemService {
 		return new SimpleResponse();
 	}
 
+	private SimpleItemWithLikedStatusResponse mapToDTOSimple(Item item, boolean liked) {
+		SimpleItemResponse simpleItemResponse = mapToDTOSimple(item);
+		return SimpleItemWithLikedStatusResponse.builder()
+												.id(simpleItemResponse.getId())
+												.name(simpleItemResponse.getName())
+												.unitPrice(simpleItemResponse.getUnitPrice())
+												.images(simpleItemResponse.getImages())
+												.liked(liked)
+												.isDeleted(simpleItemResponse.isDeleted())
+												.build();
+	}
+
 	private SimpleItemResponse mapToDTOSimple(Item item) {
 		return SimpleItemResponse.builder()
 								 .id(item.getId())
@@ -423,6 +470,25 @@ public class ItemService {
 								 .images(item.getImages())
 								 .isDeleted(item.isDeleted())
 								 .build();
+	}
+
+	private ItemWithLikedStatusResponse mapToDTO(Item item, boolean liked) {
+		ItemResponse itemResponse = mapToDTO(item);
+
+		return ItemWithLikedStatusResponse.builder()
+										  .id(itemResponse.getId())
+										  .name(itemResponse.getName())
+										  .gender(itemResponse.getGender())
+										  .season(itemResponse.getSeason())
+										  .colors(itemResponse.getColors())
+										  .sizes(itemResponse.getSizes())
+										  .quantities(itemResponse.getQuantities())
+										  .categories(itemResponse.getCategories())
+										  .unitPrice(itemResponse.getUnitPrice())
+										  .images(itemResponse.getImages())
+										  .isDeleted(itemResponse.isDeleted())
+										  .liked(liked)
+										  .build();
 	}
 
 	private ItemResponse mapToDTO(Item item) {
