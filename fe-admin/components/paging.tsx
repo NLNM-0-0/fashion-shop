@@ -59,7 +59,7 @@ const Paging = ({ page, totalPage }: PagingProps) => {
             {pageArray.map((item) => {
               return (
                 <SelectItem key={item} value={`${item}`}>
-                  {`Trang ${item}`}
+                  {`Page ${item}`}
                 </SelectItem>
               );
             })}

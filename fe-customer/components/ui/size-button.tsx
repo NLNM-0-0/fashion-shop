@@ -21,9 +21,9 @@ const SizeRadioButton = ({
       variant="outline"
       disabled={readonly}
       className={cn(
-        "text-fs-gray-dark",
+        "text-fs-gray-black",
         className,
-        selected && "border-fs-black text-fs-black"
+        selected && "border-fs-black"
       )}
       onClick={() => onSelect(value)}
     >

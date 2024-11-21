@@ -43,7 +43,7 @@ const ProductImage = ({ images }: { images: string[] }) => {
         ))}
       </div>
       <Carousel
-        className="md:w-[600px] w-[500px] md:h-[700px] h-[580px] relative rounded-2xl overflow-clip"
+        className="md:w-[600px] sm:w-[500px] md:h-[700px] sm:h-[580px] relative rounded-2xl overflow-clip"
         opts={{
           loop: true,
         }}

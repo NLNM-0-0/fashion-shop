@@ -1,27 +1,26 @@
 import React from "react";
 import { Button } from "../ui/button";
-
 import { toast } from "@/hooks/use-toast";
 import { FaTrash } from "react-icons/fa";
 import ConfirmDialog from "../ui/confirm-dialog";
 import { AxiosError } from "axios";
 import { ApiError } from "@/lib/types";
-import { deleteCustomer } from "@/lib/api/customer/deleteCustomer";
+import { deleteCategory } from "@/lib/api/category/deleteCategory";
 
-interface DeleteCustomerProps {
+interface DeleteCategoryProps {
   id: number;
   onDelete: () => void;
 }
 
-const DeleteCustomer = ({ id, onDelete }: DeleteCustomerProps) => {
+const DeleteCategory = ({ id, onDelete }: DeleteCategoryProps) => {
   const handleDelete = () => {
-    deleteCustomer(id)
+    deleteCategory(id)
       .then(() => {
         onDelete();
         return toast({
           variant: "success",
           title: "Success",
-          description: "Edit customer successfully",
+          description: "Edit category successfully",
         });
       })
 
@@ -29,7 +28,7 @@ const DeleteCustomer = ({ id, onDelete }: DeleteCustomerProps) => {
         toast({
           variant: "destructive",
           title: "Error",
-          description: err.response?.data.message ?? "Edit customer failed",
+          description: err.response?.data.message ?? "Edit category failed",
         });
       });
   };
@@ -37,7 +36,7 @@ const DeleteCustomer = ({ id, onDelete }: DeleteCustomerProps) => {
   return (
     <ConfirmDialog
       title={"Confirmation"}
-      description="Are you sure you want to delete this customer?"
+      description="Are you sure you want to delete this category?"
       handleYes={() => handleDelete()}
     >
       <Button
@@ -53,4 +52,4 @@ const DeleteCustomer = ({ id, onDelete }: DeleteCustomerProps) => {
   );
 };
 
-export default DeleteCustomer;
+export default DeleteCategory;

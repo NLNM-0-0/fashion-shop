@@ -1,18 +1,24 @@
 "use client";
 
-import { Product } from "@/lib/types";
 import ProductImage from "./product-image";
 import ProductContentForm from "./product-content-form";
+import { useProduct } from "@/hooks/useProduct";
 
-const DetailContent = ({ product }: { product: Product }) => {
-  return (
-    <div className="flex gap-9 w-full justify-center">
-      <ProductImage images={product.images} />
-      <div className="max-w-[420px]">
-        <ProductContentForm product={product} />
+const DetailContent = ({ id }: { id: string }) => {
+  const { data, isLoading, error } = useProduct({ id: id });
+  const product = data?.data;
+
+  if (error) return <>Failed to load.</>;
+  else if (isLoading || !data || !product) return <>Skeleton...</>;
+  else
+    return (
+      <div className="flex xl:flex-row flex-col gap-9 w-full justify-center items-center">
+        <ProductImage images={product.images} />
+        <div className="flex-1 w-full xl:max-w-[400px]">
+          <ProductContentForm product={product} />
+        </div>
       </div>
-    </div>
-  );
+    );
 };
 
 export default DetailContent;

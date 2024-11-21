@@ -4,8 +4,10 @@ import { Color, FilterInputType, OrderStatus } from "./enum";
 import { PiDress } from "react-icons/pi";
 import { LuClipboardList } from "react-icons/lu";
 import { AiOutlineLineChart } from "react-icons/ai";
+import { BiCategory } from "react-icons/bi";
 import { LucideIcon } from "lucide-react";
 import { Menu, PackageCheck, PackageX, Truck, Receipt } from "lucide-react";
+
 export const sidebarItems: SidebarItem[] = [
   {
     title: "Products",
@@ -13,6 +15,13 @@ export const sidebarItems: SidebarItem[] = [
     icon: PiDress,
     submenu: false,
   },
+  {
+    title: "Category",
+    href: "/admin/category",
+    icon: BiCategory,
+    submenu: false,
+  },
+
   {
     title: "Orders",
     href: "/admin/order",
@@ -110,11 +119,11 @@ export const orderStatusValues: OrderStatusValue[] = [
 ];
 
 export const orderStatusColors: Record<OrderStatus, string> = {
-  [OrderStatus.PENDING]: "bg-orange-400",
-  [OrderStatus.CONFIRMED]: "bg-cyan-600",
-  [OrderStatus.SHIPPING]: "bg-green-700",
-  [OrderStatus.DONE]: "bg-sky-600",
-  [OrderStatus.CANCELED]: "bg-red-700",
+  [OrderStatus.PENDING]: "#fb923c",
+  [OrderStatus.CONFIRMED]: "#0891b2",
+  [OrderStatus.SHIPPING]: "#15803d",
+  [OrderStatus.DONE]: "#0284c7",
+  [OrderStatus.CANCELED]: "#b91c1c",
 };
 
 export const orderStatusTitle: Record<OrderStatus, string> = {
@@ -131,6 +140,13 @@ export const orderStatusIcons: Record<OrderStatus, LucideIcon> = {
   [OrderStatus.SHIPPING]: Truck,
   [OrderStatus.DONE]: PackageCheck,
   [OrderStatus.CANCELED]: PackageX,
+};
+export const orderStatusToNextTitle: Record<OrderStatus, string | undefined> = {
+  [OrderStatus.PENDING]: "Confirm Order",
+  [OrderStatus.CONFIRMED]: "Ship Order",
+  [OrderStatus.SHIPPING]: "Complete Order",
+  [OrderStatus.DONE]: undefined,
+  [OrderStatus.CANCELED]: undefined,
 };
 
 export const colorToClassMap: Record<Color, string> = {
