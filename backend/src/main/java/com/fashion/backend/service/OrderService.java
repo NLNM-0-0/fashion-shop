@@ -135,6 +135,7 @@ public class OrderService {
 			throw new AppException(HttpStatus.BAD_REQUEST, Message.Order.ORDER_JUST_CAN_BE_REACHED_BY_OWNER_CUSTOMER);
 		}
 
+		order.setDoneAt(new Date());
 		order.setStatus(OrderStatus.DONE);
 
 		orderRepository.save(order);
@@ -151,6 +152,7 @@ public class OrderService {
 			throw new AppException(HttpStatus.BAD_REQUEST, Message.Order.CAN_NOT_BE_REACHED_CLOSED_ORDER);
 		}
 
+		order.setCancelledAt(new Date());
 		order.setStatus(OrderStatus.CANCELED);
 
 		orderRepository.save(order);
@@ -179,7 +181,7 @@ public class OrderService {
 			order.setShippingAt(new Date());
 			updatedStatus = OrderStatus.SHIPPING;
 		} else {
-			order.setShippingAt(new Date());
+			order.setDoneAt(new Date());
 			updatedStatus = OrderStatus.DONE;
 		}
 		order.setStatus(updatedStatus);
