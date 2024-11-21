@@ -7,6 +7,7 @@ import { createOrder } from "@/lib/api/order/createOrder";
 import { toast } from "@/hooks/use-toast";
 import { AxiosError } from "axios";
 import { ApiError } from "@/lib/types";
+import CartListSkeleton from "./cart-list-skeleton";
 
 const CartList = () => {
   const { data, isLoading, error } = useCartList();
@@ -51,7 +52,12 @@ const CartList = () => {
   };
 
   if (error) return <>Failed to load</>;
-  else if (isLoading || !data) return <>Skeleton...</>;
+  else if (isLoading || !data)
+    return (
+      <>
+        <CartListSkeleton />
+      </>
+    );
   return (
     <div className="flex gap-10 lg:flex-row flex-col">
       <div className="flex basis-2/3 flex-col">
@@ -82,7 +88,7 @@ const CartList = () => {
           </span>
         </div>
         <Button className="h-12 rounded-full mt-5" onClick={handleCreateOrder}>
-          Check out
+          Checkout
         </Button>
       </div>
     </div>

@@ -1,8 +1,7 @@
-import { CustomerFilterParam, StaffFilterParam } from "../types";
+import { NotiFilterParam } from "../types";
 
 type EncodableParams =
-  | CustomerFilterParam
-  | StaffFilterParam
+  | NotiFilterParam
   | { [key: string]: string | number | boolean };
 
 export default function encodeParams(
@@ -22,7 +21,7 @@ export default function encodeParams(
   }
 
   const { page = 1, limit = 10, ...otherParams } = params;
-  
+
   if (hasPaging) {
     addParam("page", page);
     addParam("limit", limit);

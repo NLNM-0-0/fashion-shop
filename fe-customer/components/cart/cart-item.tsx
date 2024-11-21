@@ -13,7 +13,7 @@ const CartListItem = ({
   itemId: number;
 }) => {
   return (
-    <div className="flex gap-4 pt-6 py-10 border-b">
+    <div className="flex gap-4 pt-6 py-10 border-b lg:last:border-b-0">
       <div className="flex flex-col gap-3">
         <Image
           src={product.item.images.at(0) ?? ""}
