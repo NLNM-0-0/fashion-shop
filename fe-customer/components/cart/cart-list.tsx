@@ -81,7 +81,7 @@ const CartList = () => {
           <span>Estimated Delivery & Handling</span>
           <span>Free</span>
         </div>
-        <div className="flex justify-between mt-5 py-4 border-y">
+        <div className="flex justify-between mt-5 py-4 border-y font-medium">
           <span>Total</span>
           <span>
             <span>{toVND(price ?? 0)}</span>
