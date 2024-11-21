@@ -4,8 +4,10 @@ import { Color, FilterInputType, OrderStatus } from "./enum";
 import { PiDress } from "react-icons/pi";
 import { LuClipboardList } from "react-icons/lu";
 import { AiOutlineLineChart } from "react-icons/ai";
+import { BiCategory } from "react-icons/bi";
 import { LucideIcon } from "lucide-react";
 import { Menu, PackageCheck, PackageX, Truck, Receipt } from "lucide-react";
+
 export const sidebarItems: SidebarItem[] = [
   {
     title: "Products",
@@ -13,6 +15,13 @@ export const sidebarItems: SidebarItem[] = [
     icon: PiDress,
     submenu: false,
   },
+  {
+    title: "Category",
+    href: "/admin/category",
+    icon: BiCategory,
+    submenu: false,
+  },
+
   {
     title: "Orders",
     href: "/admin/order",

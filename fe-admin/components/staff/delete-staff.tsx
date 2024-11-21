@@ -36,7 +36,7 @@ const DeleteStaff = ({ id, onDelete }: DeleteStaffProps) => {
   return (
     <ConfirmDialog
       title={"Confirmation"}
-      description="Are you sure you want to delete this user?"
+      description="Are you sure you want to delete this staff?"
       handleYes={() => handleDelete()}
     >
       <Button
