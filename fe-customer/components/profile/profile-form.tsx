@@ -26,6 +26,7 @@ import { PiPencilSimpleBold } from "react-icons/pi";
 import { RxReset } from "react-icons/rx";
 import { format } from "date-fns";
 import { vi } from "date-fns/locale";
+import ProfileSkeleton from "./profile-skeleton";
 
 const ProfileScheme = z.object({
   email: z.string().email("Invalid email"),
@@ -134,7 +135,12 @@ const ProfileForm = () => {
     resetUser();
   }, [resetUser]);
 
-  if (!user) return <>Skeleton</>;
+  if (!user)
+    return (
+      <>
+        <ProfileSkeleton />
+      </>
+    );
   return (
     <form
       className="max-w-[800px] w-full"
@@ -270,7 +276,7 @@ const ProfileForm = () => {
                 </span>
               )}
             </div>
-            <Button className="w-full uppercase self-end" disabled={!isDirty}>
+            <Button className="w-full self-end" disabled={!isDirty}>
               Update
             </Button>
           </div>

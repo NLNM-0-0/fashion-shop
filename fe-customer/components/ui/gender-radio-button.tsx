@@ -21,11 +21,11 @@ const GenderRadioButton = ({
     <Button
       type="button"
       variant="outline"
-      disabled={readonly}
       className={cn(
         "text-fs-gray-dark",
         className,
-        selected && "border-fs-black text-fs-black"
+        selected && "border-fs-black text-fs-black",
+        readonly && "pointer-events-none"
       )}
       onClick={() => onSelect(value)}
     >
