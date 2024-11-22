@@ -1,13 +1,4 @@
-import { IconType } from "react-icons";
 import { FilterInputType, OrderStatus } from "../constants/enum";
-
-export interface SidebarItem {
-  title: string;
-  href: string;
-  icon?: IconType;
-  submenu?: boolean;
-  subMenuItems?: SidebarItem[];
-}
 
 export interface User {
   email: string;
@@ -33,17 +24,6 @@ export interface Customer extends User {
   id: number;
 }
 
-export interface Staff {
-  id: number;
-  email: string;
-  name: string;
-  dob: string;
-  address: string;
-  image: string;
-  male: boolean;
-  admin: boolean;
-}
-
 export interface OrderStaff {
   id: number;
   email: string;
@@ -59,16 +39,6 @@ export interface OrderCustomer {
   image: string;
 }
 
-export interface CreateStaffPayload {
-  email: string;
-  name: string;
-  dob: string;
-  address: string;
-  image: string;
-  male: boolean;
-  admin: boolean;
-}
-
 export interface CreateProductPayload {
   name: string;
   image: string;
@@ -80,11 +50,6 @@ export interface CreateNotificationPayload {
   title: string;
   description: string;
   receiver: number[];
-}
-
-export interface CustomerData {
-  data: Customer[];
-  page: PagingType;
 }
 
 export interface ProductData {
@@ -103,10 +68,6 @@ export interface CategoryData {
 
 export interface OrderData {
   data: Order[];
-  page: PagingType;
-}
-export interface StaffData {
-  data: Staff[];
   page: PagingType;
 }
 
@@ -150,12 +111,6 @@ export interface PagingType {
   totalElements: number;
 }
 
-export interface CustomerFilterParam extends PagingParam {
-  name?: string;
-  email?: string;
-  phone?: string;
-}
-
 export interface ProductFilterParam extends PagingParam {
   name?: string;
 }
@@ -164,15 +119,6 @@ export interface OrderFilterParam extends PagingParam {
   orderStatus?: OrderStatus;
   staffName?: string;
   customerName?: string;
-}
-
-export interface StaffFilterParam extends PagingParam {
-  name?: string;
-  email?: string;
-  admin?: boolean;
-  male?: boolean;
-  monthDOB?: number;
-  yearDOB?: number;
 }
 
 // Memo: no paging param
@@ -262,6 +208,7 @@ export interface Product {
   quantities: Record<string, number>;
   unitPrice: number;
   delete: boolean;
+  liked: boolean;
 }
 
 export interface Order {
@@ -300,7 +247,7 @@ export interface CartItemDetail {
 
 export interface CartItem {
   id: number;
-  item: CartItemDetail;
+  item: Product;
   size: string;
   color: string;
   quantity: number;
@@ -310,4 +257,15 @@ export interface CartItem {
 
 export interface CartListData {
   data: CartItem[];
+}
+
+export interface BaseProduct {
+  id: number;
+  name: string;
+  images: string[];
+  unitPrice: number;
+}
+
+export interface FavoriteData {
+  data: BaseProduct[];
 }

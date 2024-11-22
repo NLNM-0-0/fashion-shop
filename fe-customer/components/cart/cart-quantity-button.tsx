@@ -1,6 +1,6 @@
 import { LuMinus, LuPlus, LuTrash2 } from "react-icons/lu";
 import { Button } from "../ui/button";
-import { useCallback, useMemo, useState } from "react";
+import { useCallback, useEffect, useMemo, useState } from "react";
 import { debounce } from "lodash";
 import { AxiosError } from "axios";
 import { ApiError, CartItem } from "@/lib/types";
@@ -70,9 +70,15 @@ const CartQuantityButton = ({
       return newQuantity;
     });
   };
+
+  useEffect(() => {
+    setNewQuantity(product.quantity);
+  }, [product.quantity]);
+
   return (
     <div className="rounded-full border flex items-center">
       <Button
+        type="button"
         variant={"ghost"}
         size={"icon"}
         className="rounded-full"
@@ -86,6 +92,7 @@ const CartQuantityButton = ({
       </Button>
       <div className="font-medium text-base w-6 text-center">{newQuantity}</div>
       <Button
+        type="button"
         variant={"ghost"}
         size={"icon"}
         className="rounded-full"

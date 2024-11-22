@@ -43,7 +43,7 @@ const ProductImage = ({ images }: { images: string[] }) => {
         ))}
       </div>
       <Carousel
-        className="md:w-[600px] sm:w-[500px] md:h-[700px] sm:h-[580px] relative rounded-2xl overflow-clip"
+        className="md:w-[600px] sm:w-[500px] md:h-[700px] w-full h-full relative rounded-2xl overflow-clip"
         opts={{
           loop: true,
         }}
@@ -54,7 +54,7 @@ const ProductImage = ({ images }: { images: string[] }) => {
             <CarouselItem key={`product-image-${img}`}>
               <Image
                 alt="Header 1"
-                className="object-cover w-full md:h-[700px]"
+                className="object-cover w-full md:h-[700px] h-full"
                 priority
                 src={img}
                 width={600}

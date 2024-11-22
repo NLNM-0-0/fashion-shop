@@ -111,7 +111,7 @@ const Profile = () => {
                 <AvatarFallback>{user?.name.substring(0, 2)}</AvatarFallback>
               </Avatar>
               {unseenNoti && unseenNoti.data.number > 0 && (
-                <div className="absolute top-0 right-[1px] rounded-full bg-sky-600 h-2.5 w-2.5" />
+                <div className="absolute top-[1px] right-[2px] rounded-full bg-sky-600 h-2.5 w-2.5" />
               )}
             </div>
           </div>
@@ -130,7 +130,7 @@ const Profile = () => {
           >
             <div className="flex gap-2 items-center text-primary">
               <GoPerson className="w-6 h-6" />
-              My Account
+              My Profile
             </div>
           </Button>
           <Button
