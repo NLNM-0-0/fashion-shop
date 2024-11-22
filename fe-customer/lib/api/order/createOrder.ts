@@ -1,14 +1,10 @@
 import axios from "../axios";
 
-interface CreateOrderItem {
-  itemId: number;
-  size: string;
-  color: string;
-  quantity: number;
-}
-
 interface CreateOrderPayload {
-  details: CreateOrderItem[];
+  name: string;
+  phone: string;
+  address: string;
+  cardIds: number[];
 }
 export const createOrder = (payload: CreateOrderPayload) => {
   return axios.post(`/order`, payload);
