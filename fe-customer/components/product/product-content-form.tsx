@@ -7,13 +7,15 @@ import { Controller, SubmitHandler, useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { Button } from "../ui/button";
 import Heart from "@/lib/assets/icons/heart.svg";
+import HeartFill from "@/lib/assets/icons/heart-fill.svg";
+
 import Image from "next/image";
 import { AxiosError } from "axios";
 import { toast } from "@/hooks/use-toast";
 import { addToCard } from "@/lib/api/cart/addToCart";
 import { CART_NUMBER_KEY } from "@/hooks/cart/useCartNumber";
 import { useSWRConfig } from "swr";
-import { likeItem } from "@/lib/api/favorite/likeItem";
+import { likeItem, unlikeItem } from "@/lib/api/favorite/likeItem";
 import AddedToBagDialog from "../cart/added-to-bag-dialog";
 import { useState } from "react";
 
@@ -22,7 +24,13 @@ export const ProductSchema = z.object({
   size: z.string().min(1, "Select a size"),
 });
 
-const ProductContentForm = ({ product }: { product: Product }) => {
+const ProductContentForm = ({
+  product,
+  onMutate,
+}: {
+  product: Product;
+  onMutate: () => void;
+}) => {
   const { mutate } = useSWRConfig();
   const initialSizes = getSizesFromColor(product, product.colors.at(0)?.name);
 
@@ -67,13 +75,28 @@ const ProductContentForm = ({ product }: { product: Product }) => {
   };
 
   const handleLike = () => {
-    likeItem(product.id).catch((err: AxiosError<ApiError>) => {
-      toast({
-        variant: "destructive",
-        title: "Error",
-        description: err.response?.data.message ?? "Like product failed",
-      });
-    });
+    if (product.liked) {
+      unlikeItem(product.id)
+        .then(() => onMutate())
+        .catch((err: AxiosError<ApiError>) => {
+          toast({
+            variant: "destructive",
+            title: "Error",
+            description: err.response?.data.message ?? "Unlike product failed",
+          });
+          return;
+        });
+    } else
+      likeItem(product.id)
+        .then(() => onMutate())
+        .catch((err: AxiosError<ApiError>) => {
+          toast({
+            variant: "destructive",
+            title: "Error",
+            description: err.response?.data.message ?? "Like product failed",
+          });
+          return;
+        });
   };
 
   return (
@@ -147,7 +170,11 @@ const ProductContentForm = ({ product }: { product: Product }) => {
             onClick={handleLike}
           >
             Favorite
-            <Image src={Heart.src} alt="cart" height={20} width={20} />
+            {product.liked ? (
+              <Image src={HeartFill.src} alt="heart" height={20} width={20} />
+            ) : (
+              <Image src={Heart.src} alt="heart" height={20} width={20} />
+            )}
           </Button>
         </div>
       </form>

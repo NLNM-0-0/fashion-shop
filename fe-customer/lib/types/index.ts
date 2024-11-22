@@ -208,6 +208,7 @@ export interface Product {
   quantities: Record<string, number>;
   unitPrice: number;
   delete: boolean;
+  liked: boolean;
 }
 
 export interface Order {
@@ -246,7 +247,7 @@ export interface CartItemDetail {
 
 export interface CartItem {
   id: number;
-  item: CartItemDetail;
+  item: Product;
   size: string;
   color: string;
   quantity: number;
