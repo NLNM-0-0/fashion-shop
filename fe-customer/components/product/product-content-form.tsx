@@ -104,8 +104,8 @@ const ProductContentForm = ({
       <form onSubmit={handleSubmit(onSubmit)} className="flex flex-col gap-6">
         <div>
           <h1 className="text-2xl tracking-wide font-medium">{product.name}</h1>
-          <span className="font-medium text-sm">
-            {product.categories.map((item) => item.name).join(", ")}
+          <span className="font-medium text-base text-fs-gray-darker">
+            {product.categories.map((item) => item.name).join(" | ")}
           </span>
         </div>
         <span className="font-medium text-base">
@@ -146,7 +146,7 @@ const ProductContentForm = ({
                     key={size.name}
                     value={size.name}
                     selected={field.value === size.name}
-                    className="px-6 flex-1"
+                    className="px-6 min-w-20"
                     onSelect={(value) => field.onChange(value)}
                     readonly={
                       product.quantities[`${size.name}-${colorValue}`] < 1

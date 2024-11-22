@@ -21,6 +21,7 @@ import { createOrder } from "@/lib/api/order/createOrder";
 import { AxiosError } from "axios";
 import { ApiError } from "@/lib/types";
 import { toast } from "@/hooks/use-toast";
+import PaymentSkeleton from "./payment-skeleton";
 
 const PaymentScheme = z.object({
   name: required,
@@ -90,7 +91,12 @@ const PaymentLayout = () => {
   }, []);
 
   if (error) return <>Failed to load</>;
-  else if (!data || isLoading) return <>Skeleton...</>;
+  else if (!data || isLoading)
+    return (
+      <>
+        <PaymentSkeleton />
+      </>
+    );
   return (
     <form
       onSubmit={handleSubmit(onSubmit)}
