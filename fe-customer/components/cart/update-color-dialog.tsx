@@ -10,7 +10,6 @@ import {
 } from "../ui/dialog";
 import { ApiError, CartItem } from "@/lib/types";
 import { Button } from "../ui/button";
-import SizeRadioButton from "../ui/size-button";
 import Image from "next/image";
 import { toVND } from "@/lib/utils";
 import { updateCartItem } from "@/lib/api/cart/updateCartItem";
@@ -18,28 +17,29 @@ import { toast } from "@/hooks/use-toast";
 import { AxiosError } from "axios";
 import { useSWRConfig } from "swr";
 import { CART_KEY } from "@/hooks/cart/useCartList";
+import ColorItem from "../product/color-item";
 
 type DialogProps = {
   cartItem: CartItem;
 };
 
-const UpdateSizeDialog = ({ cartItem }: DialogProps) => {
+const UpdateColorDialog = ({ cartItem }: DialogProps) => {
   const { mutate } = useSWRConfig();
 
   const [open, setOpen] = useState(false);
-  const [selectedSize, setSelectedSize] = useState(cartItem.size);
+  const [selectedColor, setSelectedColor] = useState(cartItem.color);
 
-  const handleUpdateSize = async () => {
+  const handleUpdateColor = async () => {
     updateCartItem(cartItem.id, {
-      size: selectedSize,
+      color: selectedColor,
       quantity: cartItem.quantity,
-      color: cartItem.color,
+      size: cartItem.size,
     })
       .then(() => {
         toast({
           variant: "success",
           title: "Success",
-          description: "Update size successfully",
+          description: "Update color successfully",
         });
         mutate(CART_KEY);
         setOpen(false);
@@ -48,14 +48,14 @@ const UpdateSizeDialog = ({ cartItem }: DialogProps) => {
         toast({
           variant: "destructive",
           title: "Error",
-          description: err.response?.data.message ?? "Update size failed",
+          description: err.response?.data.message ?? "Update color failed",
         });
       });
   };
 
   useEffect(() => {
-    setSelectedSize(cartItem.size);
-  }, [cartItem.size]);
+    setSelectedColor(cartItem.color);
+  }, [cartItem.color]);
 
   return (
     <Dialog open={open} onOpenChange={setOpen}>
@@ -63,9 +63,9 @@ const UpdateSizeDialog = ({ cartItem }: DialogProps) => {
         <Button
           type="button"
           variant={"link"}
-          className="underline underline-offset-2 text-fs-gray-darker hover:text-fs-gray-darker/80 px-2 py-0 h-fit"
+          className="underline underline-offset-2 text-fs-gray-darker hover:text-fs-gray-darker/80 px-2 py-0 h-fit capitalize"
         >
-          {cartItem.size}
+          {cartItem.color.toLowerCase()}
         </Button>
       </DialogTrigger>
       <DialogContent className="md:left-[50%] md:top-[50%] md:translate-x-[-50%] md:translate-y-[-50%]  rounded-3xl md:rounded-b-3xl rounded-b-none top-auto bottom-0 left-0 right-0 translate-x-0 translate-y-0 md:max-w-3xl max-w-full flex flex-col gap-0 h-fit">
@@ -90,7 +90,7 @@ const UpdateSizeDialog = ({ cartItem }: DialogProps) => {
                 {toVND(cartItem.item.unitPrice)}
               </p>
               <p className="md:text-lg text-base text-fs-gray-darker mt-1 mb-2 capitalize">
-                Color: {cartItem.color.toLowerCase()}
+                Size: {cartItem.size.toLowerCase()}
               </p>
             </div>
           </div>
@@ -103,34 +103,35 @@ const UpdateSizeDialog = ({ cartItem }: DialogProps) => {
                 {toVND(cartItem.item.unitPrice)}
               </p>
               <p className="md:text-lg text-base text-fs-gray-darker mt-1 mb-2 capitalize">
-                Color: {cartItem.color.toLowerCase()}
+                Size: {cartItem.size.toLowerCase()}
               </p>
             </div>
             <div className="flex flex-col mt-auto">
-              <span className="font-medium text-base mb-2">Select Size</span>
-              <div className="h-fit grid grid-cols-4 gap-2">
-                {cartItem.item.sizes.map((size) => (
-                  <SizeRadioButton
-                    key={size.name}
-                    value={size.name}
-                    selected={selectedSize === size.name}
-                    className="px-6 flex-1"
-                    onSelect={(value) => setSelectedSize(value)}
-                    readonly={
+              <span className="font-medium text-base mb-2">Select Color</span>
+              <div className="flex gap-4 flex-wrap">
+                {cartItem.item.colors.map((color) => (
+                  <ColorItem
+                    key={color.name}
+                    color={color}
+                    selected={selectedColor === color.name}
+                    disable={
                       cartItem.item.quantities[
-                        `${size.name}-${cartItem.color}`
+                        `${cartItem.size}-${color.name}`
                       ] < 1
                     }
+                    onSelected={(value) => {
+                      setSelectedColor(value);
+                    }}
                   />
                 ))}
               </div>
               <Button
                 className="rounded-full h-12 mt-4"
                 type="button"
-                onClick={handleUpdateSize}
-                disabled={selectedSize === cartItem.size}
+                onClick={handleUpdateColor}
+                disabled={selectedColor === cartItem.color}
               >
-                Update Size
+                Update Color
               </Button>
             </div>
           </div>
@@ -140,4 +141,4 @@ const UpdateSizeDialog = ({ cartItem }: DialogProps) => {
   );
 };
 
-export default UpdateSizeDialog;
+export default UpdateColorDialog;

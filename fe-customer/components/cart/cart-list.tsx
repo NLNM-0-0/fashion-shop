@@ -1,55 +1,17 @@
 "use client";
 import { useCartList } from "@/hooks/cart/useCartList";
 import CartListItem from "./cart-item";
-import { toVND } from "@/lib/utils";
-import { Button } from "../ui/button";
-import { createOrder } from "@/lib/api/order/createOrder";
-import { toast } from "@/hooks/use-toast";
-import { AxiosError } from "axios";
-import { ApiError } from "@/lib/types";
+import { cn, toVND } from "@/lib/utils";
+import { buttonVariants } from "../ui/button";
 import CartListSkeleton from "./cart-list-skeleton";
+import Link from "next/link";
 
 const CartList = () => {
   const { data, isLoading, error } = useCartList();
   const price = data?.data.data.reduce(
-    (total, item) => total + item.item.unitPrice,
+    (total, item) => total + item.item.unitPrice * item.quantity,
     0
   );
-
-  const handleCreateOrder = () => {
-    if (!data || data?.data.data.length < 1) {
-      toast({
-        variant: "destructive",
-        title: "Error",
-        description: "Please have at least one item in bag",
-      });
-      return;
-    }
-    createOrder({
-      details: data?.data.data.map((item) => {
-        return {
-          itemId: item.item.id,
-          size: item.size,
-          color: item.color,
-          quantity: item.quantity,
-        };
-      }),
-    })
-      .then(() => {
-        toast({
-          variant: "success",
-          title: "Success",
-          description: "Create order successfully",
-        });
-      })
-      .catch((err: AxiosError<ApiError>) => {
-        toast({
-          variant: "destructive",
-          title: "Error",
-          description: err.response?.data.message ?? "Update quantity failed",
-        });
-      });
-  };
 
   if (error) return <>Failed to load</>;
   else if (isLoading || !data)
@@ -87,9 +49,15 @@ const CartList = () => {
             <span>{toVND(price ?? 0)}</span>
           </span>
         </div>
-        <Button className="h-12 rounded-full mt-5" onClick={handleCreateOrder}>
+        <Link
+          href={"/fa/cart/payment"}
+          className={cn(
+            buttonVariants({ variant: "default" }),
+            "h-12 rounded-full mt-5 text-base"
+          )}
+        >
           Checkout
-        </Button>
+        </Link>
       </div>
     </div>
   );

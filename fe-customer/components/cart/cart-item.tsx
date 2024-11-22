@@ -4,6 +4,8 @@ import { Button } from "../ui/button";
 import { toVND } from "@/lib/utils";
 import CartQuantityButton from "./cart-quantity-button";
 import Heart from "@/lib/assets/icons/heart.svg";
+import UpdateSizeDialog from "./update-size-dialog";
+import UpdateColorDialog from "./update-color-dialog";
 
 const CartListItem = ({
   product,
@@ -24,7 +26,12 @@ const CartListItem = ({
         />
         <div className="flex justify-between">
           <CartQuantityButton product={product} itemId={itemId} />
-          <Button variant={"ghost"} className="rounded-full" size={"icon"}>
+          <Button
+            variant={"ghost"}
+            type="button"
+            className="rounded-full"
+            size={"icon"}
+          >
             <Image src={Heart.src} alt="cart" height={20} width={20} />
           </Button>
         </div>
@@ -35,10 +42,12 @@ const CartListItem = ({
             {product.item.name}
           </h1>
           <span className="text-base text-fs-gray-darker">
-            Color: {product.color}
+            Color:
+            <UpdateColorDialog cartItem={product} />
           </span>
           <span className="text-base text-fs-gray-darker">
-            Size: {product.size}
+            Size:
+            <UpdateSizeDialog cartItem={product} />
           </span>
         </div>
         <span className="tracking-wide font-medium">

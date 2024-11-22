@@ -1,5 +1,5 @@
 import { FormFilterType, OrderStatusValue } from "../types";
-import { FilterInputType, OrderStatus } from "./enum";
+import { Color, FilterInputType, OrderStatus } from "./enum";
 import { LucideIcon } from "lucide-react";
 import { Menu, PackageCheck, PackageX, Truck, Receipt } from "lucide-react";
 
@@ -91,4 +91,18 @@ export const orderStatusIcons: Record<OrderStatus, LucideIcon> = {
   [OrderStatus.SHIPPING]: Truck,
   [OrderStatus.DONE]: PackageCheck,
   [OrderStatus.CANCELED]: PackageX,
+};
+
+export const colorToClassMap: Record<Color, string> = {
+  [Color.BLACK]: "#000",
+  [Color.BLUE]: "#0000FF",
+  [Color.BROWN]: "#8B4513",
+  [Color.GREEN]: "#008000",
+  [Color.GREY]: "#808080",
+  [Color.ORANGE]: "#FFA500",
+  [Color.PINK]: "#FFC0CB",
+  [Color.PURPLE]: "#800080",
+  [Color.RED]: "#FF0000",
+  [Color.WHITE]: "#FFFFFF",
+  [Color.YELLOW]: "#facc15",
 };

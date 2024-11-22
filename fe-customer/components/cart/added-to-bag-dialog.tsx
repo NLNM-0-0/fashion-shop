@@ -8,7 +8,7 @@ import {
 } from "../ui/dialog";
 import { CartItemDetail } from "@/lib/types";
 import CheckCircle from "@/lib/assets/icons/check-circle.svg";
-import { Button, buttonVariants } from "../ui/button";
+import { buttonVariants } from "../ui/button";
 import Link from "next/link";
 import { cn } from "@/lib/utils";
 import AddedItem from "./added-item";
@@ -47,9 +47,15 @@ const AddedToBagDialog = ({ product, open, onOpenChange }: DialogProps) => {
           >
             View Bag
           </Link>
-          <Button type="button" className="rounded-full h-12">
+          <Link
+            href={"/admin/cart/payment"}
+            className={cn(
+              buttonVariants({ variant: "default" }),
+              "rounded-full h-12"
+            )}
+          >
             Checkout
-          </Button>
+          </Link>
         </div>
       </DialogContent>
     </Dialog>
