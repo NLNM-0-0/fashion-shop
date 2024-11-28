@@ -10,7 +10,10 @@ import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 import org.hibernate.validator.constraints.Length;
+import org.springframework.data.annotation.CreatedDate;
+import org.springframework.data.jpa.domain.support.AuditingEntityListener;
 
+import java.util.Date;
 import java.util.List;
 
 @Data
@@ -25,6 +28,7 @@ import java.util.List;
 				name = "Item's name"
 		)}
 )
+@EntityListeners(AuditingEntityListener.class)
 public class Item {
 	@Id @GeneratedValue(strategy = GenerationType.IDENTITY) private Long id;
 
@@ -65,4 +69,12 @@ public class Item {
 
 	@Column(nullable = false)
 	private boolean isDeleted = false;
+
+	@CreatedDate
+	@Column(
+			name = "created_at",
+			nullable = false,
+			updatable = false
+	)
+	private Date createdAt;
 }

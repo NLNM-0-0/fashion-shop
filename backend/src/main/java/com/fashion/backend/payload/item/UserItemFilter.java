@@ -1,10 +1,6 @@
 package com.fashion.backend.payload.item;
 
-import com.fashion.backend.constant.Gender;
-import com.fashion.backend.constant.Message;
-import com.fashion.backend.constant.PriceFilter;
-import com.fashion.backend.constant.Season;
-import com.fashion.backend.payload.CheckedFilter;
+import com.fashion.backend.constant.*;
 import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -35,27 +31,36 @@ public class UserItemFilter {
 	private Long categoryId;
 
 	@Schema(
-			name = "genders"
+			name = "genders",
+			example = "[\"MEN\"]"
 	)
-	private List<CheckedFilter<Gender>> genders;
+	private List<Gender> genders;
 
 	@Schema(
-			name = "seasons"
+			name = "seasons",
+			example = "[\"SPRING\"]"
 	)
-	private List<CheckedFilter<Season>> seasons;
+	private List<Season> seasons;
 
 	@Schema(
-			name = "sizes"
+			name = "price",
+			example = "ALL"
 	)
-	private List<CheckedFilter<ItemSizeDTO>> sizes;
+	private PriceFilter price;
 
 	@Schema(
-			name = "prices"
+			name = "colors",
+			example = "[\"BLACK\"]"
 	)
-	private List<CheckedFilter<PriceFilter>> prices;
+	private List<Color> colors;
 
 	@Schema(
-			name = "colors"
+			name = "sortPrice"
 	)
-	private List<CheckedFilter<ItemColorDTO>> colors;
+	private Boolean sortPrice;
+
+	@Schema(
+			name = "sortNew"
+	)
+	private Boolean sortNew;
 }

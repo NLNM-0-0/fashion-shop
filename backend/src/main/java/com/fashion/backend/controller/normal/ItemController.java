@@ -16,7 +16,10 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.validation.annotation.Validated;
-import org.springframework.web.bind.annotation.*;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RestController;
 
 @RestController
 @RequestMapping("/api/v1/item")
@@ -28,7 +31,7 @@ import org.springframework.web.bind.annotation.*;
 public class ItemController {
 	private final ItemService itemService;
 
-	@PostMapping
+	@GetMapping
 	@SecurityRequirement(
 			name = "Bearer Authentication"
 	)
@@ -42,8 +45,8 @@ public class ItemController {
 	)
 	@PreAuthorize("hasAnyAuthority('USER')")
 	public ResponseEntity<ListResponse<SimpleItemWithLikedStatusResponse, UserItemFilter>> getItems(
-			@Valid @RequestBody AppPageRequest page,
-			@Valid @RequestBody UserItemFilter filter) {
+			@Valid AppPageRequest page,
+			@Valid UserItemFilter filter) {
 		return new ResponseEntity<>(itemService.userGetItems(page, filter), HttpStatus.OK);
 	}
 

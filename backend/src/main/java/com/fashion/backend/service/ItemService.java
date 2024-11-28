@@ -1,9 +1,9 @@
 package com.fashion.backend.service;
 
-import com.fashion.backend.constant.*;
+import com.fashion.backend.constant.ApplicationConst;
+import com.fashion.backend.constant.Color;
+import com.fashion.backend.constant.StockChangeType;
 import com.fashion.backend.entity.*;
-import com.fashion.backend.exception.AppException;
-import com.fashion.backend.payload.CheckedFilter;
 import com.fashion.backend.payload.ListResponse;
 import com.fashion.backend.payload.SimpleResponse;
 import com.fashion.backend.payload.category.CategoryResponse;
@@ -11,19 +11,16 @@ import com.fashion.backend.payload.item.*;
 import com.fashion.backend.payload.page.AppPageRequest;
 import com.fashion.backend.payload.page.AppPageResponse;
 import com.fashion.backend.repository.*;
-import com.fashion.backend.utils.tuple.Pair;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
 import org.springframework.data.jpa.domain.Specification;
-import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.*;
-import java.util.stream.Collectors;
 
 @Service
 @RequiredArgsConstructor
@@ -50,7 +47,7 @@ public class ItemService {
 																						UserItemFilter filter) {
 		Pageable pageable = PageRequest.of(page.getPage() - 1,
 										   page.getLimit(),
-										   Sort.by(Sort.Direction.ASC, "name"));
+										   userGetSort(filter));
 		Specification<Item> spec = userFilterItems(filter);
 
 		Page<Item> itemPage = itemRepository.findAllNotDelete(spec, pageable);
@@ -82,28 +79,31 @@ public class ItemService {
 						   .build();
 	}
 
+	private Sort userGetSort(UserItemFilter filter) {
+		List<Sort.Order> orders = new ArrayList<>();
+
+		if (filter.getSortPrice() != null) {
+			if (filter.getSortPrice()) {
+				orders.add(Sort.Order.asc("unitPrice"));
+			} else {
+				orders.add(Sort.Order.desc("unitPrice"));
+			}
+		}
+
+		if (filter.getSortNew() != null) {
+			if (filter.getSortNew()) {
+				orders.add(Sort.Order.desc("createdAt"));
+			} else {
+				orders.add(Sort.Order.asc("createdAt"));
+			}
+		}
+
+		orders.add(Sort.Order.asc("name"));
+
+		return Sort.by(orders);
+	}
+
 	private Specification<Item> userFilterItems(UserItemFilter filter) {
-		Pair<Boolean, List<CheckedFilter<Season>>> filteredSeasonsPair = getFilteredSeason(filter.getSeasons());
-		Boolean isNeedToFilterSeason = filteredSeasonsPair.first();
-		List<CheckedFilter<Season>> filterSeasons = filteredSeasonsPair.second();
-
-		List<Item> items = itemRepository.findAllNotDelete();
-		Pair<Boolean, List<CheckedFilter<ItemSizeDTO>>> filterSizesPair = getFilteredSizes(items, filter.getSizes());
-		Boolean isNeedToFilterSize = filterSizesPair.first();
-		List<CheckedFilter<ItemSizeDTO>> filterSizes = filterSizesPair.second();
-
-		Pair<Boolean, List<CheckedFilter<Gender>>> filterGendersPair = getFilteredGender(filter.getGenders());
-		Boolean isNeedToFilterGender = filterGendersPair.first();
-		List<CheckedFilter<Gender>> filterGenders = filterGendersPair.second();
-
-		Pair<Boolean, List<CheckedFilter<ItemColorDTO>>> filterColorsPair = getFilteredColors(filter.getColors());
-		Boolean isNeedToFilterColor = filterColorsPair.first();
-		List<CheckedFilter<ItemColorDTO>> filterColors = filterColorsPair.second();
-
-		Pair<Boolean, List<CheckedFilter<PriceFilter>>> filterPricesPair = getFilteredPrice(filter.getPrices());
-		Boolean isNeedToFilterPrice = filterPricesPair.first();
-		List<CheckedFilter<PriceFilter>> filterPrices = filterPricesPair.second();
-
 		Specification<Item> spec = Specification.where(null);
 		if (filter.getCategoryId() != null) {
 			spec = spec.and(ItemSpecs.hasCategoryId(filter.getCategoryId()));
@@ -111,172 +111,49 @@ public class ItemService {
 		if (filter.getName() != null) {
 			spec = spec.and(ItemSpecs.hasName(filter.getName()));
 		}
-		if (filter.getSeasons() != null && isNeedToFilterSeason) {
-			spec = spec.and(ItemSpecs.hasSeason(filterSeasons));
+		if (filter.getSeasons() != null) {
+			spec = spec.and(ItemSpecs.hasSeason(filter.getSeasons()));
 		}
-		if (filter.getSizes() != null && isNeedToFilterSize) {
-			spec = spec.and(ItemSpecs.hasSize(filterSizes));
+		if (filter.getGenders() != null) {
+			spec = spec.and(ItemSpecs.hasGender(filter.getGenders()));
 		}
-		if (filter.getGenders() != null && isNeedToFilterGender) {
-			spec = spec.and(ItemSpecs.hasGender(filterGenders));
+		if (filter.getColors() != null) {
+			spec = spec.and(ItemSpecs.hasColor(filter.getColors()));
 		}
-		if (filter.getColors() != null && isNeedToFilterColor) {
-			spec = spec.and(ItemSpecs.hasColor(filterColors));
-		}
-		if (filter.getPrices() != null && isNeedToFilterPrice) {
+		if (filter.getPrice() != null) {
 			Integer minValue = null, maxValue = null;
-			for (CheckedFilter<PriceFilter> price : filterPrices) {
-				if (!price.isChecked()) {
-					continue;
-				}
-				switch (price.getData()) {
-					case BELOW199:
-						maxValue = 199000;
-						break;
-					case FROM199TO299:
-						minValue = 199000;
-						maxValue = 299000;
-						break;
-					case FROM299TO399:
-						minValue = 299000;
-						maxValue = 399000;
-						break;
-					case FROM399TO499:
-						minValue = 399000;
-						maxValue = 499000;
-						break;
-					case FROM499TO799:
-						minValue = 499000;
-						maxValue = 799000;
-						break;
-					case FROM799TO999:
-						minValue = 799000;
-						maxValue = 999000;
-						break;
-					case ABOVE999:
-						minValue = 999000;
-						break;
-				}
-				break;
+			switch (filter.getPrice()) {
+				case BELOW199:
+					maxValue = 199000;
+					break;
+				case FROM199TO299:
+					minValue = 199000;
+					maxValue = 299000;
+					break;
+				case FROM299TO399:
+					minValue = 299000;
+					maxValue = 399000;
+					break;
+				case FROM399TO499:
+					minValue = 399000;
+					maxValue = 499000;
+					break;
+				case FROM499TO799:
+					minValue = 499000;
+					maxValue = 799000;
+					break;
+				case FROM799TO999:
+					minValue = 799000;
+					maxValue = 999000;
+					break;
+				case ABOVE999:
+					minValue = 999000;
+					break;
 			}
 			spec = spec.and(ItemSpecs.hasPrice(minValue, maxValue));
 		}
 
-		filter.setSizes(filterSizes);
-		filter.setColors(filterColors);
-		filter.setGenders(filterGenders);
-		filter.setSeasons(filterSeasons);
-		filter.setPrices(filterPrices);
-
 		return spec;
-	}
-
-	private Pair<Boolean, List<CheckedFilter<ItemSizeDTO>>> getFilteredSizes(List<Item> items,
-																			 List<CheckedFilter<ItemSizeDTO>> filter) {
-		List<ItemSizeDTO> itemSizes = items.stream()
-										   .flatMap(item -> itemQuantityRepository.findAllByItemId(item.getId())
-																				  .stream())
-										   .map(this::mapToSizeDTO)
-										   .distinct()
-										   .toList();
-
-		Set<String> definedSizes = filter.stream()
-										 .filter(CheckedFilter::isChecked)
-										 .map(size -> size.getData().getName())
-										 .collect(Collectors.toSet());
-
-		return new Pair<>(!definedSizes.isEmpty(), itemSizes.stream()
-															.map(itemSize -> CheckedFilter.<ItemSizeDTO>builder()
-																						  .data(itemSize)
-																						  .checked(definedSizes.contains(
-																								  itemSize.getName()))
-																						  .build())
-															.toList());
-	}
-
-	private Pair<Boolean, List<CheckedFilter<ItemColorDTO>>> getFilteredColors(List<CheckedFilter<ItemColorDTO>> filter) {
-		List<ItemColorDTO> colors = new ArrayList<>(List.of(Color.values()))
-				.stream()
-				.map(color -> ItemColorDTO.builder()
-										  .name(color.name())
-										  .hex(color.getHexValue())
-										  .build())
-				.toList();
-
-		Set<String> definedColors = filter.stream()
-										  .filter(CheckedFilter::isChecked)
-										  .map(color -> color.getData().getName())
-										  .collect(Collectors.toSet());
-
-		return new Pair<>(!definedColors.isEmpty(), colors.stream()
-														  .map(color -> CheckedFilter.<ItemColorDTO>builder()
-																					 .data(color)
-																					 .checked(definedColors.contains(
-																							 color.getName()))
-																					 .build())
-														  .toList());
-	}
-
-	private Pair<Boolean, List<CheckedFilter<Season>>> getFilteredSeason(List<CheckedFilter<Season>> filter) {
-		if (filter == null) {
-		    return new Pair<>(false, new ArrayList<>());
-		}
-
-		List<Season> seasons = new ArrayList<>(List.of(Season.values()));
-
-		Set<String> definedSeasons = filter.stream()
-										   .filter(CheckedFilter::isChecked)
-										   .map(season -> season.getData().name())
-										   .collect(Collectors.toSet());
-
-		return new Pair<>(!definedSeasons.isEmpty(), seasons.stream()
-															.map(season -> CheckedFilter.<Season>builder()
-																						.data(season)
-																						.checked(definedSeasons.contains(
-																								season.name()))
-																						.build())
-															.toList());
-	}
-
-	private Pair<Boolean, List<CheckedFilter<Gender>>> getFilteredGender(List<CheckedFilter<Gender>> filter) {
-		List<Gender> genders = new ArrayList<>(List.of(Gender.values()));
-
-		Set<String> definedGenders = filter.stream()
-										   .filter(CheckedFilter::isChecked)
-										   .map(gender -> gender.getData().name())
-										   .collect(Collectors.toSet());
-
-		return new Pair<>(!definedGenders.isEmpty(), genders.stream()
-															.map(gender -> CheckedFilter.<Gender>builder()
-																						.data(gender)
-																						.checked(definedGenders.contains(
-																								gender.name()))
-																						.build())
-															.toList());
-	}
-
-	private Pair<Boolean, List<CheckedFilter<PriceFilter>>> getFilteredPrice(List<CheckedFilter<PriceFilter>> filter) {
-		List<PriceFilter> prices = new ArrayList<>(List.of(PriceFilter.values()));
-
-		Set<String> definedPrices = filter.stream()
-										  .filter(CheckedFilter::isChecked)
-										  .map(price -> price.getData().name())
-										  .collect(Collectors.toSet());
-
-		if (definedPrices.size() > 2) {
-			throw new AppException(HttpStatus.BAD_REQUEST, Message.Item.CAN_NOT_FILTER_2_TYPE_PRICE_FILTER);
-		}
-		if (definedPrices.isEmpty()) {
-			definedPrices.add(PriceFilter.ALL.name());
-		}
-
-		return new Pair<>(true, prices.stream()
-									  .map(price -> CheckedFilter.<PriceFilter>builder()
-																 .data(price)
-																 .checked(definedPrices.contains(
-																		 price.name()))
-																 .build())
-									  .toList());
 	}
 
 	@Transactional
