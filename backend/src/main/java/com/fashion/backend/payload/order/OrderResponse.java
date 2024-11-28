@@ -7,7 +7,6 @@ import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.Builder;
 import lombok.Data;
 
-import java.util.Date;
 import java.util.List;
 
 @Data
@@ -37,7 +36,10 @@ public class OrderResponse {
 	@Schema(name = "staff")
 	private SimpleStaffResponse staff;
 
-	@Schema(name = "createdAt", example = "")
+	@Schema(
+			name = "createdAt",
+			example = ""
+	)
 	private String createdAt;
 
 	@Schema(name = "confirmedAt")
