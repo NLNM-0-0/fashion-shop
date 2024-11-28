@@ -67,7 +67,7 @@ public class ItemWithLikedStatusResponse {
 	private List<String> images;
 
 	@Schema(
-			name = "isLiked",
+			name = "liked",
 			example = "true"
 	)
 	private Boolean liked;

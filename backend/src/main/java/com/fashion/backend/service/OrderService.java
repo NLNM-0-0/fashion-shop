@@ -248,7 +248,7 @@ public class OrderService {
 		List<Cart> carts = cartRepository.findAllById(cartIds);
 
 		if (cartIds.size() != carts.size()) {
-		    throw new AppException(HttpStatus.BAD_REQUEST, Message.Order.ORDER_CAN_NOT_HAVE_NOT_EXISTED_CART_ITEM);
+			throw new AppException(HttpStatus.BAD_REQUEST, Message.Order.ORDER_CAN_NOT_HAVE_NOT_EXISTED_CART_ITEM);
 		}
 
 		int totalPrice = 0;
@@ -336,6 +336,9 @@ public class OrderService {
 		return OrderResponse.builder()
 							.id(order.getId())
 							.customer(mapToDTOCustomer(order.getCustomer()))
+							.phone(order.getPhone())
+							.name(order.getName())
+							.address(order.getAddress())
 							.staff(mapToDTOStaff(order.getStaff()))
 							.totalPrice(order.getTotalPrice())
 							.totalQuantity(order.getTotalQuantity())
@@ -375,7 +378,7 @@ public class OrderService {
 								  .build();
 	}
 
-		private OrderDetailResponse mapToDTO(OrderDetail detail) {
+	private OrderDetailResponse mapToDTO(OrderDetail detail) {
 		return OrderDetailResponse.builder()
 								  .item(mapToDTO(detail.getItem()))
 								  .color(detail.getColor())

@@ -19,6 +19,15 @@ public class OrderResponse {
 	@Schema(name = "customer")
 	private SimpleCustomerResponse customer;
 
+	@Schema(name = "name")
+	private String name;
+
+	@Schema(name = "phone")
+	private String phone;
+
+	@Schema(name = "address")
+	private String address;
+
 	@Schema(name = "totalPrice")
 	private int totalPrice;
 
