@@ -38,7 +38,7 @@ public class SimpleItemWithLikedStatusResponse {
 	private boolean isDeleted;
 
 	@Schema(
-			name = "isLiked",
+			name = "liked",
 			example = "true"
 	)
 	private Boolean liked;

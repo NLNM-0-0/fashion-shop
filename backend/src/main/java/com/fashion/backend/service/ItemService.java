@@ -48,8 +48,6 @@ public class ItemService {
 	@Transactional
 	public ListResponse<SimpleItemWithLikedStatusResponse, UserItemFilter> userGetItems(AppPageRequest page,
 																						UserItemFilter filter) {
-
-
 		Pageable pageable = PageRequest.of(page.getPage() - 1,
 										   page.getLimit(),
 										   Sort.by(Sort.Direction.ASC, "name"));
@@ -220,6 +218,10 @@ public class ItemService {
 	}
 
 	private Pair<Boolean, List<CheckedFilter<Season>>> getFilteredSeason(List<CheckedFilter<Season>> filter) {
+		if (filter == null) {
+		    return new Pair<>(false, new ArrayList<>());
+		}
+
 		List<Season> seasons = new ArrayList<>(List.of(Season.values()));
 
 		Set<String> definedSeasons = filter.stream()
