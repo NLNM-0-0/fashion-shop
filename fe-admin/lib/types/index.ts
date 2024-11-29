@@ -259,6 +259,9 @@ export interface Order {
   shippingAt: string | null;
   doneAt: string | null;
   canceledAt: string | null;
+  name: string;
+  phone: string;
+  address: string;
 }
 
 export interface Category {

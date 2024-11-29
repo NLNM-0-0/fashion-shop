@@ -35,7 +35,7 @@ const OrderItem = ({ order }: OrderItemProps) => {
       {order.details.map((detail, index) => (
         <OrderDetailItem key={`order-detail-${index}`} detail={detail} />
       ))}
-      <span className="text-lg font-medium self-end">
+      <span className="text-lg font-medium self-end py-2">
         Total ({order.totalQuantity} item{order.totalQuantity > 1 ? "s" : ""}):{" "}
         {toVND(order.totalPrice)}
       </span>
