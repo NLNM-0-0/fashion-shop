@@ -63,7 +63,11 @@ const OrderContent = ({ orderId }: { orderId: string }) => {
     return (
       <div className="flex flex-col gap-6 pb-10">
         <div className="flex justify-between">
-          <span className="text-xl">Order ID: {order.id}</span>
+          <div className="md:text-xl md:flex-row flex-col text-base flex gap-2">
+            <span>Order ID: {order.id}</span>
+            <span className="md:block hidden">|</span>
+            <span>Order date: {order.createdAt}</span>
+          </div>
           <OrderStatusView status={order.orderStatus} />
         </div>
         <Separator />

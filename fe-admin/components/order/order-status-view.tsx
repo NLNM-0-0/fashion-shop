@@ -6,7 +6,7 @@ const OrderStatusView = ({ status }: { status: OrderStatus }) => {
   return (
     <div
       className={cn(
-        "rounded-xl px-3 py-1.5 text-sm font-medium text-white tracking-wide"
+        "rounded-xl px-3 py-1.5 text-sm font-medium text-white tracking-wide self-start"
       )}
       style={{ background: orderStatusColors[status] }}
     >

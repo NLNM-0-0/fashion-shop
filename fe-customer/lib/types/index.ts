@@ -135,7 +135,7 @@ export interface NotiFilterParam extends PagingParam {
 }
 export interface FormFilterItem {
   type: string;
-  value: string;
+  value: string | string[];
 }
 
 export interface FormFilterType {
@@ -221,6 +221,13 @@ export interface Order {
   updatedAt: string;
   orderStatus: OrderStatus;
   details: OrderDetail[];
+  confirmedAt: string | null;
+  shippingAt: string | null;
+  doneAt: string | null;
+  canceledAt: string | null;
+  name: string;
+  phone: string;
+  address: string;
 }
 
 export interface OrderDetail {
@@ -228,6 +235,8 @@ export interface OrderDetail {
   quantity: number;
   unitPrice: number;
   totalSubPrice: number;
+  color: string;
+  size: string;
 }
 
 export interface AddToCartPayload {
