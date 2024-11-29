@@ -1,5 +1,5 @@
 "use client";
-import React, { useState } from "react";
+import React from "react";
 import { z } from "zod";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { Controller, useForm } from "react-hook-form";
@@ -34,29 +34,22 @@ const VerifyOTPForm = () => {
     register,
     handleSubmit,
     getValues,
-    watch,
     formState: { errors, isDirty, isValid },
   } = useForm<z.infer<typeof VerifyOTPScheme>>({
     resolver: zodResolver(VerifyOTPScheme),
     mode: "onChange",
+    defaultValues: { phone: "", otp: "" },
   });
-  const { remainingTime, startCountdown, stopCountdown } = useCountDown();
-
-  const [verified, setVerified] = useState(false);
-  const phoneValue = watch("phone");
-  const isPhoneValid = phoneRegex.test(phoneValue || "");
+  const { remainingTime, startCountdown, wasOptSend } = useCountDown();
 
   const handleSendOtp = async () => {
     sendOTP({ phone: getValues().phone })
       .then((res) => {
         if (res.data.data) {
-          setVerified(true);
           startCountdown();
         }
       })
       .catch((err: AxiosError<ApiError>) => {
-        setVerified(false);
-        stopCountdown();
         toast({
           variant: "destructive",
           title: "Error",
@@ -73,8 +66,6 @@ const VerifyOTPForm = () => {
         }
       })
       .catch((err: AxiosError<ApiError>) => {
-        setVerified(false);
-        stopCountdown();
         toast({
           variant: "destructive",
           title: "Error",
@@ -95,12 +86,16 @@ const VerifyOTPForm = () => {
               format(addSeconds(new Date(0), remainingTime), "mm:ss")}
           </span>
           <div className="relative flex-1">
-            <Input placeholder="Phone number" {...register("phone")} />
+            <Input
+              placeholder="Phone number"
+              {...register("phone")}
+              readOnly={wasOptSend}
+            />
             {errors.phone && (
               <span className="error___message">{errors.phone.message}</span>
             )}
             <Button
-              disabled={!isPhoneValid || verified}
+              disabled={!isDirty || !!errors.phone || wasOptSend}
               type="button"
               variant={"outline"}
               className="absolute top-1 right-1 h-8 px-2"
@@ -116,7 +111,7 @@ const VerifyOTPForm = () => {
             name="otp"
             render={({ field }) => (
               <InputOTP
-                disabled={!verified}
+                disabled={!wasOptSend}
                 maxLength={6}
                 onChange={(value) => field.onChange(value)}
               >
@@ -138,7 +133,7 @@ const VerifyOTPForm = () => {
         <Button
           type="submit"
           className="w-full"
-          disabled={!isDirty || !isValid}
+          disabled={!isDirty || !isValid || !wasOptSend}
         >
           Verify
         </Button>
