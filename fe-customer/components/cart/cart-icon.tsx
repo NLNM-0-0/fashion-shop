@@ -17,9 +17,11 @@ const CartButton = () => {
       )}
     >
       <Image src={Cart.src} alt="cart" height={20} width={20} />
-      <span className="absolute top-2.5 text-[10px]">
-        {data?.data.number ?? 0}
-      </span>
+      {data && data.data.number > 0 && (
+        <span className="absolute top-2.5 text-[10px]">
+          {data?.data.number ?? 0}
+        </span>
+      )}
     </Link>
   );
 };

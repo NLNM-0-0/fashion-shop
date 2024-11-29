@@ -1,35 +1,7 @@
 import { FormFilterType, OrderStatusValue } from "../types";
-import { Color, FilterInputType, OrderStatus } from "./enum";
+import { Color, FilterInputType, OrderStatus, Price } from "./enum";
 import { LucideIcon } from "lucide-react";
 import { Menu, PackageCheck, PackageX, Truck, Receipt } from "lucide-react";
-
-export const customerFilterValues: FormFilterType[] = [
-  { type: "name", title: "Name", inputType: FilterInputType.TEXT },
-  { type: "email", title: "Email", inputType: FilterInputType.TEXT },
-  { type: "phone", title: "Phone", inputType: FilterInputType.TEXT },
-];
-
-export const staffFilterValues: FormFilterType[] = [
-  { type: "name", title: "Name", inputType: FilterInputType.TEXT },
-  { type: "email", title: "Email", inputType: FilterInputType.TEXT },
-  {
-    type: "male",
-    title: "Gender",
-    inputType: FilterInputType.BOOLEAN,
-    trueTitle: "Male",
-    falseTitle: "Female",
-  },
-  {
-    type: "monthDOB",
-    title: "Month of birth",
-    inputType: FilterInputType.MONTH,
-  },
-  {
-    type: "yearDOB",
-    title: "Year of birth",
-    inputType: FilterInputType.YEAR,
-  },
-];
 
 export const notiFilterValues: FormFilterType[] = [
   { type: "sender", title: "Sender Name", inputType: FilterInputType.TEXT },
@@ -70,11 +42,11 @@ export const orderStatusValues: OrderStatusValue[] = [
 ];
 
 export const orderStatusColors: Record<OrderStatus, string> = {
-  [OrderStatus.PENDING]: "bg-orange-400",
-  [OrderStatus.CONFIRMED]: "bg-cyan-600",
-  [OrderStatus.SHIPPING]: "bg-green-700",
-  [OrderStatus.DONE]: "bg-sky-600",
-  [OrderStatus.CANCELED]: "bg-red-700",
+  [OrderStatus.PENDING]: "#fb923c",
+  [OrderStatus.CONFIRMED]: "#0891b2",
+  [OrderStatus.SHIPPING]: "#15803d",
+  [OrderStatus.DONE]: "#0284c7",
+  [OrderStatus.CANCELED]: "#b91c1c",
 };
 
 export const orderStatusTitle: Record<OrderStatus, string> = {
@@ -105,4 +77,16 @@ export const colorToClassMap: Record<Color, string> = {
   [Color.RED]: "#FF0000",
   [Color.WHITE]: "#FFFFFF",
   [Color.YELLOW]: "#facc15",
+  [Color.MULTI_COLOR]: "",
+};
+
+export const priceToTitle: Record<Price, string> = {
+  [Price.ALL]: "All",
+  [Price.BELOW199]: "< 199K",
+  [Price.FROM199TO299]: "199K - 299K",
+  [Price.FROM299TO399]: "299K - 399K",
+  [Price.FROM399TO499]: "399K - 499K",
+  [Price.FROM499TO799]: "499K - 799K",
+  [Price.FROM799TO999]: "799K - 999K",
+  [Price.ABOVE999]: "> 999K",
 };

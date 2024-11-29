@@ -1,6 +1,6 @@
 "use client";
 
-import { useCartList } from "@/hooks/cart/useCartList";
+import { CART_KEY, useCartList } from "@/hooks/cart/useCartList";
 import PaymentItem from "./payment-item";
 import { toVND } from "@/lib/utils";
 import { Input } from "../ui/input";
@@ -12,7 +12,7 @@ import {
   AccordionItem,
   AccordionTrigger,
 } from "../ui/accordion";
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { z } from "zod";
 import { phoneRegex, required } from "@/lib/helpers/zod";
 import { SubmitHandler, useForm } from "react-hook-form";
@@ -22,6 +22,9 @@ import { AxiosError } from "axios";
 import { ApiError } from "@/lib/types";
 import { toast } from "@/hooks/use-toast";
 import PaymentSkeleton from "./payment-skeleton";
+import { useAuth } from "../auth/auth-context";
+import { useSWRConfig } from "swr";
+import { useRouter } from "next/navigation";
 
 const PaymentScheme = z.object({
   name: required,
@@ -30,7 +33,13 @@ const PaymentScheme = z.object({
 });
 
 const PaymentLayout = () => {
+  const { mutate } = useSWRConfig();
+  const router = useRouter();
+  const { user, isLoading: isUserLoading } = useAuth();
   const { data, isLoading, error } = useCartList();
+
+  const isInitialSet = useRef<boolean>(false);
+
   const cartItems = data?.data.data;
   const totalValue = cartItems?.reduce(
     (total, item) => {
@@ -47,7 +56,8 @@ const PaymentLayout = () => {
   const {
     register,
     handleSubmit,
-    formState: { errors, isDirty },
+    reset,
+    formState: { errors },
   } = useForm<z.infer<typeof PaymentScheme>>({
     resolver: zodResolver(PaymentScheme),
     defaultValues: {
@@ -65,6 +75,8 @@ const PaymentLayout = () => {
       cardIds: cartItems ? cartItems?.map((item) => item.id) : [],
     })
       .then(() => {
+        mutate(CART_KEY);
+        router.push("/fa/order");
         toast({
           variant: "success",
           title: "Success",
@@ -79,6 +91,13 @@ const PaymentLayout = () => {
         });
       });
   };
+
+  useEffect(() => {
+    if (!isUserLoading && user && !isInitialSet.current) {
+      reset({ name: user?.name, phone: user?.phone, address: user?.address });
+      isInitialSet.current = true;
+    }
+  });
 
   useEffect(() => {
     const mediaQuery = window.matchMedia("(min-width: 1024px)");
@@ -138,7 +157,7 @@ const PaymentLayout = () => {
         />
         <Button
           className="h-12 rounded-full mt-16"
-          disabled={!isDirty || !cartItems || cartItems.length < 1}
+          disabled={!cartItems || cartItems.length < 1}
         >
           Place order
         </Button>

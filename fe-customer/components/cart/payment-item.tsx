@@ -19,8 +19,8 @@ const PaymentItem = ({ product }: { product: CartItem }) => {
         <span className="text-base text-fs-gray-darker">
           Qty: {product.quantity}
         </span>
-        <span className="text-base text-fs-gray-darker">
-          Color: {product.color}
+        <span className="text-base text-fs-gray-darker capitalize">
+          Color: {product.color.toLowerCase()}
         </span>
         <span className="text-base text-fs-gray-darker">
           Size: {product.size}

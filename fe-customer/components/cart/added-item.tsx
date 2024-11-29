@@ -12,7 +12,9 @@ const AddedItem = ({ product }: { product: AddedItemProps }) => {
       />
       <div>
         <p className="font-medium">{product.item.name}</p>
-        <p className="text-fs-gray-darker">Color: {product.color}</p>
+        <p className="text-fs-gray-darker capitalize">
+          Color: {product.color.toLowerCase()}
+        </p>
         <p className="text-fs-gray-darker">Size: {product.size}</p>
         <p className="font-medium">{toVND(product.item.unitPrice)}</p>
       </div>
