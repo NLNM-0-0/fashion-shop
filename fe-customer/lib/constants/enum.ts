@@ -55,3 +55,10 @@ export enum Price {
   FROM799TO999 = "FROM799TO999",
   ABOVE999 = "ABOVE999",
 }
+
+export enum SortType {
+  Newest = "Newest",
+  Oldest = "Oldest",
+  PriceHighLow = "Price: High-Low",
+  PriceLowHigh = "Price: Low-High",
+}

@@ -5,7 +5,7 @@ import "@/lib/styles/globals.css";
 
 const NotFoundPage = () => {
   return (
-    <div className="flex flex-col items-center mt-[15vh] gap-16 w-full">
+    <div className="flex flex-col items-center mt-[15vh] gap-16 w-full text-center">
       <Player
         autoplay
         loop
@@ -13,7 +13,7 @@ const NotFoundPage = () => {
         style={{ width: "80%" }}
       />
       <h1 className="text-3xl lg:text-4xl font-bold">
-        Oops! Page not found
+        Sorry, we couldn&apos;t find the page you&apos;re looking for.
       </h1>
     </div>
   );

@@ -5,6 +5,7 @@ import SWRProvider from "@/components/auth/swr-provider";
 import { AuthProvider } from "@/components/auth/auth-context";
 import { LoadingSpinner } from "@/components/loading-spinner";
 import Header from "@/components/header";
+import { ProductFilterProvider } from "@/components/product/product-filter-context";
 
 export const metadata: Metadata = {
   title: "Fashop",
@@ -27,12 +28,16 @@ export default function PrivateLayout({
       <LoadingSpinner />
       <main className="flex flex-1 h-screen">
         <div className="flex w-full flex-col overflow-y-hidden">
-          <SWRProvider>
-            <AuthProvider>
-              <Header />
-            </AuthProvider>
-          </SWRProvider>
-          <div className="md:p-10 p-6 overflow-auto">{children}</div>
+          <ProductFilterProvider>
+            <>
+              <SWRProvider>
+                <AuthProvider>
+                  <Header />
+                </AuthProvider>
+              </SWRProvider>
+              <div className="md:p-10 p-6 overflow-auto">{children}</div>
+            </>
+          </ProductFilterProvider>
           <Toaster />
         </div>
       </main>

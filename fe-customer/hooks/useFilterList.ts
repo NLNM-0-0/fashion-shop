@@ -1,28 +1,40 @@
-import { useSearchParams } from "next/navigation";
+import encodeParams from "@/lib/helpers/params";
+import { useRouter, useSearchParams } from "next/navigation";
 import { useCallback, useEffect, useState, useRef, useMemo } from "react";
 
 export interface FilterParams {
-  [key: string]: string;
+  [key: string]: string | string[] | null;
 }
 
 export const useFilteredList = () => {
+  const router = useRouter();
   const searchParams = useSearchParams();
   const [filters, setFilters] = useState<FilterParams>({});
   const filtersReady = useRef(false);
 
-  const updateFilter = (filterName: string, value: string) => {
+  const updateFilter = (filterName: string, value: string | string[]) => {
     setFilters((prev) => ({ ...prev, [filterName]: value }));
   };
 
   const resetFilters = useCallback(() => {
     const initialFilters: FilterParams = {};
     searchParams.forEach((value: string, key: string) => {
-      initialFilters[key] = value;
+      const existingValue = initialFilters[key];
+      if (existingValue) {
+        if (Array.isArray(existingValue)) {
+          existingValue.push(value);
+        } else {
+          initialFilters[key] = [existingValue, value];
+        }
+      } else {
+        initialFilters[key] = value;
+      }
     });
-
-    setFilters(initialFilters);
+    if (JSON.stringify(filters) !== JSON.stringify(initialFilters)) {
+      setFilters(initialFilters);
+    }
     filtersReady.current = true;
-  }, [searchParams]);
+  }, [searchParams, filters]);
 
   const removeFilter = (filterName: string) => {
     setFilters((prev) => {
@@ -39,6 +51,13 @@ export const useFilteredList = () => {
     }));
   };
 
+  const updateFilterUrl = (newFilters: FilterParams) => {
+    const params = {
+      ...filters,
+      ...newFilters,
+    };
+    router.push(`/fa/products?${encodeParams(params)}`);
+  };
   useEffect(() => {
     resetFilters();
   }, [resetFilters]);
@@ -46,6 +65,7 @@ export const useFilteredList = () => {
   return {
     filters: useMemo(() => filters, [filters]),
     updateFilter,
+    updateFilterUrl,
     updateFilters,
     resetFilters,
     removeFilter,

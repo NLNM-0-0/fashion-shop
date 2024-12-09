@@ -45,7 +45,7 @@ const NotificationList = () => {
     const updatedParams = new URLSearchParams();
     data.filters.forEach(({ type, value }) => {
       if (value) {
-        updatedParams.set(type, value);
+        updatedParams.set(type, value.toString());
       } else {
         updatedParams.delete(type);
       }

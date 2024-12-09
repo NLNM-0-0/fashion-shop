@@ -154,7 +154,9 @@ const FilterPopover = ({
                       control={control}
                       name={`filters.${index}.value`}
                       render={({ field }) => {
-                        const dateObject = stringNumberToDate(field.value);
+                        const dateObject = stringNumberToDate(
+                          field.value.toString()
+                        );
                         return (
                           <DaypickerPopup
                             triggerClassname="flex-1 w-full"
