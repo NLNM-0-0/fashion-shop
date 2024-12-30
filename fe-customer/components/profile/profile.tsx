@@ -26,6 +26,7 @@ import { GoBell, GoPerson } from "react-icons/go";
 import { useRouter } from "next/navigation";
 import { useUnseenNumber } from "@/hooks/useUnseenNumber";
 import { CgMenuBoxed } from "react-icons/cg";
+import { LogIn } from "lucide-react";
 
 const PasswordSchema = z
   .object({
@@ -102,155 +103,175 @@ const Profile = () => {
 
   return (
     <div>
-      <Popover open={open} onOpenChange={setOpen}>
-        <PopoverTrigger asChild>
-          <div className="flex items-center">
-            <div className="relative">
-              <Avatar className="cursor-pointer rounded-full border overflow-clip">
-                <AvatarImage src={avatar} alt="avatar" />
-                <AvatarFallback>{user?.name.substring(0, 2)}</AvatarFallback>
-              </Avatar>
-              {unseenNoti && unseenNoti.data.number > 0 && (
-                <div className="absolute top-[1px] right-[2px] rounded-full bg-sky-600 h-2.5 w-2.5" />
-              )}
-            </div>
-          </div>
-        </PopoverTrigger>
-        <PopoverContent className="w-48 mx-4 flex flex-col gap-2 p-0 py-2">
-          <div className="flex flex-col px-4 pt-2">
-            <h1 className="text-lg font-semibold">{user?.name}</h1>
-          </div>
-          <Button
-            variant={"ghost"}
-            className="rounded-none w-full justify-start"
-            onClick={() => {
-              router.push("/fa/profile");
-              setOpen(false);
-            }}
-          >
-            <div className="flex gap-2 items-center text-primary">
-              <GoPerson className="w-6 h-6" />
-              My Profile
-            </div>
-          </Button>
-          <Button
-            variant={"ghost"}
-            className="rounded-none w-full justify-start"
-            onClick={() => {
-              router.push("/fa/order");
-              setOpen(false);
-            }}
-          >
-            <div className="flex gap-2 items-center text-primary">
-              <CgMenuBoxed className="w-6 h-6" />
-              My Order
-            </div>
-          </Button>
-          <Button
-            variant={"ghost"}
-            className="rounded-none w-full justify-start"
-            onClick={() => {
-              router.push("/fa/notifications");
-              setOpen(false);
-            }}
-          >
-            <div className="flex gap-2 items-center text-primary">
+      {user ? (
+        <Popover open={open} onOpenChange={setOpen}>
+          <PopoverTrigger asChild>
+            <div className="flex items-center">
               <div className="relative">
-                <GoBell className="w-6 h-6" />
-                {unseenNoti && unseenNoti.data.number != 0 && (
-                  <div className="absolute top-[-8px] right-[-4px] rounded-full bg-sky-600 h-4 w-4 flex leading-3 justify-center items-center text-xs font-medium text-accent">
-                    {unseenNoti.data.number}
-                  </div>
+                <Avatar className="cursor-pointer rounded-full border overflow-clip">
+                  <AvatarImage src={avatar} alt="avatar" />
+                  <AvatarFallback>{user?.name.substring(0, 2)}</AvatarFallback>
+                </Avatar>
+                {unseenNoti && unseenNoti.data.number > 0 && (
+                  <div className="absolute top-[1px] right-[2px] rounded-full bg-sky-600 h-2.5 w-2.5" />
                 )}
               </div>
-              Notifications
             </div>
-          </Button>
-
-          <Dialog open={openPass} onOpenChange={onOpenPass}>
-            <DialogTrigger asChild>
-              <Button variant={"ghost"} className="rounded-none justify-start">
-                <div className="flex gap-2 items-center">
-                  <MdOutlineLock className="h-6 w-6" />
-                  Change Password
-                </div>
-              </Button>
-            </DialogTrigger>
-            <DialogContent className="max-w-[472px] p-0 bg-white">
-              <DialogHeader>
-                <DialogTitle className="p-6 pb-0">Change Password</DialogTitle>
-              </DialogHeader>
-              <form onSubmit={handleSubmitPass(onSubmitPass)}>
-                <div className="p-6 flex flex-col gap-4 border-y-[1px]">
-                  <div>
-                    <Input
-                      placeholder="Current password"
-                      type="password"
-                      id="pass"
-                      {...registerPass("oldPassword")}
-                    ></Input>
-                    {errorPass.oldPassword && (
-                      <span className="error___message">
-                        {errorPass.oldPassword.message}
-                      </span>
-                    )}
-                  </div>
-                  <div>
-                    <Input
-                      type="password"
-                      placeholder="New password"
-                      id="new"
-                      {...registerPass("newPassword")}
-                    ></Input>
-                    {errorPass.newPassword && (
-                      <span className="error___message">
-                        {errorPass.newPassword.message}
-                      </span>
-                    )}
-                  </div>
-                  <div>
-                    <Input
-                      type="password"
-                      placeholder="Confirm new password"
-                      id="confirm"
-                      {...registerPass("confirmNewPass")}
-                    ></Input>
-                    {errorPass.confirmNewPass && (
-                      <span className="error___message">
-                        {errorPass.confirmNewPass.message}
-                      </span>
-                    )}
-                  </div>
-                </div>
-                <div className="p-4 flex-1 flex justify-end">
-                  <div className="flex gap-4">
-                    <Button
-                      type="button"
-                      variant={"outline"}
-                      onClick={() => setOpenPass(false)}
-                    >
-                      Cancel
-                    </Button>
-
-                    <Button>Confirm</Button>
-                  </div>
-                </div>
-              </form>
-            </DialogContent>
-          </Dialog>
-          <form action={logout} className="w-full">
+          </PopoverTrigger>
+          <PopoverContent className="w-48 mx-4 flex flex-col gap-2 p-0 py-2">
+            <div className="flex flex-col px-4 pt-2">
+              <h1 className="text-lg font-semibold">{user?.name}</h1>
+            </div>
             <Button
               variant={"ghost"}
               className="rounded-none w-full justify-start"
+              onClick={() => {
+                router.push("/fa/profile");
+                setOpen(false);
+              }}
             >
-              <div className="flex items-center gap-2 text-primary">
-                <LuLogOut className="h-6 w-6" />
-                Log out
+              <div className="flex gap-2 items-center text-primary">
+                <GoPerson className="w-6 h-6" />
+                My Profile
               </div>
             </Button>
-          </form>
-        </PopoverContent>
-      </Popover>
+            <Button
+              variant={"ghost"}
+              className="rounded-none w-full justify-start"
+              onClick={() => {
+                router.push("/fa/order");
+                setOpen(false);
+              }}
+            >
+              <div className="flex gap-2 items-center text-primary">
+                <CgMenuBoxed className="w-6 h-6" />
+                My Order
+              </div>
+            </Button>
+            <Button
+              variant={"ghost"}
+              className="rounded-none w-full justify-start"
+              onClick={() => {
+                router.push("/fa/notifications");
+                setOpen(false);
+              }}
+            >
+              <div className="flex gap-2 items-center text-primary">
+                <div className="relative">
+                  <GoBell className="w-6 h-6" />
+                  {unseenNoti && unseenNoti.data.number != 0 && (
+                    <div className="absolute top-[-8px] right-[-4px] rounded-full bg-sky-600 h-4 w-4 flex leading-3 justify-center items-center text-xs font-medium text-accent">
+                      {unseenNoti.data.number}
+                    </div>
+                  )}
+                </div>
+                Notifications
+              </div>
+            </Button>
+
+            <Dialog open={openPass} onOpenChange={onOpenPass}>
+              <DialogTrigger asChild>
+                <Button
+                  variant={"ghost"}
+                  className="rounded-none justify-start"
+                >
+                  <div className="flex gap-2 items-center">
+                    <MdOutlineLock className="h-6 w-6" />
+                    Change Password
+                  </div>
+                </Button>
+              </DialogTrigger>
+              <DialogContent className="max-w-[472px] p-0 bg-white">
+                <DialogHeader>
+                  <DialogTitle className="p-6 pb-0">
+                    Change Password
+                  </DialogTitle>
+                </DialogHeader>
+                <form onSubmit={handleSubmitPass(onSubmitPass)}>
+                  <div className="p-6 flex flex-col gap-4 border-y-[1px]">
+                    <div>
+                      <Input
+                        placeholder="Current password"
+                        type="password"
+                        id="pass"
+                        {...registerPass("oldPassword")}
+                      ></Input>
+                      {errorPass.oldPassword && (
+                        <span className="error___message">
+                          {errorPass.oldPassword.message}
+                        </span>
+                      )}
+                    </div>
+                    <div>
+                      <Input
+                        type="password"
+                        placeholder="New password"
+                        id="new"
+                        {...registerPass("newPassword")}
+                      ></Input>
+                      {errorPass.newPassword && (
+                        <span className="error___message">
+                          {errorPass.newPassword.message}
+                        </span>
+                      )}
+                    </div>
+                    <div>
+                      <Input
+                        type="password"
+                        placeholder="Confirm new password"
+                        id="confirm"
+                        {...registerPass("confirmNewPass")}
+                      ></Input>
+                      {errorPass.confirmNewPass && (
+                        <span className="error___message">
+                          {errorPass.confirmNewPass.message}
+                        </span>
+                      )}
+                    </div>
+                  </div>
+                  <div className="p-4 flex-1 flex justify-end">
+                    <div className="flex gap-4">
+                      <Button
+                        type="button"
+                        variant={"outline"}
+                        onClick={() => setOpenPass(false)}
+                      >
+                        Cancel
+                      </Button>
+
+                      <Button>Confirm</Button>
+                    </div>
+                  </div>
+                </form>
+              </DialogContent>
+            </Dialog>
+            <form action={logout} className="w-full">
+              <Button
+                variant={"ghost"}
+                className="rounded-none w-full justify-start"
+              >
+                <div className="flex items-center gap-2 text-primary">
+                  <LuLogOut className="h-6 w-6" />
+                  Log out
+                </div>
+              </Button>
+            </form>
+          </PopoverContent>
+        </Popover>
+      ) : (
+        <Button
+          size={"icon"}
+          type="button"
+          onClick={() => {
+            router.push("/login");
+          }}
+          variant={"ghost"}
+          className="rounded-full h-9 w-9 p-0"
+          title="Log In"
+        >
+          <LogIn />
+        </Button>
+      )}
     </div>
   );
 };

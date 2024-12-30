@@ -61,21 +61,40 @@ const OrderContent = ({ orderId }: { orderId: string }) => {
   else if (isLoading || !order) return <>Skeleton...</>;
   else
     return (
-      <div className="flex flex-col gap-6">
+      <div className="flex flex-col gap-6 pb-10">
         <div className="flex justify-between">
-          <span className="text-xl">Order ID: {order.id}</span>
+          <div className="md:text-xl md:flex-row flex-col text-base flex gap-2">
+            <span>Order ID: {order.id}</span>
+            <span className="md:block hidden">|</span>
+            <span>Order date: {order.createdAt}</span>
+          </div>
           <OrderStatusView status={order.orderStatus} />
         </div>
         <Separator />
+        <OrderSteps order={order} />
         <div className="flex flex-1 lg:flex-row flex-col justify-center grow w-full gap-10">
           <div className="flex flex-col w-full max-w-[1200px]">
-            <OrderSteps order={order} />
             {order.details.map((detail, index) => (
               <OrderDetailItem key={`order-detail-${index}`} detail={detail} />
             ))}
           </div>
 
-          <div className="flex basis-1/3 w-full flex-col self-start min-w-96">
+          <div className="flex basis-1/3 w-full flex-col self-start xl:min-w-96 min-w-80">
+            <span className="table___title mb-10">Contact information</span>
+            <div className="flex justify-between">
+              <span>Name</span>
+              <span>{order.name}</span>
+            </div>
+            <div className="flex justify-between mt-5">
+              <span>Phone number</span>
+              <span>{order.phone}</span>
+            </div>
+            <div className="flex justify-between mt-5 border-b mb-10 pb-4">
+              <span>Address</span>
+              <span>
+                <span>{order.address}</span>
+              </span>
+            </div>
             <span className="table___title mb-10">Summary</span>
             <div className="flex justify-between">
               <span>Subtotal</span>

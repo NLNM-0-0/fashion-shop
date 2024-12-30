@@ -42,4 +42,5 @@ export enum Color {
   RED = "RED",
   WHITE = "WHITE",
   YELLOW = "YELLOW",
+  MULTI_COLOR = "MULTI_COLOR",
 }

@@ -1,5 +1,8 @@
+import SWRProvider from "@/components/auth/swr-provider";
 import OrderContent from "@/components/order/order-content";
+import OrderListSkeleton from "@/components/order/order-list-skeleton";
 import { Metadata } from "next";
+import { Suspense } from "react";
 
 export const metadata: Metadata = {
   title: "Order",
@@ -7,7 +10,11 @@ export const metadata: Metadata = {
 const OrderDetail = ({ params }: { params: { id: string } }) => {
   return (
     <>
-      <OrderContent orderId={params.id} />
+      <Suspense fallback={<OrderListSkeleton number={5} />}>
+        <SWRProvider>
+          <OrderContent orderId={params.id} />
+        </SWRProvider>
+      </Suspense>
     </>
   );
 };

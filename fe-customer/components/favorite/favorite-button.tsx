@@ -13,6 +13,7 @@ const FavoriteButton = () => {
         buttonVariants({ variant: "ghost" }),
         "rounded-full w-9 h-9 p-0"
       )}
+      title="Favorite"
     >
       <Image src={Heart.src} alt="heart" height={20} width={20} />
     </Link>

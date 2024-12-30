@@ -1,17 +1,25 @@
 import { Category } from "@/lib/types";
-import Link from "next/link";
 import React from "react";
+import { Button } from "../ui/button";
 
-const CategoryList = ({ categories }: { categories: Category[] }) => {
+interface CategoryListProps {
+  categories: Category[];
+  onClick: (categoryId: number, categoryName: string) => void;
+}
+const CategoryList = ({ categories, onClick }: CategoryListProps) => {
   return (
     <div className="grid md:grid-cols-4 grid-cols-3 gap-2">
       {categories.map((item) => (
-        <div
+        <Button
+          variant={"link"}
           key={item.id}
-          className="text-fs-gray-dark hover:text-fs-black text-sm font-bold transition-colors pl-[30%]"
+          className="text-fs-gray-dark hover:text-fs-black pl-[30%] no-underline hover:no-underline"
+          onClick={() => onClick(item.id, item.name)}
         >
-          <Link href={"#"}>{item.name}</Link>
-        </div>
+          <span className="text-sm font-bold transition-colors">
+            {item.name}
+          </span>
+        </Button>
       ))}
     </div>
   );

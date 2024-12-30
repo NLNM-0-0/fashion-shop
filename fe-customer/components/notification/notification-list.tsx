@@ -45,7 +45,7 @@ const NotificationList = () => {
     const updatedParams = new URLSearchParams();
     data.filters.forEach(({ type, value }) => {
       if (value) {
-        updatedParams.set(type, value);
+        updatedParams.set(type, value.toString());
       } else {
         updatedParams.delete(type);
       }
@@ -97,8 +97,8 @@ const NotificationList = () => {
           <div className="flex justify-center py-20">Nothing found.</div>
         )}
         {notificationsData?.page &&
-        notificationsData?.page.limit <
-          notificationsData?.page.totalElements ? (
+        notificationsData?.page.index <
+          notificationsData?.page.totalPages - 1 ? (
           <div className="flex items-center justify-end space-x-2 py-4">
             <ViewMoreLink />
           </div>

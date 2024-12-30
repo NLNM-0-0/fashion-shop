@@ -44,7 +44,7 @@ const ChangeImage = ({
         toast({
           variant: "destructive",
           title: "Có lỗi",
-          description: "File không hợp lệ",
+          description: "Invalid File",
         });
       }
     } else {
@@ -69,7 +69,7 @@ const ChangeImage = ({
           </div>
         </Button>
       </DialogTrigger>
-      <DialogContent className="max-w-[472px] p-0 bg-white">s
+      <DialogContent className="max-w-[472px] p-0 bg-white">
         <DialogHeader>
           <DialogTitle className="p-6 pb-0">Choose image</DialogTitle>
         </DialogHeader>

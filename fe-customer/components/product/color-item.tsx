@@ -27,12 +27,15 @@ const ColorItem = ({
       <div
         className={cn(
           "h-7 w-7 rounded-full flex justify-center items-center relative",
-          color.name === Color.WHITE && "border"
+          color.name === Color.WHITE && "border",
+          color.name === Color.MULTI_COLOR && "multicolor__picker"
         )}
         style={{ background: color.hex }}
       >
         {selected && !disable && (
           <LuCheck
+            size={18}
+            style={{ strokeWidth: 3 }}
             className={cn(
               color.name === Color.WHITE ? "text-black" : "text-white"
             )}
@@ -42,7 +45,11 @@ const ColorItem = ({
           <div className="absolute h-0.5 w-9 bg-fs-black rounded-xl -rotate-45" />
         )}
       </div>
-      <span className="capitalize text-sm">{color.name.toLowerCase()}</span>
+      <span className="capitalize text-sm">
+        {color.name === Color.MULTI_COLOR
+          ? "Multi Color"
+          : color.name.toLowerCase()}
+      </span>
     </div>
   );
 };

@@ -90,7 +90,7 @@ const UpdateColorDialog = ({ cartItem }: DialogProps) => {
                 {toVND(cartItem.item.unitPrice)}
               </p>
               <p className="md:text-lg text-base text-fs-gray-darker mt-1 mb-2 capitalize">
-                Size: {cartItem.size.toLowerCase()}
+                Size: {cartItem.size}
               </p>
             </div>
           </div>
@@ -103,7 +103,7 @@ const UpdateColorDialog = ({ cartItem }: DialogProps) => {
                 {toVND(cartItem.item.unitPrice)}
               </p>
               <p className="md:text-lg text-base text-fs-gray-darker mt-1 mb-2 capitalize">
-                Size: {cartItem.size.toLowerCase()}
+                Size: {cartItem.size}
               </p>
             </div>
             <div className="flex flex-col mt-auto">

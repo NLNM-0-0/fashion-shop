@@ -41,21 +41,18 @@ const ForgotPasswordForm = () => {
   } = useForm<z.infer<typeof ForgotPasswordScheme>>({
     resolver: zodResolver(ForgotPasswordScheme),
     mode: "onChange",
+    defaultValues: { phone: "", otp: "", password: "" },
   });
-  const { remainingTime, startCountdown } = useCountDown();
+  const { remainingTime, startCountdown, wasOptSend } = useCountDown();
 
-  const [hasSent, setHasSent] = useState(false);
   const [verified, setVerified] = useState(false);
 
-  const phoneValue = watch("phone");
   const otpValue = watch("otp");
-  const isPhoneValid = phoneRegex.test(phoneValue || "");
 
   const handleSendOtp = async () => {
     sendOTP({ phone: getValues().phone })
       .then((res) => {
         if (res.data.data) {
-          setHasSent(true);
           startCountdown();
         }
       })
@@ -76,7 +73,6 @@ const ForgotPasswordForm = () => {
         }
       })
       .catch((err: AxiosError<ApiError>) => {
-        setHasSent(false);
         toast({
           variant: "destructive",
           title: "Error",
@@ -125,14 +121,18 @@ const ForgotPasswordForm = () => {
                   format(addSeconds(new Date(0), remainingTime), "mm:ss")}
               </span>
               <div className="relative flex-1">
-                <Input placeholder="Phone number" {...register("phone")} />
+                <Input
+                  placeholder="Phone number"
+                  {...register("phone")}
+                  readOnly={wasOptSend}
+                />
                 {errors.phone && (
                   <span className="error___message">
                     {errors.phone.message}
                   </span>
                 )}
                 <Button
-                  disabled={!isPhoneValid || hasSent}
+                  disabled={!isDirty || !!errors.phone || wasOptSend}
                   type="button"
                   variant={"outline"}
                   className="absolute top-1 right-1 h-8 px-2"
@@ -148,7 +148,7 @@ const ForgotPasswordForm = () => {
                 name="otp"
                 render={({ field }) => (
                   <InputOTP
-                    disabled={!hasSent}
+                    disabled={!wasOptSend}
                     maxLength={6}
                     onChange={(value) => field.onChange(value)}
                   >
@@ -185,7 +185,11 @@ const ForgotPasswordForm = () => {
               handleVerifyOtp({ phone: getValues().phone, otp: otpValue })
             }
             disabled={
-              !isDirty || !otpValue || otpValue.length !== 6 || !isPhoneValid
+              !isDirty ||
+              !otpValue ||
+              otpValue.length !== 6 ||
+              !!errors.phone ||
+              !wasOptSend
             }
           >
             Verify OTP

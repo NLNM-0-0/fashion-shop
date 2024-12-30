@@ -39,7 +39,7 @@ const AddedToBagDialog = ({ product, open, onOpenChange }: DialogProps) => {
         <div className="w-full h-full flex flex-col gap-2">
           <AddedItem product={product} />
           <Link
-            href={"/admin/cart"}
+            href={"/fa/cart"}
             className={cn(
               buttonVariants({ variant: "outline" }),
               "rounded-full h-12"
@@ -48,7 +48,7 @@ const AddedToBagDialog = ({ product, open, onOpenChange }: DialogProps) => {
             View Bag
           </Link>
           <Link
-            href={"/admin/cart/payment"}
+            href={"/fa/cart/payment"}
             className={cn(
               buttonVariants({ variant: "default" }),
               "rounded-full h-12"

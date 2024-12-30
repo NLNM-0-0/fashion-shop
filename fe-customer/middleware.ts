@@ -1,10 +1,29 @@
 import { NextResponse } from "next/server";
 import type { NextRequest } from "next/server";
+const authRoutes = ["/reset-password", "/signup", "/login", "/otp"];
 
 export function middleware(request: NextRequest) {
   const token = request.cookies.get("token")?.value;
+  const url = request.nextUrl.clone();
 
-  if (!token && request.nextUrl.pathname === "/login") {
+  const publicRoutes = [
+    "/login",
+    "/otp",
+    "/reset-password",
+    "/signup",
+    "/fa",
+    "/fa/products",
+    "/fa/products/:id",
+  ];
+
+  if (token && authRoutes.includes(url.pathname)) {
+    return NextResponse.redirect(new URL("/fa", request.url));
+  }
+
+  if (
+    publicRoutes.includes(url.pathname) ||
+    url.pathname.startsWith("/fa/products/")
+  ) {
     return NextResponse.next();
   }
 
@@ -12,11 +31,8 @@ export function middleware(request: NextRequest) {
     return NextResponse.redirect(new URL("/login", request.url));
   }
 
-  if (token && request.nextUrl.pathname === "/login") {
-    return NextResponse.redirect(new URL("/fa", request.url));
-  }
   return NextResponse.next();
 }
 export const config = {
-  matcher: ["/fa/:path*", "/login"],
+  matcher: ["/((?!api|static|.*\\..*|_next).*)"],
 };

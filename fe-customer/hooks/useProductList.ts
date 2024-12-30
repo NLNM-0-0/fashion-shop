@@ -1,11 +1,16 @@
 import useSWR from "swr";
 
-import { useFilteredList } from "./useFilterList";
 import getAllProduct from "@/lib/api/product/getAllProduct";
+import { useProductFilter } from "@/components/product/product-filter-context";
 
 export const useProductList = () => {
-  const { filters, updateFilter, updateFilters, resetFilters, removeFilter } =
-    useFilteredList();
+  const {
+    filters,
+    updateFilterUrl,
+    updateFilters,
+    resetFilters,
+    removeFilter,
+  } = useProductFilter();
   const { data, isLoading, error, mutate } = useSWR(
     `product-${JSON.stringify(filters)}`,
     () => getAllProduct(filters)
@@ -13,7 +18,7 @@ export const useProductList = () => {
 
   return {
     filters,
-    updateFilter,
+    updateFilterUrl,
     updateFilters,
     resetFilters,
     removeFilter,

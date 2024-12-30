@@ -2,7 +2,7 @@ import { NotiFilterParam } from "../types";
 
 type EncodableParams =
   | NotiFilterParam
-  | { [key: string]: string | number | boolean };
+  | { [key: string]: string | number | boolean | string[] };
 
 export default function encodeParams(
   params: EncodableParams,

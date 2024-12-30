@@ -33,13 +33,12 @@ export default function PrivateLayout({
       </SWRProvider>
       <main className="flex flex-1 h-screen">
         <div className="flex w-full flex-col overflow-y-hidden">
-          {/* <Header /> */}
           <SWRProvider>
             <AuthProvider>
               <HeaderMobile />
             </AuthProvider>
           </SWRProvider>
-          <div className="md:p-10 p-4 md:mt-0 mt-12 overflow-auto">
+          <div className="md:p-10 p-4 mt-0 overflow-auto">
             {children}
           </div>
           <Toaster />

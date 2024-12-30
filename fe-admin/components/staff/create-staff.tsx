@@ -31,7 +31,7 @@ import { ApiError } from "@/lib/types";
 
 const StaffSchema = z.object({
   name: required,
-  email: z.string().email("Email không hợp lệ"),
+  email: z.string().email("Invalid email"),
   dob: required,
   male: z.boolean(),
   address: required,

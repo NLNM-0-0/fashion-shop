@@ -135,3 +135,32 @@ body {
 .table___title {
   @apply lg:text-3xl text-2xl;
 }
+
+.multicolor__picker {
+  background: conic-gradient(
+    red,
+    yellow,
+    rgb(0, 128, 32),
+    rgb(0, 128, 255),
+    magenta,
+    red
+  );
+}
+
+/* width */
+::-webkit-scrollbar {
+  width: 10px;
+  height: 10px;
+}
+
+/* Track */
+::-webkit-scrollbar-track {
+  background: #f1f1f1;
+}
+
+/* Handle */
+::-webkit-scrollbar-thumb {
+  background: #888;
+  border-radius: 5px;
+  height: 10px;
+}

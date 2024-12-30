@@ -19,17 +19,22 @@ const ColorItem = ({ color, selected, onSelected }: ColorItemProps) => {
       <div
         className={cn(
           "h-7 w-7 rounded-full flex justify-center items-center",
-          color === Color.WHITE && "border"
+          color === Color.WHITE && "border",
+          color === Color.MULTI_COLOR && "multicolor__picker"
         )}
         style={{ background: bgColor }}
       >
         {selected && (
           <LuCheck
+            size={18}
+            style={{ strokeWidth: 3 }}
             className={cn(color === Color.WHITE ? "text-black" : "text-white")}
           />
         )}
       </div>
-      <span className="capitalize text-sm">{color.toLowerCase()}</span>
+      <span className="capitalize text-sm">
+        {color === Color.MULTI_COLOR ? "Multi Color" : color.toLowerCase()}
+      </span>
     </div>
   );
 };

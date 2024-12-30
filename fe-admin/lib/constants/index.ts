@@ -161,4 +161,5 @@ export const colorToClassMap: Record<Color, string> = {
   [Color.RED]: "#FF0000",
   [Color.WHITE]: "#FFFFFF",
   [Color.YELLOW]: "#facc15",
+  [Color.MULTI_COLOR]: "",
 };

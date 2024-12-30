@@ -30,6 +30,7 @@ export default function useCountDown() {
 
   return {
     remainingTime,
+    wasOptSend,
     startCountdown: () => setWasOptSend(true),
     stopCountdown: () => setWasOptSend(false),
   };
