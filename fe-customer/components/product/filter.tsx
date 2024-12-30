@@ -25,11 +25,12 @@ const FilterScheme = z.object({
   price: z.string(),
 });
 
-interface FilterProductProps {
+export interface FilterProductProps {
   filters: FilterParams;
   updateFilters: (newFilters: FilterParams) => void;
+  className?: string;
 }
-const Filter = ({ filters, updateFilters }: FilterProductProps) => {
+const Filter = ({ filters, updateFilters, className }: FilterProductProps) => {
   const { control, handleSubmit, reset } = useForm<
     z.infer<typeof FilterScheme>
   >({
@@ -105,10 +106,7 @@ const Filter = ({ filters, updateFilters }: FilterProductProps) => {
   }, [resetFilter]);
 
   return (
-    <form
-      className="flex fixed flex-col sm:top-[74px] top-[114px] bottom-0 w-[260px]"
-      onSubmit={handleSubmit(onSubmit)}
-    >
+    <form className={className} onSubmit={handleSubmit(onSubmit)}>
       <div className="overflow-y-auto overflow-x-hidden px-1">
         <CategoryFilter />
         <Accordion type="multiple" className="w-full">

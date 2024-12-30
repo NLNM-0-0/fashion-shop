@@ -39,10 +39,11 @@ const CategoryHeader = () => {
                 <div className="w-screen bg-white xl:px-80 md:px-40 px-10 md:py-12 py-8">
                   <CategoryList
                     categories={data?.data.data}
-                    onClick={(categoryId) => {
+                    onClick={(categoryId, categoryName) => {
                       const queryParams = encodeParams({
                         genders: gender,
                         categoryId: categoryId,
+                        categoryName: categoryName,
                       });
 
                       router.push(`/fa/products?${queryParams}`);

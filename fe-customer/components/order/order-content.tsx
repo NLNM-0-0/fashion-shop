@@ -13,6 +13,7 @@ import { ApiError } from "@/lib/types";
 import { OrderStatus } from "@/lib/constants/enum";
 import { cancelOrder } from "@/lib/api/order/cancelOrder";
 import { receiveOrder } from "@/lib/api/order/receiveOrder";
+import OrderListSkeleton from "./order-list-skeleton";
 
 const OrderContent = ({ orderId }: { orderId: string }) => {
   const { data, isLoading, error, mutate } = useOrder({ orderId: orderId });
@@ -58,7 +59,12 @@ const OrderContent = ({ orderId }: { orderId: string }) => {
   };
 
   if (error) return <>Failed to load</>;
-  else if (isLoading || !order) return <>Skeleton...</>;
+  else if (isLoading || !order)
+    return (
+      <>
+        <OrderListSkeleton number={5} />
+      </>
+    );
   else
     return (
       <div className="flex flex-col gap-6 pb-10">

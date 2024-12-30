@@ -7,6 +7,7 @@ import { Button } from "../ui/button";
 import { unlikeItem } from "@/lib/api/favorite/likeItem";
 import { AxiosError } from "axios";
 import { toast } from "@/hooks/use-toast";
+import Link from "next/link";
 
 const FavoriteProductItem = ({
   product,
@@ -30,16 +31,18 @@ const FavoriteProductItem = ({
   return (
     <div className="flex flex-col bg-white font-medium pb-10">
       <AspectRatio ratio={1 / 1} className="bg-muted">
-        <Image
-          src={product.images.at(0) ?? ""}
-          alt="prd"
-          fill
-          className="h-full w-full rounded-md object-cover"
-        />
+        <Link href={`/fa/products/${product.id}`}>
+          <Image
+            src={product.images.at(0) ?? ""}
+            alt="prd"
+            fill
+            className="h-full w-full rounded-md object-cover"
+          />
+        </Link>
       </AspectRatio>
       <div className="flex justify-between mt-3 items-start">
         <div>
-          <div>{product.name}</div>
+          <Link href={`/fa/products/${product.id}`}>{product.name}</Link>
           <div>{toVND(product.unitPrice)}</div>
         </div>
         <Button

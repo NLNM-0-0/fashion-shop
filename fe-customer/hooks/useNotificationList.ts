@@ -3,10 +3,10 @@ import { useFilteredList } from "./useFilterList";
 import getAllNotification from "@/lib/api/notification/getAllNotification";
 
 export const useNotificationList = () => {
-  const { filters, filtersReady, updateFilter, resetFilters, removeFilter } =
+  const { filters, updateFilter, resetFilters, removeFilter } =
     useFilteredList();
   const { data, isLoading, error, mutate } = useSWR(
-    filtersReady.current ? `notification-${JSON.stringify(filters)}` : null,
+    `notification-${JSON.stringify(filters)}`,
     () => getAllNotification(filters),
     {
       revalidateOnFocus: false,

@@ -1,5 +1,5 @@
 import SWRProvider from "@/components/auth/swr-provider";
-import OrderListSkeleton from "@/components/order/order-list-skeleton";
+import FavoriteListSkeleton from "@/components/favorite/favorite-list-skeleton";
 import AllProductLayout from "@/components/product/all-product-layout";
 import { Metadata } from "next";
 import React, { Suspense } from "react";
@@ -10,7 +10,7 @@ export const metadata: Metadata = {
 
 const ProductPage = () => {
   return (
-    <Suspense fallback={<OrderListSkeleton number={5} />}>
+    <Suspense fallback={<FavoriteListSkeleton />}>
       <SWRProvider>
         <AllProductLayout />
       </SWRProvider>

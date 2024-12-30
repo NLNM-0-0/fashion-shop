@@ -1,13 +1,13 @@
 import Link from "next/link";
-import { useRouter } from "next/router";
+import { useSearchParams } from "next/navigation";
 import React from "react";
 import { GoArrowRight } from "react-icons/go";
 
 const ViewMoreLink = () => {
-  const router = useRouter();
-  const { limit, ...restParams } = router.query;
-
   const searchParams = new URLSearchParams();
+  const currentParams = useSearchParams();
+  const { limit, ...restParams } = Object.fromEntries(currentParams.entries());
+
   for (const key in restParams) {
     const value = restParams[key];
     if (Array.isArray(value)) {

@@ -37,7 +37,7 @@ const FilterPopover = ({
     defaultValues: {
       filters: Object.entries(filters).map(([key, value]) => ({
         type: key,
-        value,
+        value: `${value}`,
       })),
     },
   });
@@ -55,7 +55,7 @@ const FilterPopover = ({
     reset({
       filters: Object.entries(filters).map(([key, value]) => ({
         type: key,
-        value,
+        value: `${value}`,
       })),
     });
   }, [filters, reset]);

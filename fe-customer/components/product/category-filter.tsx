@@ -23,7 +23,10 @@ const CategoryFilter = () => {
               item.id.toString() == filters.categoryId && "!font-bold"
             )}
             onClick={() => {
-              void updateFilterUrl({ categoryId: item.id.toString() });
+              void updateFilterUrl({
+                categoryId: item.id.toString(),
+                categoryName: item.name.toString(),
+              });
             }}
           >
             {item.name}

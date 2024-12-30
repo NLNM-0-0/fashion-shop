@@ -4,7 +4,7 @@ import { Button } from "../ui/button";
 
 interface CategoryListProps {
   categories: Category[];
-  onClick: (categoryId: number) => void;
+  onClick: (categoryId: number, categoryName: string) => void;
 }
 const CategoryList = ({ categories, onClick }: CategoryListProps) => {
   return (
@@ -14,7 +14,7 @@ const CategoryList = ({ categories, onClick }: CategoryListProps) => {
           variant={"link"}
           key={item.id}
           className="text-fs-gray-dark hover:text-fs-black pl-[30%] no-underline hover:no-underline"
-          onClick={() => onClick(item.id)}
+          onClick={() => onClick(item.id, item.name)}
         >
           <span className="text-sm font-bold transition-colors">
             {item.name}

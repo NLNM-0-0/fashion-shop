@@ -15,6 +15,7 @@ const CartButton = () => {
         buttonVariants({ variant: "ghost" }),
         "rounded-full w-9 h-9 p-0 relative"
       )}
+      title="Bag"
     >
       <Image src={Cart.src} alt="cart" height={20} width={20} />
       {data && data.data.number > 0 && (

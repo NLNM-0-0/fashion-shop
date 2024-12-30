@@ -44,7 +44,7 @@ const ChangeImage = ({
         toast({
           variant: "destructive",
           title: "Có lỗi",
-          description: "File không hợp lệ",
+          description: "Invalid file",
         });
       }
     } else {

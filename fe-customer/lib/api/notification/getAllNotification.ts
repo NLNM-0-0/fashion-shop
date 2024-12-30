@@ -7,6 +7,6 @@ export default function getAllNotification(
   params: NotiFilterParam
 ): Promise<AxiosResponse<NotificationData>> {
   return axios.get<NotificationData>(
-    `/notification?${encodeParams(params)}`
+    `/notification?${encodeParams({ ...params })}`
   );
 }
