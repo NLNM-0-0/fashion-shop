@@ -55,7 +55,7 @@ const SizeForm = ({ control }: SizeFormProps) => {
           Add
         </Button>
       </div>
-      <div className="flex gap-2 flex-wrap">
+      <div className="flex gap-3 flex-wrap">
         {fields.map((item, index) => (
           <div key={`size-${index}`} className="relative">
             <SizeRadioButton selected={false} readonly name={item.sizeName} />

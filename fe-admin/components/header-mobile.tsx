@@ -10,6 +10,7 @@ import { motion, useCycle } from "framer-motion";
 import { LuChevronDown } from "react-icons/lu";
 import { SidebarItem } from "@/lib/types";
 import { sidebarItems } from "@/lib/constants";
+import Profile from "./profile/profile";
 
 type MenuItemWithSubMenuProps = {
   item: SidebarItem;
@@ -33,6 +34,17 @@ const sidebar = {
       damping: 40,
     },
   },
+};
+
+const Header = () => {
+  return (
+    <div className="h-14 py-2 px-4 flex w-full justify-end shadow-sm md:hidden">
+      <HeaderMobile />
+      <Profile>
+        <></>
+      </Profile>
+    </div>
+  );
 };
 
 const HeaderMobile = () => {
@@ -92,12 +104,12 @@ const HeaderMobile = () => {
   );
 };
 
-export default HeaderMobile;
+export default Header;
 
 const MenuToggle = ({ toggle }: { toggle: () => void }) => (
   <button
     onClick={toggle}
-    className="pointer-events-auto absolute left-4 top-[14px] z-30"
+    className="pointer-events-auto absolute left-4 top-5 z-30"
   >
     <svg width="23" height="23" viewBox="0 0 23 23">
       <Path

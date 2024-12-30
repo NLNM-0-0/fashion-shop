@@ -35,19 +35,25 @@ const CategoryForm = ({ control }: CategoryFormProps) => {
         category={category}
         setCategory={(value: string | number, name) => onSelect(+value, name)}
       />
-      {fields.map((item, index) => (
-        <div key={`category-${index}`} className="relative w-fit">
-          <SizeRadioButton selected={false} readonly name={item.categoryName} />
-          <Button
-            type="button"
-            onClick={() => remove(index)}
-            variant={"outline"}
-            className="absolute -top-2 -right-2 rounded-full h-5 w-5 p-0"
-          >
-            <div className="h-[2px] w-2.5 bg-fs-error rounded-lg"></div>
-          </Button>
-        </div>
-      ))}
+      <div className="flex flex-wrap gap-3">
+        {fields.map((item, index) => (
+          <div key={`category-${index}`} className="relative w-fit">
+            <SizeRadioButton
+              selected={false}
+              readonly
+              name={item.categoryName}
+            />
+            <Button
+              type="button"
+              onClick={() => remove(index)}
+              variant={"outline"}
+              className="absolute -top-2 -right-2 rounded-full h-5 w-5 p-0"
+            >
+              <div className="h-[2px] w-2.5 bg-fs-error rounded-lg"></div>
+            </Button>
+          </div>
+        ))}
+      </div>
     </div>
   );
 };

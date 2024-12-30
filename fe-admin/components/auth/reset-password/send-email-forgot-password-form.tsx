@@ -13,7 +13,7 @@ import sendEmailForgotPassword from "@/lib/api/reset-password/sendEmailForgotPas
 import LoadingSpinner from "@/components/ui/loading-spinner";
 
 const SendEmailForgotPasswordSchema = z.object({
-  email: z.string().email("Email không hợp lệ"),
+  email: z.string().email("Invalid email"),
 });
 
 const SendEmailForgotPasswordForm = () => {

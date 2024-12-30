@@ -63,61 +63,68 @@ const QuantityForm = ({ control, watch, errors }: QuantityFormProps) => {
       </div>
       <div>
         <div className="font-medium mb-2">Quantity</div>
-        <table className="min-w-full bg-white border">
-          <thead>
-            <tr>
-              <th className="border px-4 py-2">Size \ Color</th>
-              {colors &&
-                colors.map((column) => (
-                  <th key={column.colorName} className="border px-4 py-2">
-                    {column.colorName}
-                  </th>
-                ))}
-            </tr>
-          </thead>
-          <tbody>
-            {sizes &&
-              sizes.map((size) => (
-                <tr key={size.sizeName}>
-                  <td className="border px-4 py-2 font-semibold">
-                    {size.sizeName}
-                  </td>
-                  {colors.map((column) => {
-                    const index = fields.findIndex(
-                      (quantity) =>
-                        quantity.quantityKey ===
-                        `${size.sizeName}-${column.colorName}`
-                    );
-                    if (index === -1)
+        <div className="min-w-full overflow-x-auto max-w-[50vw]">
+          <table className="bg-white">
+            <thead>
+              <tr>
+                <th className="border xl:px-3 px-2 py-2 xl:text-base text-sm">
+                  Size \ Color
+                </th>
+                {colors &&
+                  colors.map((column) => (
+                    <th
+                      key={column.colorName}
+                      className="border xl:px-3 px-2 py-2 xl:text-base text-sm min-w-20"
+                    >
+                      {column.colorName}
+                    </th>
+                  ))}
+              </tr>
+            </thead>
+            <tbody>
+              {sizes &&
+                sizes.map((size) => (
+                  <tr key={size.sizeName}>
+                    <td className="border xl:px-3 px-2 py-2 font-semibold">
+                      {size.sizeName}
+                    </td>
+                    {colors.map((column) => {
+                      const index = fields.findIndex(
+                        (quantity) =>
+                          quantity.quantityKey ===
+                          `${size.sizeName}-${column.colorName}`
+                      );
+                      if (index === -1)
+                        return (
+                          <td
+                            key={`${size.sizeName}-${column.colorName}`}
+                            className="border xl:px-3 px-2 py-2"
+                          >
+                            N/A
+                          </td>
+                        );
+
                       return (
                         <td
                           key={`${size.sizeName}-${column.colorName}`}
-                          className="border px-4 py-2"
+                          className="border xl:px-3 px-2 py-2"
                         >
-                          N/A
+                          <Controller
+                            key={`${size.sizeName}-${column.colorName}`}
+                            control={control}
+                            name={`quantity.${index}.quantity`}
+                            render={({ field }) => (
+                              <Input type="number" {...field} className="px-2"/>
+                            )}
+                          />
                         </td>
                       );
-
-                    return (
-                      <td
-                        key={`${size.sizeName}-${column.colorName}`}
-                        className="border px-4 py-2"
-                      >
-                        <Controller
-                          key={`${size.sizeName}-${column.colorName}`}
-                          control={control}
-                          name={`quantity.${index}.quantity`}
-                          render={({ field }) => (
-                            <Input type="number" {...field} />
-                          )}
-                        />
-                      </td>
-                    );
-                  })}
-                </tr>
-              ))}
-          </tbody>
-        </table>
+                    })}
+                  </tr>
+                ))}
+            </tbody>
+          </table>
+        </div>
       </div>
     </div>
   );
