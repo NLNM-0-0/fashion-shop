@@ -12,7 +12,7 @@ import java.util.Map;
 
 @Data
 @Builder
-public class ItemWithLikedStatusResponse {
+public class ItemDetail {
 	@Schema(
 			name = "id",
 			example = "1"

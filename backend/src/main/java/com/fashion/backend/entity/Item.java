@@ -70,6 +70,9 @@ public class Item {
 	@Column(nullable = false)
 	private boolean isDeleted = false;
 
+	@Column(nullable = false)
+	private int sold;
+
 	@CreatedDate
 	@Column(
 			name = "created_at",

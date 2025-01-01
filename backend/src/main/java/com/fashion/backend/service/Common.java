@@ -13,6 +13,7 @@ import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.core.userdetails.UserDetails;
 
 import java.util.List;
+import java.util.Optional;
 import java.util.function.Consumer;
 
 public class Common {
@@ -101,9 +102,14 @@ public class Common {
 											  .orElseThrow(() -> new AppException(HttpStatus.BAD_REQUEST,
 																				  Message.Notification.NOTIFICATION_NOT_EXIST));
 
-		String email = Common.getCurrUserName();
+		String currUserName = Common.getCurrUserName();
 
-		if (!notification.getToUser().getUserAuth().getEmail().equals(email)) {
+		String toUserUserName = notification.getToUser().getUserAuth().getEmail();
+		if (toUserUserName == null) {
+		    toUserUserName = notification.getToUser().getUserAuth().getPhone();
+		}
+
+		if (!toUserUserName.equals(currUserName)) {
 			throw new AppException(HttpStatus.BAD_REQUEST, Message.Notification.CAN_NOT_READ_OTHER_S_NOTIFICATION);
 		}
 
@@ -203,5 +209,14 @@ public class Common {
 		return cartRepository.findById(cartId)
 							 .orElseThrow(() -> new AppException(HttpStatus.BAD_REQUEST,
 																 Message.Cart.ITEM_NOT_IN_CART));
+	}
+
+	public static Optional<Long> getUserLoginId(UserRepository userRepository, UserAuthRepository userAuthRepository) {
+		try {
+			User user = Common.findCurrUser(userRepository, userAuthRepository);
+			return user.getId().describeConstable();
+		} catch (Exception e) {
+			return Optional.empty();
+		}
 	}
 }

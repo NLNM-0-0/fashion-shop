@@ -12,7 +12,8 @@ import java.util.Optional;
 public interface CartRepository extends JpaRepository<Cart, Long> {
 	List<Cart> findAllByUserId(Long userId, Sort sort);
 
-	int countByUserId(Long userId);
+	@Query("SELECT SUM(c.quantity) FROM Cart c WHERE c.user.id = :userId")
+	int getCartNumbers(Long userId);
 
 	@Query("SELECT c FROM Cart c WHERE c.user.id = :userId AND c.item.id = :itemId AND c.size = :size AND c.color = :color")
 	Optional<Cart> findFirstByUserIdAndItemIdAndSizeAndColor(Long userId, Long itemId, String size, Color color);

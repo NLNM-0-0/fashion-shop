@@ -28,7 +28,7 @@ public class Message {
 		public static final String ORDER_NOT_EXIST = "Order does not exist in the system";
 		public static final String ORDER_JUST_CAN_BE_REACHED_BY_OWNER_CUSTOMER
 				= "You cannot access another customer's order";
-		public static final String CAN_NOT_BE_REACHED_CLOSED_ORDER = "You cannot access a closed order";
+		public static final String CAN_NOT_BE_REACHED_CLOSED_ORDER = "Can't close order has this status";
 		public static final String ORDER_CAN_NOT_HAVE_NO_ITEM = "Order cannot be empty";
 		public static final String ORDER_ITEM_MUST_HAVE_COLOR = "Order information must include color";
 		public static final String ORDER_ITEM_MUST_HAVE_SIZE = "Order information must include size";
