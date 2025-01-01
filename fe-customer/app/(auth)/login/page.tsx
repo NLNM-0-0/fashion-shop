@@ -9,16 +9,20 @@ export const metadata: Metadata = {
 const Login = () => {
   return (
     <div className="flex flex-col w-full h-full py-20 items-center">
-      <Image
-        src={"/android-chrome-192x192.png"}
-        alt="logo"
-        width={100}
-        height={100}
-      />
+      <Link href={"/fa"}>
+        <Image
+          src={"/android-chrome-192x192.png"}
+          alt="logo"
+          width={100}
+          height={100}
+        />
+      </Link>
       <LoginForm />
       <div className="text-sm mt-auto">
         <span className="text-fs-gray-dark">Don&#39;t have an account? </span>
-        <Link className="underline underline-offset-2" href={"/signup"}>Sign Up</Link>
+        <Link className="underline underline-offset-2" href={"/signup"}>
+          Sign Up
+        </Link>
       </div>
     </div>
   );

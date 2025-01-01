@@ -41,7 +41,7 @@ const PasswordSchema = z
 
 const Profile = () => {
   const { user, logout } = useAuth();
-  const { data: unseenNoti } = useUnseenNumber();
+  const { data: unseenNoti } = useUnseenNumber(user);
   const router = useRouter();
 
   const [open, setOpen] = useState(false);
