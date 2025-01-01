@@ -66,7 +66,10 @@ export default function Sidebar() {
           <ul className="sidebar__list">
             {sidebarItems.map((item) => {
               {
-                if (item.title === "Staffs" && !user?.admin) {
+                if (
+                  (item.title === "Staffs" || item.title === "Report") &&
+                  !user?.admin
+                ) {
                   return null;
                 } else {
                   return (

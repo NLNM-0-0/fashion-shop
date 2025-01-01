@@ -1,8 +1,9 @@
 import useSWR from "swr";
 import { useFilteredList } from "./useFilterList";
 import getSaleReport from "@/lib/api/report/getSaleReport";
+import { UserInfo } from "@/lib/types";
 
-export const useSaleReportList = () => {
+export const useSaleReportList = (user: UserInfo | null) => {
   const {
     filters,
     filtersReady,
@@ -12,7 +13,9 @@ export const useSaleReportList = () => {
     removeFilter,
   } = useFilteredList();
   const { data, isLoading, error, mutate } = useSWR(
-    filtersReady.current ? `saleReport-${JSON.stringify(filters)}` : null,
+    user?.admin === true && filtersReady.current
+      ? `saleReport-${JSON.stringify(filters)}`
+      : null,
     () => getSaleReport(filters),
     {
       revalidateOnFocus: false,

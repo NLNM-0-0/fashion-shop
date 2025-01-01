@@ -5,8 +5,10 @@ import { cn } from "@/lib/utils";
 import Cart from "@/lib/assets/icons/bag.svg";
 import Image from "next/image";
 import { useCartNumber } from "@/hooks/cart/useCartNumber";
+import { useAuth } from "../auth/auth-context";
 const CartButton = () => {
-  const { data } = useCartNumber();
+  const { user } = useAuth();
+  const { data } = useCartNumber(user);
 
   return (
     <Link

@@ -9,12 +9,14 @@ export const metadata: Metadata = {
 const ForgotPassword = () => {
   return (
     <div className="flex flex-col w-full h-full py-20 justify-center items-center">
-      <Image
-        src={"/android-chrome-192x192.png"}
-        alt="logo"
-        width={100}
-        height={100}
-      />
+      <Link href={"/fa"}>
+        <Image
+          src={"/android-chrome-192x192.png"}
+          alt="logo"
+          width={100}
+          height={100}
+        />
+      </Link>
       <SendEmailForgotPasswordForm />
       <div className="text-sm mt-auto">
         <span className="text-fs-gray-dark">Already a Member? </span>

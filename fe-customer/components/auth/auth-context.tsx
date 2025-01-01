@@ -20,8 +20,11 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({
   children,
 }) => {
   const [user, setUser] = useState<UserInfo | null>(null);
+  const token = Cookies.get("token");
 
-  const { data, isLoading, mutate } = useSWR("/user", () => getUser());
+  const { data, isLoading, mutate } = useSWR(token ? "/user" : null, () =>
+    getUser()
+  );
 
   useEffect(() => {
     if (data) {
