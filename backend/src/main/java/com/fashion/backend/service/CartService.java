@@ -70,7 +70,7 @@ public class CartService {
 		User user = Common.findCurrUser(userRepository, userAuthRepository);
 
 		return NumberNotificationNotSeenResponse.builder()
-												.number(cartRepository.countByUserId(
+												.number(cartRepository.getCartNumbers(
 														user.getId()))
 												.build();
 	}

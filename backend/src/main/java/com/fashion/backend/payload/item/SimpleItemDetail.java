@@ -1,5 +1,7 @@
 package com.fashion.backend.payload.item;
 
+import com.fashion.backend.constant.Gender;
+import com.fashion.backend.payload.category.CategoryResponse;
 import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.Builder;
 import lombok.Data;
@@ -8,7 +10,7 @@ import java.util.List;
 
 @Data
 @Builder
-public class SimpleItemWithLikedStatusResponse {
+public class SimpleItemDetail {
 	@Schema(
 			name = "id",
 			example = "1"
@@ -36,6 +38,16 @@ public class SimpleItemWithLikedStatusResponse {
 			example = "false"
 	)
 	private boolean isDeleted;
+
+	@Schema(
+			name = "gender"
+	)
+	private Gender gender;
+
+	@Schema(
+			name = "categories"
+	)
+	private List<CategoryResponse> categories;
 
 	@Schema(
 			name = "liked",

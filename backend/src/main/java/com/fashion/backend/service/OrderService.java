@@ -17,6 +17,7 @@ import com.fashion.backend.payload.staff.SimpleStaffResponse;
 import com.fashion.backend.repository.*;
 import com.fashion.backend.utils.TimeHelper;
 import com.fashion.backend.utils.tuple.Triple;
+import com.google.firestore.v1.StructuredQuery;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
@@ -40,6 +41,7 @@ public class OrderService {
 	private final MailSender mailSender;
 	private final NotificationRepository notificationRepository;
 	private final ItemQuantityRepository itemQuantityRepository;
+	private final ItemRepository itemRepository;
 
 	@Transactional
 	public ListResponse<OrderResponse, StaffOrderFilter> getOrders(AppPageRequest page, StaffOrderFilter filter) {
@@ -145,10 +147,18 @@ public class OrderService {
 		return new SimpleResponse();
 	}
 
+	public SimpleResponse adminCancelOrder(Long orderId) {
+		return cancelOrder(orderId, List.of(OrderStatus.DONE, OrderStatus.CANCELED));
+	}
+
+	public SimpleResponse customerCancelOrder(Long orderId) {
+		return cancelOrder(orderId, List.of(OrderStatus.DONE, OrderStatus.CANCELED, OrderStatus.CONFIRMED, OrderStatus.SHIPPING));
+	}
+
 	@Transactional
-	public SimpleResponse cancelOrder(Long orderId) {
+	public SimpleResponse cancelOrder(Long orderId, List<OrderStatus> blockedStatuses) {
 		Order order = Common.findOrderById(orderId, orderRepository);
-		if (order.getStatus() == OrderStatus.DONE || order.getStatus() == OrderStatus.CANCELED) {
+		if (blockedStatuses.contains(order.getStatus())) {
 			throw new AppException(HttpStatus.BAD_REQUEST, Message.Order.CAN_NOT_BE_REACHED_CLOSED_ORDER);
 		}
 
@@ -279,6 +289,8 @@ public class OrderService {
 	private void handleOrderItem(Order order) {
 		List<ItemQuantity> savedItemQuantities = new ArrayList<>();
 		List<StockChangeHistory> savedHistories = new ArrayList<>();
+		List<Item> savedItems = new ArrayList<>();
+
 		for (OrderDetail orderDetail : order.getOrderDetails()) {
 			Item item = orderDetail.getItem();
 			ItemQuantity itemQuantity = Common.findItemQuantity(item.getId(),
@@ -301,15 +313,21 @@ public class OrderService {
 														   .quantity(-orderDetail.getQuantity())
 														   .build();
 			savedHistories.add(history);
+
+			item.setSold(item.getSold() + orderDetail.getQuantity());
+			savedItems.add(item);
 		}
 
 		itemQuantityRepository.saveAll(savedItemQuantities);
 		stockChangeHistoryRepository.saveAll(savedHistories);
+		itemRepository.saveAll(savedItems);
 	}
 
 	private void handlePaybackItem(Order order) {
 		List<ItemQuantity> savedItemQuantities = new ArrayList<>();
 		List<StockChangeHistory> savedHistories = new ArrayList<>();
+		List<Item> savedItems = new ArrayList<>();
+
 		for (OrderDetail orderDetail : order.getOrderDetails()) {
 			Item item = orderDetail.getItem();
 			ItemQuantity itemQuantity = Common.findItemQuantity(item.getId(),
@@ -329,10 +347,14 @@ public class OrderService {
 														   .quantity(orderDetail.getQuantity())
 														   .build();
 			savedHistories.add(history);
+
+			item.setSold(item.getSold() - orderDetail.getQuantity());
+			savedItems.add(item);
 		}
 
 		itemQuantityRepository.saveAll(savedItemQuantities);
 		stockChangeHistoryRepository.saveAll(savedHistories);
+		itemRepository.saveAll(savedItems);
 	}
 
 	private OrderResponse mapToDTO(Order order) {

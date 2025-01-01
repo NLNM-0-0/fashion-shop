@@ -33,18 +33,9 @@ public class ItemService {
 	private final UserRepository userRepository;
 	private final UserAuthRepository userAuthRepository;
 
-	private Optional<Long> getUserLoginId() {
-		try {
-			User user = Common.findCurrUser(userRepository, userAuthRepository);
-			return user.getId().describeConstable();
-		} catch (Exception e) {
-			return Optional.empty();
-		}
-	}
-
 	@Transactional
-	public ListResponse<SimpleItemWithLikedStatusResponse, UserItemFilter> userGetItems(AppPageRequest page,
-																						UserItemFilter filter) {
+	public ListResponse<SimpleItemDetail, UserItemFilter> userGetItems(AppPageRequest page,
+																	   UserItemFilter filter) {
 		Pageable pageable = PageRequest.of(page.getPage() - 1,
 										   page.getLimit(),
 										   userGetSort(filter));
@@ -54,8 +45,8 @@ public class ItemService {
 
 		List<Item> items = itemPage.getContent();
 
-		List<SimpleItemWithLikedStatusResponse> data;
-		Optional<Long> userId = getUserLoginId();
+		List<SimpleItemDetail> data;
+		Optional<Long> userId = Common.getUserLoginId(userRepository, userAuthRepository);
 		data = userId.map(aLong -> items.stream()
 										.map(item -> {
 											Optional<Like> like = likeRepository.findFirstByUserIdAndItemId(aLong,
@@ -67,7 +58,7 @@ public class ItemService {
 																		.toList());
 
 
-		return ListResponse.<SimpleItemWithLikedStatusResponse, UserItemFilter>builder()
+		return ListResponse.<SimpleItemDetail, UserItemFilter>builder()
 						   .data(data)
 						   .appPageResponse(AppPageResponse.builder()
 														   .index(page.getPage())
@@ -198,8 +189,8 @@ public class ItemService {
 	}
 
 	@Transactional
-	public ItemWithLikedStatusResponse userGetItem(Long itemId) {
-		Optional<Long> userId = getUserLoginId();
+	public ItemDetail userGetItem(Long itemId) {
+		Optional<Long> userId = Common.getUserLoginId(userRepository, userAuthRepository);
 
 		Item item = Common.findItemById(itemId, itemRepository);
 
@@ -329,16 +320,17 @@ public class ItemService {
 		return new SimpleResponse();
 	}
 
-	private SimpleItemWithLikedStatusResponse mapToDTOSimple(Item item, boolean liked) {
-		SimpleItemResponse simpleItemResponse = mapToDTOSimple(item);
-		return SimpleItemWithLikedStatusResponse.builder()
-												.id(simpleItemResponse.getId())
-												.name(simpleItemResponse.getName())
-												.unitPrice(simpleItemResponse.getUnitPrice())
-												.images(simpleItemResponse.getImages())
-												.liked(liked)
-												.isDeleted(simpleItemResponse.isDeleted())
-												.build();
+	private SimpleItemDetail mapToDTOSimple(Item item, boolean liked) {
+		return SimpleItemDetail.builder()
+							   .id(item.getId())
+							   .name(item.getName())
+							   .unitPrice(item.getUnitPrice())
+							   .images(item.getImages())
+							   .categories(item.getCategories().stream().map(this::mapToDTO).toList())
+							   .gender(item.getGender())
+							   .liked(liked)
+							   .isDeleted(item.isDeleted())
+							   .build();
 	}
 
 	private SimpleItemResponse mapToDTOSimple(Item item) {
@@ -351,23 +343,23 @@ public class ItemService {
 								 .build();
 	}
 
-	private ItemWithLikedStatusResponse mapToDTO(Item item, boolean liked) {
+	private ItemDetail mapToDTO(Item item, boolean liked) {
 		ItemResponse itemResponse = mapToDTO(item);
 
-		return ItemWithLikedStatusResponse.builder()
-										  .id(itemResponse.getId())
-										  .name(itemResponse.getName())
-										  .gender(itemResponse.getGender())
-										  .season(itemResponse.getSeason())
-										  .colors(itemResponse.getColors())
-										  .sizes(itemResponse.getSizes())
-										  .quantities(itemResponse.getQuantities())
-										  .categories(itemResponse.getCategories())
-										  .unitPrice(itemResponse.getUnitPrice())
-										  .images(itemResponse.getImages())
-										  .isDeleted(itemResponse.isDeleted())
-										  .liked(liked)
-										  .build();
+		return ItemDetail.builder()
+						 .id(itemResponse.getId())
+						 .name(itemResponse.getName())
+						 .gender(itemResponse.getGender())
+						 .season(itemResponse.getSeason())
+						 .colors(itemResponse.getColors())
+						 .sizes(itemResponse.getSizes())
+						 .quantities(itemResponse.getQuantities())
+						 .categories(itemResponse.getCategories())
+						 .unitPrice(itemResponse.getUnitPrice())
+						 .images(itemResponse.getImages())
+						 .isDeleted(itemResponse.isDeleted())
+						 .liked(liked)
+						 .build();
 	}
 
 	private ItemResponse mapToDTO(Item item) {

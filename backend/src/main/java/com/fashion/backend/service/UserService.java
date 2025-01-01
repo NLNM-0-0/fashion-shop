@@ -88,7 +88,7 @@ public class UserService {
 
 		User user = Common.findUserByUserAuth(userAuth.getId(), userRepository);
 
-		if (request.getEmail() != null) {
+		if (request.getEmail() != null && !request.getEmail().equals(user.getEmail())) {
 			Optional<User> checkedUser = userRepository.findFirstByEmail(request.getEmail());
 			if (checkedUser.isPresent()) {
 				throw new AppException(HttpStatus.BAD_REQUEST, Message.User.USER_EXIST);

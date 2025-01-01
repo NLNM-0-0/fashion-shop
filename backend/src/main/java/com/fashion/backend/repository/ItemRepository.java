@@ -7,11 +7,18 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.domain.Specification;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.JpaSpecificationExecutor;
+import org.springframework.data.jpa.repository.Query;
 
 import java.util.List;
 
 public interface ItemRepository extends JpaRepository<Item, Long>, JpaSpecificationExecutor<Item> {
 	List<Item> findAllByCategories_Id(Long categoryId);
+
+	@Query(value = "SELECT i FROM Item i ORDER BY i.sold DESC")
+	List<Item> findTopBySold(int top);
+
+	@Query(value = "SELECT i FROM Item i ORDER BY i.createdAt DESC")
+	List<Item> findTopByCreatedAt(int top);
 
 	default List<Item> findAllNotDelete() {
 		Specification<Item> spec = ItemSpecs.isNotDeleted();

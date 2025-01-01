@@ -114,6 +114,6 @@ public class AdminOrderController {
 	public ResponseEntity<SimpleResponse> cancelOrder(
 			@PathVariable Long id
 	) {
-		return new ResponseEntity<>(orderService.cancelOrder(id), HttpStatus.OK);
+		return new ResponseEntity<>(orderService.adminCancelOrder(id), HttpStatus.OK);
 	}
 }

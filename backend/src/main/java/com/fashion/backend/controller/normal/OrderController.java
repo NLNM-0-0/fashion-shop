@@ -98,4 +98,22 @@ public class OrderController {
 	) {
 		return new ResponseEntity<>(orderService.receiveOrder(id), HttpStatus.OK);
 	}
+
+	@DeleteMapping("/{id}")
+	@SecurityRequirement(
+			name = "Bearer Authentication"
+	)
+	@Operation(
+			summary = "Cancel order"
+	)
+	@ApiResponse(
+			responseCode = "200",
+			description = "Http Status is 200 OK"
+	)
+	@PreAuthorize("hasAnyAuthority('USER')")
+	public ResponseEntity<SimpleResponse> cancelOrder(
+			@PathVariable Long id
+	) {
+		return new ResponseEntity<>(orderService.customerCancelOrder(id), HttpStatus.OK);
+	}
 }
