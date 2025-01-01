@@ -9,7 +9,6 @@ import { passwordMinError, phoneRegex } from "@/lib/helpers/zod";
 import { AxiosError } from "axios";
 import { ApiError, ForgotPasswordPayload, VerifyOtpPayload } from "@/lib/types";
 import { toast } from "@/hooks/use-toast";
-import { verifyOTP } from "@/lib/api/auth/verifyOTP";
 import {
   InputOTP,
   InputOTPGroup,
@@ -20,6 +19,7 @@ import { sendOTP } from "@/lib/api/auth/sendOTP";
 import useCountDown from "@/hooks/useCountDown";
 import { addSeconds, format } from "date-fns";
 import { forgotPassword } from "@/lib/api/auth/forgotPassword";
+import { verifyOTPForPassword } from "@/lib/api/auth/verifyForPassword";
 
 const ForgotPasswordScheme = z.object({
   phone: z.string().regex(phoneRegex, "Invalid phone number"),
@@ -66,7 +66,7 @@ const ForgotPasswordForm = () => {
   };
 
   const handleVerifyOtp = async (data: VerifyOtpPayload) => {
-    verifyOTP(data)
+    verifyOTPForPassword(data)
       .then((res) => {
         if (res.data.data) {
           setVerified(true);
