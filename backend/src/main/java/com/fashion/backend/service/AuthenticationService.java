@@ -192,9 +192,6 @@ public class AuthenticationService {
 			throw new AppException(HttpStatus.BAD_REQUEST, Message.OTP_EXPIRED);
 		}
 
-		userAuth.setVerified(true);
-		userAuthRepository.save(userAuth);
-
 		return new SimpleResponse();
 	}
 
@@ -209,6 +206,11 @@ public class AuthenticationService {
 		if (!otp.isValid()) {
 			throw new AppException(HttpStatus.BAD_REQUEST, Message.OTP_EXPIRED);
 		}
+
+		userAuth.setVerified(true);
+		userAuthRepository.save(userAuth);
+
+		otpRepository.delete(otp);
 
 		return new SimpleResponse();
 	}
