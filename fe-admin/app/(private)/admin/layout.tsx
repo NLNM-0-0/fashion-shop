@@ -36,11 +36,9 @@ export default function PrivateLayout({
           <SWRProvider>
             <AuthProvider>
               <HeaderMobile />
+              <div className="md:p-10 p-4 mt-0 overflow-auto">{children}</div>
             </AuthProvider>
           </SWRProvider>
-          <div className="md:p-10 p-4 mt-0 overflow-auto">
-            {children}
-          </div>
           <Toaster />
         </div>
       </main>

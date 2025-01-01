@@ -28,6 +28,7 @@ import ReportFilter, {
 } from "@/components/filter/report-filter";
 import { FilterParams } from "@/hooks/useFilterList";
 import { unknown } from "zod";
+import { useAuth } from "@/components/auth/auth-context";
 
 export const columns: ColumnDef<StockReportItem>[] = [
   {
@@ -126,8 +127,9 @@ export const columns: ColumnDef<StockReportItem>[] = [
 ];
 
 export function StockReportTable() {
+  const { user } = useAuth();
   const { filters, data, isLoading, error, updateFilters } =
-    useStockReportList();
+    useStockReportList(user);
 
   const customers: StockReportItem[] = data?.data.details || [];
   const table = useReactTable({
@@ -155,6 +157,9 @@ export function StockReportTable() {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
+  if (!user?.admin) {
+    return <>Your account has no access to this function</>;
+  }
   if (isLoading || !data) {
     return (
       <TableSkeleton

@@ -11,6 +11,7 @@ import { LuChevronDown } from "react-icons/lu";
 import { SidebarItem } from "@/lib/types";
 import { sidebarItems } from "@/lib/constants";
 import Profile from "./profile/profile";
+import { useAuth } from "./auth/auth-context";
 
 type MenuItemWithSubMenuProps = {
   item: SidebarItem;
@@ -49,6 +50,8 @@ const Header = () => {
 
 const HeaderMobile = () => {
   const pathname = usePathname();
+  const { user } = useAuth();
+  
   const containerRef = useRef(null);
   const { height } = useDimensions(containerRef);
   const [isOpen, toggleOpen] = useCycle(false, true);
@@ -73,30 +76,35 @@ const HeaderMobile = () => {
       >
         {sidebarItems.map((item, idx) => {
           const isLastItem = idx === sidebarItems.length - 1; // Check if it's the last item
+          if (
+            (item.title === "Staffs" || item.title === "Report") &&
+            !user?.admin
+          ) {
+            return null;
+          } else
+            return (
+              <div key={idx}>
+                {item.submenu ? (
+                  <MenuItemWithSubMenu item={item} toggleOpen={toggleOpen} />
+                ) : (
+                  <MenuItem>
+                    <Link
+                      href={item.href}
+                      onClick={() => toggleOpen()}
+                      className={`flex w-full text-2xl ${
+                        item.href === pathname ? "font-bold" : ""
+                      }`}
+                    >
+                      {item.title}
+                    </Link>
+                  </MenuItem>
+                )}
 
-          return (
-            <div key={idx}>
-              {item.submenu ? (
-                <MenuItemWithSubMenu item={item} toggleOpen={toggleOpen} />
-              ) : (
-                <MenuItem>
-                  <Link
-                    href={item.href}
-                    onClick={() => toggleOpen()}
-                    className={`flex w-full text-2xl ${
-                      item.href === pathname ? "font-bold" : ""
-                    }`}
-                  >
-                    {item.title}
-                  </Link>
-                </MenuItem>
-              )}
-
-              {!isLastItem && (
-                <MenuItem className="my-3 h-px w-full bg-gray-300" />
-              )}
-            </div>
-          );
+                {!isLastItem && (
+                  <MenuItem className="my-3 h-px w-full bg-gray-300" />
+                )}
+              </div>
+            );
         })}
       </motion.ul>
       <MenuToggle toggle={toggleOpen} />

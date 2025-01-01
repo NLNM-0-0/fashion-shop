@@ -30,6 +30,7 @@ import EditStaffDialog from "./edit-staff";
 import DeleteStaff from "./delete-staff";
 import TableSkeleton from "../table-skeleton";
 import { Avatar, AvatarFallback, AvatarImage } from "../ui/avatar";
+import { useAuth } from "../auth/auth-context";
 
 export const columns: ColumnDef<Staff>[] = [
   {
@@ -105,7 +106,9 @@ export const columns: ColumnDef<Staff>[] = [
 
 export function StaffTable() {
   const router = useRouter();
-  const { filters, data, isLoading, error, mutate } = useStaffList();
+  const { user } = useAuth();
+
+  const { filters, data, isLoading, error, mutate } = useStaffList(user);
 
   const staffs: Staff[] = data?.data.data || [];
   const table = useReactTable({
@@ -127,6 +130,10 @@ export function StaffTable() {
     setOpenFilter(false);
     router.push(`?${updatedParams.toString()}`);
   };
+
+  if (!user?.admin) {
+    return <>Your account has no access to this function</>;
+  }
 
   if (isLoading || !data) {
     return (

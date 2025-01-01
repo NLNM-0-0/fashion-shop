@@ -1,8 +1,9 @@
 import useSWR from "swr";
 import { useFilteredList } from "./useFilterList";
 import getStockReport from "@/lib/api/report/getStockReport";
+import { UserInfo } from "@/lib/types";
 
-export const useStockReportList = () => {
+export const useStockReportList = (user: UserInfo | null) => {
   const {
     filters,
     filtersReady,
@@ -12,7 +13,9 @@ export const useStockReportList = () => {
     removeFilter,
   } = useFilteredList();
   const { data, isLoading, error, mutate } = useSWR(
-    filtersReady.current ? `stockReport-${JSON.stringify(filters)}` : null,
+    filtersReady.current && user?.admin
+      ? `stockReport-${JSON.stringify(filters)}`
+      : null,
     () => getStockReport(filters),
     {
       revalidateOnFocus: false,

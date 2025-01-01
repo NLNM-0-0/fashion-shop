@@ -16,6 +16,7 @@ import {
 } from "../ui/command";
 import { cn } from "@/lib/utils";
 import { Skeleton } from "../ui/skeleton";
+import { useAuth } from "../auth/auth-context";
 
 export interface StaffListProps {
   staff: string | number;
@@ -24,8 +25,9 @@ export interface StaffListProps {
   readonly?: boolean;
 }
 const StaffList = ({ isId, staff, setStaff, readonly }: StaffListProps) => {
+  const { user } = useAuth();
   const [open, setOpen] = useState(false);
-  const { data, error, isLoading } = useStaffList();
+  const { data, error, isLoading } = useStaffList(user);
   const [staffList, setStaffList] = useState<Array<Staff>>([]);
   useEffect(() => {
     if (data) {

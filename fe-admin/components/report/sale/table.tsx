@@ -29,6 +29,7 @@ import ReportFilter, {
 import { FilterParams } from "@/hooks/useFilterList";
 import { unknown } from "zod";
 import { toVND } from "@/lib/utils";
+import { useAuth } from "@/components/auth/auth-context";
 
 export const columns: ColumnDef<SaleReportItem>[] = [
   {
@@ -89,8 +90,9 @@ export const columns: ColumnDef<SaleReportItem>[] = [
   },
 ];
 export function SaleReportTable() {
+  const { user } = useAuth();
   const { filters, data, isLoading, error, updateFilters } =
-    useSaleReportList();
+    useSaleReportList(user);
 
   const customers: SaleReportItem[] = data?.data.details || [];
   const table = useReactTable({
@@ -115,6 +117,9 @@ export function SaleReportTable() {
     updateFilters(initialFilters);
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
+  if (!user?.admin) {
+    return <>Your account has no access to this function</>;
+  }
 
   if (isLoading || !data) {
     return (
