@@ -24,7 +24,7 @@ import org.springframework.web.bind.annotation.RestController;
 public class HomeController {
 	private final HomeService homeService;
 
-	@GetMapping
+	@GetMapping("/bestSeller")
 	@Operation(
 			summary = "Get top sellers",
 			description = "Note: 5"
@@ -37,7 +37,7 @@ public class HomeController {
 		return new ResponseEntity<>(homeService.getTopSellers(), HttpStatus.OK);
 	}
 
-	@GetMapping
+	@GetMapping("/latest")
 	@Operation(
 			summary = "Get latest",
 			description = "Note: 5"
