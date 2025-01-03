@@ -1,11 +1,11 @@
-import { useFilteredList } from "./useFilterList";
 import getAllOrder from "@/lib/api/order/getAllOrder";
 import { useCallback, useRef } from "react";
 import useSWRInfinite from "swr/infinite";
+import { useOrderFilteredList } from "./useOrderFilterList";
 
 export const useOrderList = () => {
   const { filters, updateFilter, updateFilters, resetFilters, removeFilter } =
-    useFilteredList();
+    useOrderFilteredList();
 
   const fetcher = (page: string) => {
     return getAllOrder(filters, +page + 1);
@@ -50,6 +50,7 @@ export const useOrderList = () => {
     isLoadingMore,
     isReachingEnd,
     error,
+    setSize,
     lastItemRef,
     filters,
     updateFilter,

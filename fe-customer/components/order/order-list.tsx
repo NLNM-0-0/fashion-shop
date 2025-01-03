@@ -1,10 +1,6 @@
 "use client";
-import { orderFilterValues, orderStatusValues } from "@/lib/constants";
-import { FormFilterItem, FormFilterValues } from "@/lib/types";
+import { orderStatusValues } from "@/lib/constants";
 import StatusButton from "../ui/status-button";
-import { useState } from "react";
-import Filter from "../filter/filter";
-import { FilterParams } from "@/hooks/useFilterList";
 import { useOrderList } from "@/hooks/useOrderList";
 import OrderItem from "./order-item";
 import OrderListSkeleton from "./order-list-skeleton";
@@ -17,38 +13,16 @@ const OrderList = () => {
     lastItemRef,
     filters,
     removeFilter,
+    setSize,
     updateFilter,
-    updateFilters,
   } = useOrderList();
 
-  const [openFilter, setOpenFilter] = useState(false);
-
-  const onApplyFilters = (data: FormFilterValues) => {
-    const filterParams = data.filters.reduce(
-      (acc: FilterParams, item: FormFilterItem) => {
-        acc[item.type] = item.value;
-        return acc;
-      },
-      {}
-    );
-    updateFilters(filterParams);
-  };
   if (error) return <div>Error loading orders.</div>;
   if (isLoadingMore) return <OrderListSkeleton number={5} />;
   return (
     <div className="flex flex-1  justify-center grow overflow-y-auto">
       <div className="flex flex-1 flex-col gap-2 max-w-[1200px]">
-        <div className="flex justify-between items-center flex-wrap">
-          <Filter
-            title="Filter orders"
-            filters={filters}
-            filterValues={orderFilterValues}
-            open={openFilter}
-            onOpenChange={(open) => {
-              setOpenFilter(open);
-            }}
-            onApplyFilters={onApplyFilters}
-          />
+        <div className="flex justify-end  items-center flex-wrap">
           <div className="flex gap-2 flex-wrap">
             <StatusButton
               title="All"
@@ -62,12 +36,16 @@ const OrderList = () => {
                 title={status.title}
                 value={status.value}
                 selected={filters.orderStatus === status.value}
-                onSelect={(value) => updateFilter("orderStatus", value)}
+                onSelect={(value) => {
+                  updateFilter("orderStatus", value);
+                  setSize(1);
+                }}
               />
             ))}
           </div>
         </div>
         <div className="flex flex-col mt-4 gap-4">
+          {orders.length < 1 && <>There are no orders found.</>}
           {orders.map((item, index) => (
             <div
               key={item.id}

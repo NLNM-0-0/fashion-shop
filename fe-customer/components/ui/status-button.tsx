@@ -21,6 +21,7 @@ const StatusButton = ({
       style={{ fontWeight: 500 }}
       onClick={() => onSelect?.(value)}
       variant={"ghost"}
+      type="button"
       className={cn(
         "px-6 border-b-2 border-transparent border-solid bg-transparent hover:bg-transparent rounded-none",
         selected &&
