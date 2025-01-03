@@ -43,7 +43,7 @@ const ChangeImage = ({
         setImage(null);
         toast({
           variant: "destructive",
-          title: "Có lỗi",
+          title: "Error",
           description: "Invalid file",
         });
       }

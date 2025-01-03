@@ -10,6 +10,7 @@ import { Button } from "../ui/button";
 import { PiSlidersHorizontal } from "react-icons/pi";
 import { cn } from "@/lib/utils";
 import FavoriteListSkeleton from "../favorite/favorite-list-skeleton";
+import Paging from "../paging";
 
 const AllProductLayout = () => {
   const { filters, updateFilterUrl, data, isLoading, error } = useProductList();
@@ -60,7 +61,9 @@ const AllProductLayout = () => {
                 : filters.genders.toLowerCase()
               : ""}
             {filters.genders && filters.categoryName ? " | " : ""}
-            {filters.categoryName ? filters.categoryName : ""}
+            {filters.categoryName
+              ? decodeURIComponent(filters.categoryName.toString())
+              : ""}
           </span>
           <FilterBySelect
             selectedValue={selectedSortType}
@@ -93,6 +96,12 @@ const AllProductLayout = () => {
               {productList?.map((item) => (
                 <ProductItem key={item.id} product={item} />
               ))}
+            </div>
+            <div className="w-full flex justify-end">
+              <Paging
+                page={data?.data.page.index.toString() ?? "1"}
+                totalPage={data?.data.page.totalPages ?? 1}
+              />
             </div>
           </>
         )}

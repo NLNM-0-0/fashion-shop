@@ -11,6 +11,8 @@ import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import sendEmailForgotPassword from "@/lib/api/reset-password/sendEmailForgotPassword";
 import LoadingSpinner from "@/components/ui/loading-spinner";
+import { AxiosError } from "axios";
+import { ApiError } from "@/lib/types";
 
 const SendEmailForgotPasswordSchema = z.object({
   email: z.string().email("Invalid email"),
@@ -29,33 +31,27 @@ const SendEmailForgotPasswordForm = () => {
 
   const onSubmit = async ({ email }: { email: string }) => {
     setIsLoading(true);
-    const responseData = await sendEmailForgotPassword({
+    sendEmailForgotPassword({
       email: email,
-    });
-    if (responseData.hasOwnProperty("data")) {
-      if (responseData.data === true) {
-        toast({
-          variant: "success",
-          title: "Thành công",
-          description: "Đã gửi hướng dẫn đổi mật khẩu đến email bạn vừa nhập.",
-        });
+    })
+      .then(() => {
         reset({
           email: "",
         });
-      }
-    } else if (responseData.hasOwnProperty("message")) {
-      toast({
-        variant: "destructive",
-        title: "Có lỗi",
-        description: responseData.message,
+        return toast({
+          variant: "success",
+          title: "Success",
+          description:
+            "A password reset email has been sent to your email address",
+        });
+      })
+      .catch((err: AxiosError<ApiError>) => {
+        toast({
+          variant: "destructive",
+          title: "Error",
+          description: err.response?.data.message ?? "Send email failed",
+        });
       });
-    } else {
-      toast({
-        variant: "destructive",
-        title: "Có lỗi",
-        description: "Vui lòng thử lại sau",
-      });
-    }
     setIsLoading(false);
   };
 

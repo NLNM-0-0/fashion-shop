@@ -17,7 +17,7 @@ interface ProductCarouselProps {
 }
 const ProductCarousel = ({ products, title }: ProductCarouselProps) => {
   return (
-    <div className="w-full">
+    <div className="w-full md:max-w-[calc(100vw-5rem)] max-w-[calc(100vw-2rem)] flex">
       <Carousel
         opts={{
           align: "start",

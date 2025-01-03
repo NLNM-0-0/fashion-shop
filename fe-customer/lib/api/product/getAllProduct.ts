@@ -6,5 +6,7 @@ import { AxiosResponse } from "axios";
 export default function getAllProduct(
   params: ProductFilterParam
 ): Promise<AxiosResponse<ProductData>> {
-  return axios.get<ProductData>(`/item?${encodeParams(params)}`);
+  return axios.get<ProductData>(
+    `/item?${encodeParams({ ...params, limit: 12 })}`
+  );
 }

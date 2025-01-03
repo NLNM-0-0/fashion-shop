@@ -21,7 +21,7 @@ const DeleteCustomer = ({ id, onDelete }: DeleteCustomerProps) => {
         return toast({
           variant: "success",
           title: "Success",
-          description: "Edit customer successfully",
+          description: "Delete customer successfully",
         });
       })
 
@@ -29,7 +29,7 @@ const DeleteCustomer = ({ id, onDelete }: DeleteCustomerProps) => {
         toast({
           variant: "destructive",
           title: "Error",
-          description: err.response?.data.message ?? "Edit customer failed",
+          description: err.response?.data.message ?? "Delete customer failed",
         });
       });
   };

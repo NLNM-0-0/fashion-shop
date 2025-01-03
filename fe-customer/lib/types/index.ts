@@ -57,6 +57,10 @@ export interface ProductData {
   page: PagingType;
 }
 
+export interface ProductList {
+  data: Product[];
+}
+
 export interface Category {
   id: number;
   name: string;
