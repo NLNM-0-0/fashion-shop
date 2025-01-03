@@ -32,6 +32,7 @@ import { Avatar, AvatarFallback, AvatarImage } from "../ui/avatar";
 import { FaPen, FaPlus } from "react-icons/fa";
 import Link from "next/link";
 import { cn, toVND } from "@/lib/utils";
+import DeleteProduct from "./delete-product";
 
 export const columns: ColumnDef<Product>[] = [
   {
@@ -92,7 +93,7 @@ export const columns: ColumnDef<Product>[] = [
 
 export function ProductTable() {
   const router = useRouter();
-  const { filters, data, isLoading, error } = useProductList();
+  const { filters, data, isLoading, error, mutate } = useProductList();
 
   const customers: Product[] = data?.data.data || [];
   const table = useReactTable({
@@ -197,7 +198,7 @@ export function ProductTable() {
                   >
                     {row.getVisibleCells().map((cell) =>
                       cell.id.includes("actions") ? (
-                        <TableCell key={cell.id}>
+                        <TableCell key={cell.id} className="flex gap-2">
                           <Link
                             href={`/admin/products/${row.original.id}`}
                             className={cn(
@@ -210,6 +211,10 @@ export function ProductTable() {
                           >
                             <FaPen />
                           </Link>
+                          <DeleteProduct
+                            id={row.original.id}
+                            onDelete={() => void mutate()}
+                          />
                         </TableCell>
                       ) : (
                         <TableCell key={cell.id}>
