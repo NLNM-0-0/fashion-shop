@@ -155,7 +155,7 @@ public class AuthenticationService {
 		UserAuth userAuth = Common.findUserAuthByPhone(request.getPhone(), userAuthRepository);
 		User user = Common.findUserByUserAuth(userAuth.getId(), userRepository);
 
-		Optional<OTP> otp = otpRepository.findByUser(user.getId());
+		Optional<OTP> otp = otpRepository.findByUserId(user.getId());
 
 		String otpNumber = OTP.generateOTP();
 		OTP newOtp;
@@ -185,7 +185,7 @@ public class AuthenticationService {
 		UserAuth userAuth = Common.findUserAuthByPhone(request.getPhone(), userAuthRepository);
 		User user = Common.findUserByUserAuth(userAuth.getId(), userRepository);
 
-		OTP otp = otpRepository.findByUserAndOtp(user.getId(), request.getOtp())
+		OTP otp = otpRepository.findByUserIdAndAndOtp(user.getId(), request.getOtp())
 							   .orElseThrow(() -> new AppException(HttpStatus.BAD_REQUEST, Message.OTP_NOT_EXIST));
 
 		if (!otp.isValid()) {
@@ -200,7 +200,7 @@ public class AuthenticationService {
 		UserAuth userAuth = Common.findUserAuthByPhone(request.getPhone(), userAuthRepository);
 		User user = Common.findUserByUserAuth(userAuth.getId(), userRepository);
 
-		OTP otp = otpRepository.findByUserAndOtp(user.getId(), request.getOtp())
+		OTP otp = otpRepository.findByUserIdAndAndOtp(user.getId(), request.getOtp())
 							   .orElseThrow(() -> new AppException(HttpStatus.BAD_REQUEST, Message.OTP_NOT_EXIST));
 
 		if (!otp.isValid()) {
@@ -220,7 +220,7 @@ public class AuthenticationService {
 		UserAuth userAuth = Common.findUserAuthByPhone(request.getPhone(), userAuthRepository);
 		User user = Common.findUserByUserAuth(userAuth.getId(), userRepository);
 
-		OTP otp = otpRepository.findByUserAndOtp(user.getId(), request.getOtp())
+		OTP otp = otpRepository.findByUserIdAndAndOtp(user.getId(), request.getOtp())
 							   .orElseThrow(() -> new AppException(HttpStatus.BAD_REQUEST, Message.OTP_NOT_EXIST));
 
 		if (!otp.isValid()) {

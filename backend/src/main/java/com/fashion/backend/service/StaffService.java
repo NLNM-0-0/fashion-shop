@@ -67,14 +67,16 @@ public class StaffService {
 	}
 
 	@Transactional
-	public StaffResponse updateStaff(Long userId, UpdateStaffRequest request) {
-		User user = Common.findUserById(userId, userRepository);
+	public StaffResponse updateStaff(Long staffId, UpdateStaffRequest request) {
+		User user = Common.findUserById(staffId, userRepository);
 
 		UserAuth userAuth = user.getUserAuth();
+
+		String updatedEmail = userAuth.getEmail();
 		String currEmail = Common.getCurrUserName();
-		if (Objects.equals(userAuth.getEmail(), currEmail)) {
+		if (Objects.equals(updatedEmail, currEmail)) {
 			throw new AppException(HttpStatus.BAD_REQUEST, Message.User.CAN_NOT_UPDATE_YOURSELF);
-		} else if (AuthHelper.isNormalUser(userAuth)) {
+		} else if (AuthHelper.isNormalUser(updatedEmail)) {
 			throw new AppException(HttpStatus.BAD_REQUEST, Message.User.CAN_NOT_REACH_CUSTOMER);
 		}
 

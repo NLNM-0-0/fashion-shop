@@ -5,6 +5,7 @@ import com.fashion.backend.constant.Message;
 import com.fashion.backend.utils.validation.date.ValidDDMMYYYYFormat;
 import io.swagger.v3.oas.annotations.media.Schema;
 import jakarta.validation.constraints.Email;
+import jakarta.validation.constraints.NotEmpty;
 import jakarta.validation.constraints.NotNull;
 import lombok.Data;
 import org.hibernate.validator.constraints.Length;
@@ -28,6 +29,7 @@ public class CreateStaffRequest {
 			example = "user@gmail.com"
 	)
 	@Email(message = Message.EMAIL_VALIDATE)
+	@NotEmpty(message = Message.EMAIL_VALIDATE)
 	@NotNull(message = Message.EMAIL_VALIDATE)
 	private String email;
 

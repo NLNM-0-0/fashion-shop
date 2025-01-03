@@ -19,7 +19,7 @@ public class AdminItemFilter {
 	)
 	@Length(
 			max = 200,
-			message = Message.Item.NAME_FILTER_VALIDATE
+				message = Message.Item.NAME_FILTER_VALIDATE
 	)
 	private String name;
 }

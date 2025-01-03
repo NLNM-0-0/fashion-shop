@@ -105,16 +105,14 @@ public class NotificationService {
 
 	@Transactional
 	public SimpleResponse sendNotification(CreateNotificationRequest request) {
-		UserAuth senderAuth = Common.findCurrUserAuth(userAuthRepository);
-
-		User sender = Common.findUserById(senderAuth.getId(), userRepository);
+		User sender = Common.findCurrUser(userRepository, userAuthRepository);
 
 		List<User> receivers;
 		if (request.getReceivers() == null || request.getReceivers().isEmpty()) {
 			receivers = userRepository.findAllNotDeleted();
 		} else {
 			receivers = userRepository.findByIdInAndAndIdNotEqualAndNotHasPhoneAndNotDelete(request.getReceivers(),
-																							senderAuth.getId());
+																							sender.getUserAuth().getId());
 		}
 
 		return Common.sendNotification(notificationRepository,
@@ -135,9 +133,7 @@ public class NotificationService {
 	@Transactional
 	public SimpleResponse seeAllNotification() {
 		UserAuth userAuth = Common.findCurrUserAuth(userAuthRepository);
-		List<Notification> notifications = notificationRepository.findAllByToUserId(userAuth.getId(),
-																					Sort.by(Sort.Direction.DESC,
-																							"createdAt"));
+		List<Notification> notifications = notificationRepository.findAllByToUserId(userAuth.getId());
 
 		notificationRepository.saveAll(notifications.stream()
 													.peek(notification -> notification.setSeen(true))

@@ -7,9 +7,7 @@ import org.springframework.data.jpa.repository.Query;
 import java.util.Optional;
 
 public interface OtpRepository extends JpaRepository<OTP, Long> {
-	@Query("SELECT otp FROM OTP otp WHERE otp.user.id = :userId AND otp.otp = :otp")
-	Optional<OTP> findByUserAndOtp(Long userId, String otp);
+	Optional<OTP> findByUserIdAndAndOtp(Long userId, String otp);
 
-	@Query("SELECT otp FROM OTP otp WHERE otp.user.id = :userId")
-	Optional<OTP> findByUser(Long userId);
+	Optional<OTP> findByUserId(Long userId);
 }

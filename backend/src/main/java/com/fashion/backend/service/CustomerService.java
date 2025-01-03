@@ -2,6 +2,7 @@ package com.fashion.backend.service;
 
 import com.fashion.backend.constant.Message;
 import com.fashion.backend.entity.User;
+import com.fashion.backend.entity.UserAuth;
 import com.fashion.backend.exception.AppException;
 import com.fashion.backend.payload.ListResponse;
 import com.fashion.backend.payload.SimpleResponse;
@@ -35,11 +36,15 @@ public class CustomerService {
 	public SimpleResponse deleteCustomer(Long customerId) {
 		User user = Common.findUserById(customerId, userRepository);
 
-		if (AuthHelper.isStaff(user.getUserAuth())) {
+		UserAuth userAuth = user.getUserAuth();
+
+		if (AuthHelper.isStaff(userAuth)) {
 			throw new AppException(HttpStatus.BAD_REQUEST, Message.User.CAN_NOT_REACH_STAFF);
 		}
 
-		userAuthRepository.deleteUserAuthById(user.getUserAuth().getId());
+		userAuth.setDeleted(true);
+
+		userAuthRepository.save(userAuth);
 
 		return new SimpleResponse();
 	}

@@ -52,10 +52,10 @@ public class CategoryService {
 	}
 
 	@Transactional
-	public SimpleResponse deleteCategory(Long id) {
-		Category category = Common.findCategoryById(id, categoryRepository);
+	public SimpleResponse deleteCategory(Long categoryId) {
+		Category category = Common.findCategoryById(categoryId, categoryRepository);
 
-		List<Item> items = itemRepository.findAllByCategories_Id(id);
+		List<Item> items = itemRepository.findAllByCategories_Id(categoryId);
 
 		for (Item item : items) {
 			if (!item.isDeleted() && item.getCategories().size() == 1) {

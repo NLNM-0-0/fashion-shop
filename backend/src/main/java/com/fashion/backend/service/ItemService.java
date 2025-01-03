@@ -238,15 +238,16 @@ public class ItemService {
 		item = itemRepository.save(item);
 
 		List<ItemQuantity> quantities = new ArrayList<>();
+		int totalQuantity = 0;
 		for (ItemQuantityRequest quantity : request.getQuantities()) {
 			ItemQuantity quantityEntity = mapToEntity(quantity);
 			quantityEntity.setItem(item);
 
 			quantities.add(quantityEntity);
+
+			totalQuantity += quantity.getQuantity();
 		}
 		itemQuantityRepository.saveAll(quantities);
-
-		int totalQuantity = this.calcTotalQuantityFromItemId(item.getId());
 
 		if (totalQuantity != 0) {
 			StockChangeHistory stockChangeHistory = StockChangeHistory.builder()
@@ -316,6 +317,8 @@ public class ItemService {
 		Item item = Common.findItemById(itemId, itemRepository);
 
 		item.setDeleted(true);
+
+		itemRepository.save(item);
 
 		return new SimpleResponse();
 	}

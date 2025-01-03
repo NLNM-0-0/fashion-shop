@@ -110,7 +110,7 @@ public class Common {
 		}
 
 		if (!toUserUserName.equals(currUserName)) {
-			throw new AppException(HttpStatus.BAD_REQUEST, Message.Notification.CAN_NOT_READ_OTHER_S_NOTIFICATION);
+			throw new AppException(HttpStatus.BAD_REQUEST, Message.Notification.CAN_NOT_READ_OTHERS_NOTIFICATION);
 		}
 
 		return notification;
@@ -190,8 +190,8 @@ public class Common {
 		return categories;
 	}
 
-	public static Order findOrderById(Long itemId, OrderRepository orderRepository) {
-		return orderRepository.findById(itemId)
+	public static Order findOrderById(Long orderId, OrderRepository orderRepository) {
+		return orderRepository.findById(orderId)
 							  .orElseThrow(() -> new AppException(HttpStatus.BAD_REQUEST,
 																  Message.Order.ORDER_NOT_EXIST));
 	}

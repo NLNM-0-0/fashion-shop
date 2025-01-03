@@ -5,6 +5,7 @@ import com.fashion.backend.constant.Message;
 import com.fashion.backend.constant.Season;
 import io.swagger.v3.oas.annotations.media.Schema;
 import jakarta.validation.constraints.Min;
+import jakarta.validation.constraints.NotEmpty;
 import jakarta.validation.constraints.NotNull;
 import lombok.Data;
 import org.hibernate.validator.constraints.Length;
@@ -22,6 +23,7 @@ public class CreateItemRequest {
 			max = 200,
 			message = Message.Item.NAME_VALIDATE
 	)
+	@NotEmpty(message = Message.Item.NAME_VALIDATE)
 	@NotNull(message = Message.Item.NAME_VALIDATE)
 	private String name;
 
