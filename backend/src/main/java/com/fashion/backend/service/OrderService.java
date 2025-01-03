@@ -71,13 +71,13 @@ public class OrderService {
 
 	@Transactional
 	public ListResponse<OrderResponse, UserOrderFilter> getOrders(AppPageRequest page, UserOrderFilter filter) {
-		User customer = Common.findCurrUser(userRepository, userAuthRepository);
+		User user = Common.findCurrUser(userRepository, userAuthRepository);
 
 		Pageable pageable = PageRequest.of(page.getPage() - 1,
 										   page.getLimit(),
 										   Sort.by(Sort.Direction.DESC, "updatedAt"));
 
-		Specification<Order> spec = filterOrders(customer.getId(), filter);
+		Specification<Order> spec = filterOrders(user.getId(), filter);
 
 		Page<Order> orderPage = orderRepository.findAll(spec, pageable);
 
@@ -128,7 +128,7 @@ public class OrderService {
 	public SimpleResponse receiveOrder(Long orderId) {
 		Order order = Common.findOrderById(orderId, orderRepository);
 		if (order.getStatus() == OrderStatus.DONE || order.getStatus() == OrderStatus.CANCELED) {
-			throw new AppException(HttpStatus.BAD_REQUEST, Message.Order.CAN_NOT_BE_REACHED_CLOSED_ORDER);
+			throw new AppException(HttpStatus.BAD_REQUEST, Message.Order.CAN_NOT_CLOSE_THIS_STATUS);
 		}
 
 		User user = Common.findCurrUser(userRepository, userAuthRepository);
@@ -148,18 +148,9 @@ public class OrderService {
 	}
 
 	public SimpleResponse adminCancelOrder(Long orderId) {
-		return cancelOrder(orderId, List.of(OrderStatus.DONE, OrderStatus.CANCELED));
-	}
-
-	public SimpleResponse customerCancelOrder(Long orderId) {
-		return cancelOrder(orderId, List.of(OrderStatus.DONE, OrderStatus.CANCELED, OrderStatus.CONFIRMED, OrderStatus.SHIPPING));
-	}
-
-	@Transactional
-	public SimpleResponse cancelOrder(Long orderId, List<OrderStatus> blockedStatuses) {
 		Order order = Common.findOrderById(orderId, orderRepository);
-		if (blockedStatuses.contains(order.getStatus())) {
-			throw new AppException(HttpStatus.BAD_REQUEST, Message.Order.CAN_NOT_BE_REACHED_CLOSED_ORDER);
+		if (order.getStatus().equals(OrderStatus.CANCELED) || order.getStatus().equals(OrderStatus.DONE)) {
+			throw new AppException(HttpStatus.BAD_REQUEST, Message.Order.CAN_NOT_CLOSE_THIS_STATUS);
 		}
 
 		order.setCancelledAt(new Date());
@@ -175,11 +166,38 @@ public class OrderService {
 		return new SimpleResponse();
 	}
 
+	public SimpleResponse customerCancelOrder(Long orderId) {
+		Order order = Common.findOrderById(orderId, orderRepository);
+		if (order.getStatus().equals(OrderStatus.CANCELED) ||
+			order.getStatus().equals(OrderStatus.DONE) ||
+			order.getStatus().equals(OrderStatus.SHIPPING) ||
+			order.getStatus().equals(OrderStatus.CONFIRMED)) {
+			throw new AppException(HttpStatus.BAD_REQUEST, Message.Order.CAN_NOT_CLOSE_THIS_STATUS);
+		}
+
+		User user = Common.findCurrUser(userRepository, userAuthRepository);
+		boolean isMadeByCurrUser = Objects.equals(user.getId(), order.getCustomer().getId());
+		if (!isMadeByCurrUser) {
+			throw new AppException(HttpStatus.BAD_REQUEST, Message.Order.ORDER_JUST_CAN_BE_REACHED_BY_OWNER_CUSTOMER);
+		}
+
+		order.setCancelledAt(new Date());
+		order.setStatus(OrderStatus.CANCELED);
+
+		orderRepository.save(order);
+
+		handlePaybackItem(order);
+
+		sendEmailOrderStatusChange(order, user, OrderStatus.CANCELED);
+
+		return new SimpleResponse();
+	}
+
 	@Transactional
 	public SimpleResponse changeOrderStatus(Long orderId) {
 		Order order = Common.findOrderById(orderId, orderRepository);
 		if (order.getStatus() == OrderStatus.DONE || order.getStatus() == OrderStatus.CANCELED) {
-			throw new AppException(HttpStatus.BAD_REQUEST, Message.Order.CAN_NOT_BE_REACHED_CLOSED_ORDER);
+			throw new AppException(HttpStatus.BAD_REQUEST, Message.Order.CAN_NOT_CLOSE_THIS_STATUS);
 		}
 
 		OrderStatus currStatus = order.getStatus();
@@ -246,7 +264,7 @@ public class OrderService {
 
 	private void validateOrderDetails(PlaceOrderRequest request) {
 		if (request.getCardIds() == null || request.getCardIds().isEmpty()) {
-			throw new AppException(HttpStatus.BAD_REQUEST, Message.Order.ORDER_CAN_NOT_HAVE_NO_ITEM);
+				throw new AppException(HttpStatus.BAD_REQUEST, Message.Order.ORDER_CAN_NOT_HAVE_NO_ITEM);
 		}
 		if (isContainOnlyUnique(request.getCardIds())) {
 			throw new AppException(HttpStatus.BAD_REQUEST, Message.Order.ORDER_CAN_NOT_HAVE_SAME_ITEM);
@@ -397,7 +415,7 @@ public class OrderService {
 		}
 		return SimpleStaffResponse.builder()
 								  .id(user.getId())
-								  .email(user.getEmail())
+								  .email(user.getUserAuth().getEmail())
 								  .image(user.getImage())
 								  .name(user.getName())
 								  .build();

@@ -39,12 +39,12 @@ public class MailSender {
 		message.setFrom(new InternetAddress("from@gmail.com"));
 		message.setRecipients(Message.RecipientType.TO, InternetAddress.parse(emailTo));
 		message.setSubject("Reset password");
-		String mailContent = "<p>Xin chào, " + nameTo + ", </p>" +
-							 "<p>Cảm ơn đã sử dụng dịch vụ của chúng tôi.</p>" +
-							 "<p>Hãy theo link này để có thể reset mật khẩu.</p>" +
+		String mailContent = "<p>Hello, " + nameTo + ", </p>" +
+							 "<p>Thanks for using our service.</p>" +
+							 "<p>Follow this link to reset your password.</p>" +
 							 "<a href=\"" + url + "\">Reset Password</a>" +
-							 "<p>Chú ý: Link này chỉ có hiệu lực trong vòng 5 phút.</p>" +
-							 "<p>Cảm ơn</p>";
+							 "<p>Note: This link is valid for only 5 minutes.</p>" +
+							 "<p>Thank you <3</p>";
 		message.setText(mailContent);
 		message.setContent(mailContent, "text/html;charset=utf-8");
 		return message;

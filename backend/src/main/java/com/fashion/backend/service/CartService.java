@@ -77,9 +77,7 @@ public class CartService {
 
 	@Transactional
 	public SimpleResponse deleteCartItem(Long cartId) {
-		Cart cart = cartRepository.findById(cartId)
-								  .orElseThrow(() -> new AppException(HttpStatus.BAD_REQUEST,
-																	  Message.Cart.ITEM_NOT_IN_CART));
+		Cart cart = Common.findCartById(cartId, cartRepository);
 
 		cartRepository.delete(cart);
 
@@ -95,7 +93,6 @@ public class CartService {
 
 	@Transactional
 	public SimpleResponse addCartItem(AddToCartRequest request) {
-		User user = Common.findCurrUser(userRepository, userAuthRepository);
 
 		Item item = Common.findItemById(request.getItemId(), itemRepository);
 		ItemQuantity itemQuantity = Common.findItemQuantity(item.getId(),
@@ -103,6 +100,7 @@ public class CartService {
 															request.getColor(),
 															itemQuantityRepository);
 
+		User user = Common.findCurrUser(userRepository, userAuthRepository);
 		Optional<Cart> cartItemOptional = findOptionalCart(user.getId(),
 														   item.getId(),
 														   request.getSize(),
@@ -178,9 +176,8 @@ public class CartService {
 			return new SimpleResponse();
 		}
 
-		Cart cart = cartRepository.findById(cartId)
-								  .orElseThrow(() -> new AppException(HttpStatus.BAD_REQUEST,
-																	  Message.Cart.ITEM_NOT_IN_CART));
+		Cart cart = Common.findCartById(cartId, cartRepository);
+
 
 		if (cart.getItem().isDeleted()) {
 			throw new AppException(HttpStatus.BAD_REQUEST, Message.Item.ITEM_IS_DELETED);
@@ -191,16 +188,17 @@ public class CartService {
 															cart.getColor(),
 															itemQuantityRepository);
 
-		cart.setQuantity(cart.getQuantity() + request.getQuantityChange());
-		if (cart.getQuantity() < 0) {
+		int currQuantity = cart.getQuantity() + request.getQuantityChange();
+		if (currQuantity < 0) {
 			throw new AppException(HttpStatus.BAD_REQUEST, Message.Cart.QUANTITY_MIN_VALIDATE);
-		} else if (cart.getQuantity() > itemQuantity.getQuantity()) {
+		} else if (currQuantity > itemQuantity.getQuantity()) {
 			throw new AppException(HttpStatus.BAD_REQUEST, Message.Cart.CAN_NOT_ADD_OVER_CURRENT_QUANTITY);
-		} else if (cart.getQuantity() == 0) {
+		} else if (currQuantity == 0) {
 			cartRepository.delete(cart);
 			return new SimpleResponse();
 		}
 
+		cart.setQuantity(currQuantity);
 		cartRepository.save(cart);
 
 		return new SimpleResponse();
@@ -250,20 +248,6 @@ public class CartService {
 						   .images(item.getImages())
 						   .isDeleted(item.isDeleted())
 						   .build();
-	}
-
-	private ItemQuantity mapToEntity(ItemQuantityRequest request) {
-		return ItemQuantity.builder()
-						   .color(request.getColor())
-						   .quantity(request.getQuantity())
-						   .size(request.getSize())
-						   .build();
-	}
-
-	private ItemSizeDTO mapToSizeDTO(ItemQuantity quantityEntity) {
-		return ItemSizeDTO.builder()
-						  .name(quantityEntity.getSize())
-						  .build();
 	}
 
 	private ItemSizeDTO mapToDTO(String size) {

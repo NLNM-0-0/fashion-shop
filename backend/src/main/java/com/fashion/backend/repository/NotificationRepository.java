@@ -12,6 +12,9 @@ public interface NotificationRepository extends JpaRepository<Notification, Long
 	@Query("SELECT n FROM Notification n WHERE n.toUser.userAuth.id = :toUserId")
 	List<Notification> findAllByToUserId(Long toUserId, Sort sort);
 
+	@Query("SELECT n FROM Notification n WHERE n.toUser.userAuth.id = :toUserId")
+	List<Notification> findAllByToUserId(Long toUserId);
+
 	@Query("SELECT COUNT(n) FROM Notification n WHERE n.toUser.userAuth.id = :toUserId AND n.seen = false")
 	int countUnseenNotificationsByToUserId(Long toUserId);
 

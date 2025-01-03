@@ -30,6 +30,7 @@ public class CreateNotificationRequest {
 			max = 200,
 			message = Message.Notification.DESCRIPTION_VALIDATE
 	)
+	@NotNull(message = Message.Notification.DESCRIPTION_VALIDATE)
 	private String description = "";
 
 	@Schema(

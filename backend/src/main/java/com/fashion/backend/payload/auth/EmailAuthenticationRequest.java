@@ -22,6 +22,7 @@ public class EmailAuthenticationRequest {
 	)
 	@Email(message = Message.EMAIL_VALIDATE)
 	@NotEmpty(message = Message.EMAIL_VALIDATE)
+	@NotNull(message = Message.EMAIL_VALIDATE)
 	private String email;
 
 	@Schema(
@@ -33,6 +34,7 @@ public class EmailAuthenticationRequest {
 			max = 20,
 			message = Message.PASSWORD_VALIDATE
 	)
+	@NotEmpty(message = Message.PASSWORD_VALIDATE)
 	@NotNull(message = Message.PASSWORD_VALIDATE)
 	private String password;
 }

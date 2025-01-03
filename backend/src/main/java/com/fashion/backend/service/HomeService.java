@@ -27,21 +27,21 @@ public class HomeService {
 	private final UserAuthRepository userAuthRepository;
 	private final LikeRepository likeRepository;
 
-	private SimpleListResponse<SimpleItemDetail> getTopSellers() {
+	public SimpleListResponse<SimpleItemDetail> getTopSellers() {
 		return getTopSellers(TOP_BEST_SELLER);
 	}
 
-	private SimpleListResponse<SimpleItemDetail> getTopSellers(int number) {
+	public SimpleListResponse<SimpleItemDetail> getTopSellers(int number) {
 		List<Item> bestSellerItems = itemRepository.findTopBySold(number);
 
 		return mapItemResponse(bestSellerItems);
 	}
 
-	private SimpleListResponse<SimpleItemDetail> getLatest() {
+	public SimpleListResponse<SimpleItemDetail> getLatest() {
 		return getLatest(TOP_LATEST);
 	}
 
-	private SimpleListResponse<SimpleItemDetail> getLatest(int number) {
+	public SimpleListResponse<SimpleItemDetail> getLatest(int number) {
 		List<Item> bestSellerItems = itemRepository.findTopByCreatedAt(number);
 
 		return mapItemResponse(bestSellerItems);

@@ -34,13 +34,8 @@ public class UserService {
 			throw new AppException(HttpStatus.BAD_REQUEST, Message.User.OLD_PASSWORD_NOT_CORRECT);
 		}
 
-		String username = userDetails.getUsername();
-		UserAuth userAuth;
-		if (AuthHelper.isStaff(username)) {
-			userAuth = Common.findUserAuthByEmail(username, userAuthRepository);
-		} else {
-			userAuth = Common.findUserAuthByPhone(username, userAuthRepository);
-		}
+		UserAuth userAuth = Common.findCurrUserAuth(userAuthRepository);
+
 		userAuth.setPassword(passwordEncoder.encode(request.getNewPassword()));
 		userAuthRepository.save(userAuth);
 
@@ -50,43 +45,31 @@ public class UserService {
 
 	@Transactional
 	public StaffProfileResponse seeStaffProfile() {
-		String email = Common.getCurrUserName();
+		User user = Common.findCurrUser(userRepository, userAuthRepository);
 
-		UserAuth userAuth = Common.findUserAuthByEmail(email, userAuthRepository);
-
-		User user = Common.findUserByUserAuth(userAuth.getId(), userRepository);
-
-		return mapToStaffDTO(user, userAuth);
+		return mapToStaffDTO(user);
 	}
 
 	@Transactional
 	public ProfileResponse seeProfile() {
-		String phone = Common.getCurrUserName();
+		User user = Common.findCurrUser(userRepository, userAuthRepository);
 
-		UserAuth userAuth = Common.findUserAuthByPhone(phone, userAuthRepository);
-
-		User user = Common.findUserByUserAuth(userAuth.getId(), userRepository);
-
-		return mapToUserDTO(user, userAuth);
+		return mapToUserDTO(user);
 	}
 
 	@Transactional
 	public StaffProfileResponse updateUserStaff(UpdateUserStaffRequest request) {
-		UserAuth userAuth = Common.findCurrUserAuth(userAuthRepository);
-
-		User user = Common.findUserByUserAuth(userAuth.getId(), userRepository);
+		User user = Common.findCurrUser(userRepository, userAuthRepository);
 
 		Common.updateIfNotNull(request.getAddress(), user::setAddress);
 		Common.updateIfNotNull(request.getImage(), user::setImage);
 
-		return mapToStaffDTO(userRepository.save(user), userAuth);
+		return mapToStaffDTO(userRepository.save(user));
 	}
 
 	@Transactional
 	public ProfileResponse updateUser(UpdateUserRequest request) {
-		UserAuth userAuth = Common.findCurrUserAuth(userAuthRepository);
-
-		User user = Common.findUserByUserAuth(userAuth.getId(), userRepository);
+		User user = Common.findCurrUser(userRepository, userAuthRepository);
 
 		if (request.getEmail() != null && !request.getEmail().equals(user.getEmail())) {
 			Optional<User> checkedUser = userRepository.findFirstByEmail(request.getEmail());
@@ -102,28 +85,28 @@ public class UserService {
 		Common.updateIfNotNull(request.getImage(), user::setImage);
 		Common.updateIfNotNull(request.getMale(), user::setMale);
 
-		return mapToUserDTO(userRepository.save(user), userAuth);
+		return mapToUserDTO(userRepository.save(user));
 	}
 
-	private StaffProfileResponse mapToStaffDTO(User user, UserAuth userAuth) {
+	private StaffProfileResponse mapToStaffDTO(User user) {
 		return StaffProfileResponse.builder()
 								   .id(user.getId())
 								   .name(user.getName())
-								   .email(userAuth.getEmail())
+								   .email(user.getEmail())
 								   .image(user.getImage())
 								   .address(user.getAddress())
 								   .male(user.isMale())
 								   .dob(user.getDob())
-								   .admin(userAuth.isAdmin())
+								   .admin(user.getUserAuth().isAdmin())
 								   .build();
 	}
 
-	private ProfileResponse mapToUserDTO(User user, UserAuth userAuth) {
+	private ProfileResponse mapToUserDTO(User user) {
 		return ProfileResponse.builder()
 							  .id(user.getId())
 							  .name(user.getName())
 							  .email(user.getEmail())
-							  .phone(userAuth.getPhone())
+							  .phone(user.getUserAuth().getPhone())
 							  .image(user.getImage())
 							  .address(user.getAddress())
 							  .male(user.isMale())
