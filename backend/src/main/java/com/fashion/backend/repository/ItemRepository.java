@@ -14,10 +14,10 @@ import java.util.List;
 public interface ItemRepository extends JpaRepository<Item, Long>, JpaSpecificationExecutor<Item> {
 	List<Item> findAllByCategories_Id(Long categoryId);
 
-	@Query(value = "SELECT i FROM Item i ORDER BY i.sold DESC LIMIT :top", nativeQuery = true)
+	@Query(value = "SELECT * FROM Item i ORDER BY i.sold DESC LIMIT :top", nativeQuery = true)
 	List<Item> findTopBySold(int top);
 
-	@Query(value = "SELECT i FROM Item i ORDER BY i.createdAt DESC LIMIT :top", nativeQuery = true)
+	@Query(value = "SELECT * FROM Item i ORDER BY i.createdAt DESC LIMIT :top", nativeQuery = true)
 	List<Item> findTopByCreatedAt(int top);
 
 	default List<Item> findAllNotDelete() {
