@@ -1,7 +1,7 @@
 package com.fashion.backend.constant;
 
 public class ApplicationConst {
-	public final static String FE_URL = "http://localhost:80";
+	public final static String FE_URL = "http://localhost:3000";
 	public final static String RESET_PASSWORD_FE_PATH = "/reset-password/";
 	public final static String BUCKET_NAME = "fashion-shop-94e75.appspot.com";
 	public final static String DEFAULT_AVATAR
