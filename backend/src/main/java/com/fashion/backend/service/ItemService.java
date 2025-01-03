@@ -74,7 +74,7 @@ public class ItemService {
 		List<Sort.Order> orders = new ArrayList<>();
 
 		if (filter.getSortPrice() != null) {
-			if (filter.getSortPrice()) {
+			if (!filter.getSortPrice()) {
 				orders.add(Sort.Order.asc("unitPrice"));
 			} else {
 				orders.add(Sort.Order.desc("unitPrice"));
