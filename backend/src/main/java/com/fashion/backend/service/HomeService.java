@@ -11,6 +11,7 @@ import com.fashion.backend.repository.LikeRepository;
 import com.fashion.backend.repository.UserAuthRepository;
 import com.fashion.backend.repository.UserRepository;
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.PageRequest;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
@@ -32,7 +33,8 @@ public class HomeService {
 	}
 
 	public SimpleListResponse<SimpleItemDetail> getTopSellers(int number) {
-		List<Item> bestSellerItems = itemRepository.findTopBySold(number);
+		PageRequest pageRequest = PageRequest.of(0, number);
+		List<Item> bestSellerItems = itemRepository.findTopBySold(pageRequest);
 
 		return mapItemResponse(bestSellerItems);
 	}
@@ -42,7 +44,8 @@ public class HomeService {
 	}
 
 	public SimpleListResponse<SimpleItemDetail> getLatest(int number) {
-		List<Item> bestSellerItems = itemRepository.findTopByCreatedAt(number);
+		PageRequest pageRequest = PageRequest.of(0, number);
+		List<Item> bestSellerItems = itemRepository.findLatestItems(pageRequest);
 
 		return mapItemResponse(bestSellerItems);
 	}
