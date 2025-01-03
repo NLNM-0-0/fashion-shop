@@ -5,22 +5,22 @@ import { FaTrash } from "react-icons/fa";
 import ConfirmDialog from "../ui/confirm-dialog";
 import { AxiosError } from "axios";
 import { ApiError } from "@/lib/types";
-import { deleteCategory } from "@/lib/api/category/deleteCategory";
+import { deleteProduct } from "@/lib/api/product/deleteProduct";
 
-interface DeleteCategoryProps {
+interface DeleteProductProps {
   id: number;
   onDelete: () => void;
 }
 
-const DeleteCategory = ({ id, onDelete }: DeleteCategoryProps) => {
+const DeleteProduct = ({ id, onDelete }: DeleteProductProps) => {
   const handleDelete = () => {
-    deleteCategory(id)
+    deleteProduct(id)
       .then(() => {
         onDelete();
         return toast({
           variant: "success",
           title: "Success",
-          description: "Delete category successfully",
+          description: "Delete product successfully",
         });
       })
 
@@ -28,7 +28,7 @@ const DeleteCategory = ({ id, onDelete }: DeleteCategoryProps) => {
         toast({
           variant: "destructive",
           title: "Error",
-          description: err.response?.data.message ?? "Delete category failed",
+          description: err.response?.data.message ?? "Delete product failed",
         });
       });
   };
@@ -36,7 +36,7 @@ const DeleteCategory = ({ id, onDelete }: DeleteCategoryProps) => {
   return (
     <ConfirmDialog
       title={"Confirmation"}
-      description="Are you sure you want to delete this category?"
+      description="Are you sure you want to delete this product?"
       handleYes={() => handleDelete()}
     >
       <Button
@@ -52,4 +52,4 @@ const DeleteCategory = ({ id, onDelete }: DeleteCategoryProps) => {
   );
 };
 
-export default DeleteCategory;
+export default DeleteProduct;

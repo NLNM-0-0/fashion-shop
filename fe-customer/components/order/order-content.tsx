@@ -121,7 +121,8 @@ const OrderContent = ({ orderId }: { orderId: string }) => {
             </div>
             <div className="flex flex-1 mt-5 gap-5">
               {order.orderStatus !== OrderStatus.CANCELED &&
-                order.orderStatus !== OrderStatus.DONE && (
+                order.orderStatus !== OrderStatus.DONE &&
+                order.orderStatus !== OrderStatus.SHIPPING && (
                   <Button
                     type="button"
                     onClick={handleCancelOrder}
