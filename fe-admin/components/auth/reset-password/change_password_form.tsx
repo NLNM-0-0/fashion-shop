@@ -46,8 +46,8 @@ const ChangePasswordForm = (props: ChangePasswordProps) => {
       if (responseData.data === true) {
         toast({
           variant: "success",
-          title: "Thành công",
-          description: "Đã thay đổi mật khẩu thành công.",
+          title: "Success",
+          description: "Change password successfully",
         });
         setIsLoading(false);
         reset({
@@ -58,14 +58,14 @@ const ChangePasswordForm = (props: ChangePasswordProps) => {
     } else if (responseData.hasOwnProperty("message")) {
       toast({
         variant: "destructive",
-        title: "Có lỗi",
+        title: "Error",
         description: responseData.message,
       });
     } else {
       toast({
         variant: "destructive",
-        title: "Có lỗi",
-        description: "Vui lòng thử lại sau",
+        title: "Error",
+        description: "Try again",
       });
     }
     setIsLoading(false);
