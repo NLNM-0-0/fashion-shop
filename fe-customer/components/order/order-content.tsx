@@ -120,18 +120,16 @@ const OrderContent = ({ orderId }: { orderId: string }) => {
               </span>
             </div>
             <div className="flex flex-1 mt-5 gap-5">
-              {order.orderStatus !== OrderStatus.CANCELED &&
-                order.orderStatus !== OrderStatus.DONE &&
-                order.orderStatus !== OrderStatus.SHIPPING && (
-                  <Button
-                    type="button"
-                    onClick={handleCancelOrder}
-                    variant={"destructive"}
-                    className="h-12 flex-1 rounded-full"
-                  >
-                    Cancel Order
-                  </Button>
-                )}
+              {order.orderStatus === OrderStatus.PENDING && (
+                <Button
+                  type="button"
+                  onClick={handleCancelOrder}
+                  variant={"destructive"}
+                  className="h-12 flex-1 rounded-full"
+                >
+                  Cancel Order
+                </Button>
+              )}
               {order.orderStatus === OrderStatus.SHIPPING && (
                 <Button
                   type="button"
