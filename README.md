@@ -13,7 +13,8 @@
 ### Cài đặt
 
 1. Vào file application.yml và điển _username-gmail_ và _password-gmail_
-2. Thêm file json private key của Firebase vào thư mục resource. Đặt tên file là "firebase-private-key.json"
+2. Vào file application.yml và điển _sms-apiKey_ và _sms-phone_
+3. Thêm file json private key của Firebase vào thư mục resource. Đặt tên file là "firebase-private-key.json"
 
 ### Chạy Backend
 
@@ -39,10 +40,10 @@
 
 
 ## Frontend
-1. **Bước 1:** Vào thư mục frontend
-2. **Bước 2:** Chỉnh lại giá trị endpoint trong file constants/index.ts
-```bash
-export const endpoint = "http://localhost:8080/api/v1";
+1. **Bước 1:** Vào thư mục frontend muốn chạy
+2. **Bước 2:** Thêm file .env vào
+```
+NEXT_PUBLIC_API_BASE_URL="http://localhost:8080/api/v1"
 ```
 3. **Bước 3:** Import các thư viện cần thiết
 ```bash
