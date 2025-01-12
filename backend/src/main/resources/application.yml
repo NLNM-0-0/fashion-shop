@@ -27,9 +27,9 @@ logging:
   level:
     root: debug
 gmail:
-  username: nguyenlengocmai000@gmail.com
-  password: dprj oedn kkid eqoj
+  username: <<gmail-email>>
+  password: <<gmail-password>>
 sms:
   speedsms:
-    apiKey: 3c-XvSUYNwsIv9P2qOBBqUsL3b4hKBJH
-    phone: 0585885214
+    apiKey: <<sms-apiKey>>
+    phone: <<sms-phone>>
