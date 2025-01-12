@@ -78,7 +78,7 @@ public class OrderController {
 	public ResponseEntity<OrderResponse> createOrder(
 			@Valid @RequestBody PlaceOrderRequest request
 	) {
-		return new ResponseEntity<>(orderService.placeOrder(request, false), HttpStatus.CREATED);
+		return new ResponseEntity<>(orderService.placeOrder(request), HttpStatus.CREATED);
 	}
 
 	@PutMapping("/{id}")

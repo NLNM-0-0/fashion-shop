@@ -63,9 +63,8 @@ public class OTP {
 	}
 
 	public static String generateOTP() {
-//		int otp = 100000 + rand.nextInt(900000);
-//		return String.valueOf(otp);
-		return "260703";
+		int otp = 100000 + rand.nextInt(900000);
+		return String.valueOf(otp);
 	}
 
 	private Date getOTPExpirationTime() {

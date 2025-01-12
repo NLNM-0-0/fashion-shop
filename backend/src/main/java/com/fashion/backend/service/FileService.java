@@ -28,17 +28,22 @@ import java.util.UUID;
 public class FileService {
 
 	@Transactional
-	public FileLinkResponse upload(MultipartFile multipartFile) {
+	public FileLinkResponse upload(MultipartFile file) {
 		try {
-			String fileName = multipartFile.getOriginalFilename();
+			String fileName = file.getOriginalFilename();
 			assert fileName != null;
+
 			String onlyFileName = getOnlyName(fileName);
 			String extension = getExtension(fileName);
-			fileName = onlyFileName + "_" + UUID.randomUUID().toString().concat(extension);
 
-			File file = convertToFile(multipartFile, fileName);
-			String url = uploadFile(file, fileName, getFileUploadType(extension));
-			if (!file.delete()) {
+			String postfix = UUID.randomUUID().toString().concat(extension);
+			fileName = onlyFileName + "_" + postfix;
+
+			File convertedFile = convertToFile(file, fileName);
+
+			String fileUploadType = getFileUploadType(extension);
+			String url = uploadFile(convertedFile, fileName, fileUploadType);
+			if (!convertedFile.delete()) {
 				throw new AppException(HttpStatus.INTERNAL_SERVER_ERROR, Message.COMMON_ERR);
 			}
 			return new FileLinkResponse(url);
@@ -73,14 +78,14 @@ public class FileService {
 		};
 	}
 
-	private String uploadFile(File file, String fileName, String contentType) throws IOException {
+	private String uploadFile(File convertedFile, String fileName, String fileUploadType) throws IOException {
 		BlobId blobId = BlobId.of(ApplicationConst.BUCKET_NAME, fileName);
-		BlobInfo blobInfo = BlobInfo.newBuilder(blobId).setContentType(contentType).build();
+		BlobInfo blobInfo = BlobInfo.newBuilder(blobId).setContentType(fileUploadType).build();
 		InputStream inputStream = FileService.class.getClassLoader().getResourceAsStream("firebase-private-key.json");
 		assert inputStream != null;
 		Credentials credentials = GoogleCredentials.fromStream(inputStream);
 		Storage storage = StorageOptions.newBuilder().setCredentials(credentials).build().getService();
-		storage.create(blobInfo, Files.readAllBytes(file.toPath()));
+		storage.create(blobInfo, Files.readAllBytes(convertedFile.toPath()));
 
 		String downloadUrl = "https://firebasestorage.googleapis.com/v0/b/" + ApplicationConst.BUCKET_NAME +
 							 "/o/%s?alt=media";

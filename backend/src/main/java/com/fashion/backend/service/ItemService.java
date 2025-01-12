@@ -74,10 +74,10 @@ public class ItemService {
 		List<Sort.Order> orders = new ArrayList<>();
 
 		if (filter.getSortPrice() != null) {
-			if (!filter.getSortPrice()) {
-				orders.add(Sort.Order.asc("unitPrice"));
-			} else {
+			if (filter.getSortPrice()) {
 				orders.add(Sort.Order.desc("unitPrice"));
+			} else {
+				orders.add(Sort.Order.asc("unitPrice"));
 			}
 		}
 
@@ -183,17 +183,16 @@ public class ItemService {
 
 	@Transactional
 	public ItemResponse staffGetItem(Long itemId) {
-		Item item = Common.findItemById(itemId, itemRepository);
+		Item item = Common.findActiveItemById(itemId, itemRepository);
 
 		return mapToDTO(item);
 	}
 
 	@Transactional
 	public ItemDetail userGetItem(Long itemId) {
+		Item item = Common.findActiveItemById(itemId, itemRepository);
+
 		Optional<Long> userId = Common.getUserLoginId(userRepository, userAuthRepository);
-
-		Item item = Common.findItemById(itemId, itemRepository);
-
 		boolean liked = false;
 		if (userId.isPresent()) {
 			Optional<Like> like = likeRepository.findFirstByUserIdAndItemId(userId.get(), itemId);
@@ -221,9 +220,25 @@ public class ItemService {
 
 	@Transactional
 	public ItemResponse createItem(CreateItemRequest request) {
-		List<Category> categories = Common.findCategoryByIds(request.getCategories(), categoryRepository);
-
 		handleImage(request);
+
+		Item createdItem = createNewProduct(request);
+
+		createProductQuantities(request.getQuantities(), createdItem);
+
+		createStockChangeHistoriesForCreateProduct(request.getQuantities(), createdItem);
+
+		return mapToDTO(createdItem);
+	}
+
+	private void handleImage(CreateItemRequest request) {
+		if (request.getImages().isEmpty()) {
+			request.setImages(new ArrayList<>(List.of(ApplicationConst.DEFAULT_IMAGE)));
+		}
+	}
+
+	private Item createNewProduct(CreateItemRequest request) {
+		List<Category> categories = Common.findCategoryByIds(request.getCategories(), categoryRepository);
 
 		Item item = Item.builder()
 						.name(request.getName())
@@ -237,17 +252,22 @@ public class ItemService {
 
 		item = itemRepository.save(item);
 
+		return item;
+	}
+
+	private void createProductQuantities(List<ItemQuantityRequest> quantityRequests, Item item) {
 		List<ItemQuantity> quantities = new ArrayList<>();
-		int totalQuantity = 0;
-		for (ItemQuantityRequest quantity : request.getQuantities()) {
+		for (ItemQuantityRequest quantity : quantityRequests) {
 			ItemQuantity quantityEntity = mapToEntity(quantity);
 			quantityEntity.setItem(item);
 
 			quantities.add(quantityEntity);
-
-			totalQuantity += quantity.getQuantity();
 		}
 		itemQuantityRepository.saveAll(quantities);
+	}
+
+	private void createStockChangeHistoriesForCreateProduct(List<ItemQuantityRequest> quantityRequests, Item item) {
+		int totalQuantity = quantityRequests.stream().mapToInt(ItemQuantityRequest::getQuantity).sum();
 
 		if (totalQuantity != 0) {
 			StockChangeHistory stockChangeHistory = StockChangeHistory.builder()
@@ -259,24 +279,24 @@ public class ItemService {
 
 			stockChangeHistoryRepository.save(stockChangeHistory);
 		}
-
-		return mapToDTO(item);
-	}
-
-	private void handleImage(CreateItemRequest request) {
-		if (request.getImages().isEmpty()) {
-			request.setImages(new ArrayList<>(List.of(ApplicationConst.DEFAULT_IMAGE)));
-		}
 	}
 
 	@Transactional
 	public ItemResponse updateItem(Long itemId, UpdateItemRequest request) {
-		List<Category> categories = Common.findCategoryByIds(request.getCategories(), categoryRepository);
+		Item item = Common.findActiveItemById(itemId, itemRepository);
 
-		Item item = Common.findItemById(itemId, itemRepository);
+		createStockChangeHistoriesForUpdateItem(request.getQuantities(), item);
 
-		int totalItemQuantity = this.calcTotalQuantityFromItemId(itemId);
-		int totalUpdatedQuantity = calcTotalQuantityFromDTOs(request.getQuantities());
+		updateItemQuantities(request.getQuantities(), item);
+
+		Item updatedItem = updateItem(request, item);
+
+		return mapToDTO(updatedItem);
+	}
+
+	private void createStockChangeHistoriesForUpdateItem(List<ItemQuantityRequest> requestedQuantity, Item item) {
+		int totalItemQuantity = this.calcTotalQuantityFromItemId(item.getId());
+		int totalUpdatedQuantity = calcTotalQuantityFromDTOs(requestedQuantity);
 
 		if (totalItemQuantity != totalUpdatedQuantity) {
 			int diff = totalUpdatedQuantity - totalItemQuantity;
@@ -291,36 +311,48 @@ public class ItemService {
 
 			stockChangeHistoryRepository.save(stockChangeHistory);
 		}
+	}
+
+	private void updateItemQuantities(List<ItemQuantityRequest> requestedQuantity, Item item){
+		itemQuantityRepository.deleteAllByItemId(item.getId());
+
+		createProductQuantities(requestedQuantity, item);
+	}
+
+	private Item updateItem(UpdateItemRequest request, Item item) {
+		List<Category> categories = new ArrayList<>();
+		if (request.getCategories() != null) {
+			categories = Common.findCategoryByIds(request.getCategories(), categoryRepository);
+		}
+
 
 		Common.updateIfNotNull(request.getName(), item::setName);
 		Common.updateIfNotNull(request.getGender(), item::setGender);
 		Common.updateIfNotNull(request.getSeason(), item::setSeason);
-		Common.updateIfNotNull(categories, item::setCategories);
 		Common.updateIfNotNull(request.getUnitPrice(), item::setUnitPrice);
 		Common.updateIfNotNull(request.getImages(), item::setImages);
+		if (!categories.isEmpty()) {
+		    item.setCategories(categories);
+		}
 
-		itemQuantityRepository.deleteAllByItemId(itemId);
+		Item updatedItem = itemRepository.save(item);
 
-		List<ItemQuantity> quantities = request.getQuantities().stream().map(dto -> {
-			ItemQuantity itemQuantity = mapToEntity(dto);
-			itemQuantity.setItem(item);
-			return itemQuantity;
-		}).toList();
-
-		itemQuantityRepository.saveAll(quantities);
-
-		return mapToDTO(itemRepository.save(item));
+		return updatedItem;
 	}
 
 	@Transactional
 	public SimpleResponse deleteItem(Long itemId) {
-		Item item = Common.findItemById(itemId, itemRepository);
+		Item item = Common.findActiveItemById(itemId, itemRepository);
 
+		deleteItem(item);
+
+		return new SimpleResponse();
+	}
+
+	private void deleteItem(Item item) {
 		item.setDeleted(true);
 
 		itemRepository.save(item);
-
-		return new SimpleResponse();
 	}
 
 	private SimpleItemDetail mapToDTOSimple(Item item, boolean liked) {
@@ -350,17 +382,17 @@ public class ItemService {
 		ItemResponse itemResponse = mapToDTO(item);
 
 		return ItemDetail.builder()
-						 .id(itemResponse.getId())
-						 .name(itemResponse.getName())
-						 .gender(itemResponse.getGender())
-						 .season(itemResponse.getSeason())
+						 .id(item.getId())
+						 .name(item.getName())
+						 .gender(item.getGender())
+						 .season(item.getSeason())
 						 .colors(itemResponse.getColors())
 						 .sizes(itemResponse.getSizes())
 						 .quantities(itemResponse.getQuantities())
 						 .categories(itemResponse.getCategories())
-						 .unitPrice(itemResponse.getUnitPrice())
-						 .images(itemResponse.getImages())
-						 .isDeleted(itemResponse.isDeleted())
+						 .unitPrice(item.getUnitPrice())
+						 .images(item.getImages())
+						 .isDeleted(item.isDeleted())
 						 .liked(liked)
 						 .build();
 	}

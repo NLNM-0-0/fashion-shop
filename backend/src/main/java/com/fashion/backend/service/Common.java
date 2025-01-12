@@ -28,92 +28,79 @@ public class Common {
 		return userDetails.getUsername();
 	}
 
-	public static User findUserById(Long userId, UserRepository repository) {
-		return repository.findById(userId)
+	public static User findUserById(Long userId, UserRepository userRepository) {
+		User user = userRepository.findById(userId)
 						 .orElseThrow(() -> new AppException(HttpStatus.BAD_REQUEST,
 															 Message.User.USER_NOT_EXIST));
+		return user;
 	}
 
-	private static UserAuth findUserAuth(String userName, boolean isByEmail, UserAuthRepository repository) {
+	private static UserAuth findUserAuthByUserName(String userName, UserAuthRepository userAuthRepository) {
 		UserAuth userAuth;
-		if (isByEmail) {
-			userAuth = repository.findByEmail(userName)
-								 .orElseThrow(() -> new AppException(HttpStatus.BAD_REQUEST,
-																	 Message.User.USER_NOT_EXIST));
+		if (AuthHelper.isNormalUser(userName)) {
+			userAuth = userAuthRepository.findByPhone(userName)
+									 .orElseThrow(() -> new AppException(HttpStatus.BAD_REQUEST,
+																		 Message.User.USER_NOT_EXIST));
 		} else {
-			userAuth = repository.findByPhone(userName)
-								 .orElseThrow(() -> new AppException(HttpStatus.BAD_REQUEST,
-																	 Message.User.USER_NOT_EXIST));
+			userAuth = userAuthRepository.findByEmail(userName)
+										 .orElseThrow(() -> new AppException(HttpStatus.BAD_REQUEST,
+																			 Message.User.USER_NOT_EXIST));
 		}
 		return userAuth;
 	}
 
-	public static UserAuth findAvailableUserAuth(String userName, boolean isByEmail, UserAuthRepository repository) {
-		UserAuth userAuth = findUserAuth(userName, isByEmail, repository);
+	public static UserAuth findAvailableUserAuth(String userName, UserAuthRepository repository) {
+		UserAuth userAuth = findUserAuthByUserName(userName, repository);
+
+		verifyUserAuth(userAuth);
+
+		return userAuth;
+	}
+
+	private static void verifyUserAuth(UserAuth userAuth) {
 		if (userAuth.isDeleted()) {
 			throw new AppException(HttpStatus.BAD_REQUEST, Message.User.USER_IS_DELETED);
 		}
-		if (!isByEmail && !userAuth.isVerified()) {
+		if (AuthHelper.isNormalUser(userAuth.getUsername()) && !userAuth.isVerified()) {
 			throw new AppException(HttpStatus.FORBIDDEN, Message.User.USER_IS_NOT_VERIFIED);
 		}
-		return userAuth;
 	}
 
-	public static UserAuth findUserAuthByEmail(String userName, UserAuthRepository repository) {
-		UserAuth userAuth = findUserAuth(userName, true, repository);
+	public static UserAuth findActiveUserAuthByUserName(String userName, UserAuthRepository repository) {
+		UserAuth userAuth = findUserAuthByUserName(userName, repository);
 		if (userAuth.isDeleted()) {
 			throw new AppException(HttpStatus.BAD_REQUEST, Message.User.USER_IS_DELETED);
 		}
 		return userAuth;
 	}
 
-	public static UserAuth findUserAuthByPhone(String userName, UserAuthRepository repository) {
-		UserAuth userAuth = findUserAuth(userName, false, repository);
-		if (userAuth.isDeleted()) {
-			throw new AppException(HttpStatus.BAD_REQUEST, Message.User.USER_IS_DELETED);
-		}
-		return userAuth;
+	public static User findActiveUserByUserName(String userName, UserAuthRepository userAuthRepository, UserRepository userRepository) {
+		UserAuth userAuth = Common.findActiveUserAuthByUserName(userName, userAuthRepository);
+		User user = Common.findUserByUserAuthId(userAuth.getId(), userRepository);
+		return user;
 	}
 
-	public static UserAuth findCurrUserAuth(UserAuthRepository userAuthRepository) {
+	public static UserAuth findCurrentUserAuth(UserAuthRepository userAuthRepository) {
 		String userName = Common.getCurrUserName();
 
-		if (AuthHelper.isNormalUser(userName)) {
-			return Common.findUserAuthByPhone(userName, userAuthRepository);
-		}
-		return Common.findUserAuthByEmail(userName, userAuthRepository);
+		UserAuth userAuth = Common.findActiveUserAuthByUserName(userName, userAuthRepository);
+
+		return userAuth;
 	}
 
-	public static User findUserByUserAuth(Long userAuthId, UserRepository userRepository) {
-		return userRepository.findFirstByUserAuthId(userAuthId)
+	public static User findUserByUserAuthId(Long userAuthId, UserRepository userRepository) {
+		User user = userRepository.findFirstByUserAuthId(userAuthId)
 							 .orElseThrow(() -> new AppException(HttpStatus.INTERNAL_SERVER_ERROR,
 																 Message.COMMON_ERR));
+		return user;
 	}
 
-	public static User findCurrUser(UserRepository userRepository, UserAuthRepository userAuthRepository) {
-		UserAuth userAuth = Common.findCurrUserAuth(userAuthRepository);
+	public static User findCurrentUser(UserRepository userRepository, UserAuthRepository userAuthRepository) {
+		UserAuth userAuth = Common.findCurrentUserAuth(userAuthRepository);
 
-		return findUserByUserAuth(userAuth.getId(), userRepository);
-	}
+		User user = findUserByUserAuthId(userAuth.getId(), userRepository);
 
-	public static Notification findNotificationById(Long notificationId,
-													NotificationRepository repository) {
-		Notification notification = repository.findById(notificationId)
-											  .orElseThrow(() -> new AppException(HttpStatus.BAD_REQUEST,
-																				  Message.Notification.NOTIFICATION_NOT_EXIST));
-
-		String currUserName = Common.getCurrUserName();
-
-		String toUserUserName = notification.getToUser().getUserAuth().getEmail();
-		if (toUserUserName == null) {
-		    toUserUserName = notification.getToUser().getUserAuth().getPhone();
-		}
-
-		if (!toUserUserName.equals(currUserName)) {
-			throw new AppException(HttpStatus.BAD_REQUEST, Message.Notification.CAN_NOT_READ_OTHERS_NOTIFICATION);
-		}
-
-		return notification;
+		return user;
 	}
 
 	public static SimpleResponse sendNotification(NotificationRepository notificationRepository,
@@ -164,7 +151,7 @@ public class Common {
 
 	}
 
-	public static Item findItemById(Long itemId, ItemRepository itemRepository) {
+	public static Item findActiveItemById(Long itemId, ItemRepository itemRepository) {
 		Item item = itemRepository.findById(itemId)
 								  .orElseThrow(() -> new AppException(HttpStatus.BAD_REQUEST,
 																	  Message.Item.ITEM_NOT_EXIST));
@@ -176,9 +163,10 @@ public class Common {
 	}
 
 	public static Category findCategoryById(Long categoryId, CategoryRepository categoryRepository) {
-		return categoryRepository.findById(categoryId)
+		Category category = categoryRepository.findById(categoryId)
 								 .orElseThrow(() -> new AppException(HttpStatus.BAD_REQUEST,
 																	 Message.Category.CATEGORY_NOT_EXIST));
+		return category;
 	}
 
 	public static List<Category> findCategoryByIds(List<Long> categoryIds, CategoryRepository categoryRepository) {
@@ -199,21 +187,25 @@ public class Common {
 	public static ItemQuantity findItemQuantity(Long itemId,
 												String size,
 												Color color,
-												ItemQuantityRepository repository) {
-		return repository.findFirstByItemIdAndColorAndAndSize(itemId, color, size)
+												ItemQuantityRepository itemQuantityRepository) {
+
+		ItemQuantity itemQuantity = itemQuantityRepository.findFirstByItemIdAndColorAndSize(itemId, color, size)
 						 .orElseThrow(() -> new AppException(HttpStatus.BAD_REQUEST,
 															 Message.ItemQuantity.ITEM_QUANTITY_NOT_EXIST));
+
+		return itemQuantity;
 	}
 
 	public static Cart findCartById(Long cartId, CartRepository cartRepository) {
-		return cartRepository.findById(cartId)
+		Cart cart = cartRepository.findById(cartId)
 							 .orElseThrow(() -> new AppException(HttpStatus.BAD_REQUEST,
 																 Message.Cart.ITEM_NOT_IN_CART));
+		return cart;
 	}
 
 	public static Optional<Long> getUserLoginId(UserRepository userRepository, UserAuthRepository userAuthRepository) {
 		try {
-			User user = Common.findCurrUser(userRepository, userAuthRepository);
+			User user = Common.findCurrentUser(userRepository, userAuthRepository);
 			return user.getId().describeConstable();
 		} catch (Exception e) {
 			return Optional.empty();

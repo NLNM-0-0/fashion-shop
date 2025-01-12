@@ -30,7 +30,7 @@ public class LikeService {
 
 	@Transactional
 	public SimpleListResponse<SimpleItemResponse> getLikedItems() {
-		User user = Common.findCurrUser(userRepository, userAuthRepository);
+		User user = Common.findCurrentUser(userRepository, userAuthRepository);
 
 		List<Like> likes = likeRepository.findAllByUserId(
 				user.getId(),
@@ -45,7 +45,7 @@ public class LikeService {
 
 	@Transactional
 	public SimpleResponse unlikeItem(Long itemId) {
-		User user = Common.findCurrUser(userRepository, userAuthRepository);
+		User user = Common.findCurrentUser(userRepository, userAuthRepository);
 
 		Like like = likeRepository.findFirstByUserIdAndItemId(user.getId(), itemId)
 								  .orElseThrow(() -> new AppException(HttpStatus.BAD_REQUEST,
@@ -58,9 +58,9 @@ public class LikeService {
 
 	@Transactional
 	public SimpleResponse likeItem(Long itemId) {
-		User user = Common.findCurrUser(userRepository, userAuthRepository);
+		User user = Common.findCurrentUser(userRepository, userAuthRepository);
 
-		Item item = Common.findItemById(itemId, itemRepository);
+		Item item = Common.findActiveItemById(itemId, itemRepository);
 
 		Like like = Like.builder()
 						.item(item)

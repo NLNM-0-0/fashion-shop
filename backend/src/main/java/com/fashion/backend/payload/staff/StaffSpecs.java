@@ -31,7 +31,7 @@ public class StaffSpecs {
 
 	public static Specification<User> hasDOBinYear(Integer dobYear) {
 		String formattedNumber = String.format("%02d", dobYear);
-		return (root, query, cb) -> cb.like(root.get("dob"), "______" + formattedNumber);
+			return (root, query, cb) -> cb.like(root.get("dob"), "______" + formattedNumber);
 	}
 
 	public static Specification<User> isNotDeleted() {

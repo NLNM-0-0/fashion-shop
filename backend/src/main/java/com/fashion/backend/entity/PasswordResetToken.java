@@ -53,6 +53,6 @@ public class PasswordResetToken {
 
 	public boolean isValid() {
 		Calendar calendar = Calendar.getInstance();
-		return (this.getTokenExpirationTime().getTime() - calendar.getTime().getTime()) > 0;
+		return this.getTokenExpirationTime().getTime() > calendar.getTime().getTime();
 	}
 }

@@ -8,6 +8,5 @@ import java.util.Date;
 import java.util.Optional;
 
 public interface StockReportRepository extends JpaRepository<StockReport, Long> {
-	@Query("SELECT r FROM StockReport r WHERE r.timeFrom = :timeFrom AND r.timeTo = :timeTo")
 	Optional<StockReport> findFirstByTimeFromAndTimeTo(Date timeFrom, Date timeTo);
 }

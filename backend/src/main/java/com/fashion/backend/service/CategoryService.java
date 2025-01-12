@@ -55,20 +55,24 @@ public class CategoryService {
 	public SimpleResponse deleteCategory(Long categoryId) {
 		Category category = Common.findCategoryById(categoryId, categoryRepository);
 
+		deleteCategoryFromProduct(categoryId, category);
+
+		categoryRepository.delete(category);
+
+		return new SimpleResponse();
+	}
+
+	private void deleteCategoryFromProduct(Long categoryId, Category category) {
 		List<Item> items = itemRepository.findAllByCategories_Id(categoryId);
 
 		for (Item item : items) {
 			if (!item.isDeleted() && item.getCategories().size() == 1) {
 				throw new AppException(HttpStatus.BAD_REQUEST,
-									   Message.Category.CAN_NOT_DELETE_CATEGORY_THAT_EXIST_ITEM_CONTAIN_ONLY_IT);
+									   Message.Category.CANNOT_DELETE_CATEGORY_ASSIGNED_TO_ONLY_ITEM);
 			}
 			item.getCategories().remove(category);
 		}
 		itemRepository.saveAll(items);
-
-		categoryRepository.delete(category);
-
-		return new SimpleResponse();
 	}
 
 	private CategoryResponse mapToDTO(Category category) {

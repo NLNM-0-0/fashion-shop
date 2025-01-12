@@ -14,6 +14,8 @@ import com.fashion.backend.repository.ItemRepository;
 import com.fashion.backend.repository.StockChangeHistoryRepository;
 import com.fashion.backend.repository.StockReportRepository;
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Sort;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 
@@ -41,18 +43,19 @@ public class StockReportService {
 			throw new AppException(HttpStatus.BAD_REQUEST, Message.TIME_FROM_TIME_TO_VALIDATE);
 		}
 
-		Date timeFrom = new Date(request.getTimeFrom() * 1000L);
-		Date timeTo = new Date(request.getTimeTo() * 1000L);
-
-		Optional<StockReport> reportOptional = stockReportRepository.findFirstByTimeFromAndTimeTo(timeFrom, timeTo);
-		if (reportOptional.isPresent()) {
-			return mapToDTO(reportOptional.get());
-		}
+		Date timeFrom = new java.sql.Date((request.getTimeFrom() - 24 * 60 * 60) * 1000L);
+		Date timeTo = new java.sql.Date((request.getTimeTo() + 24 * 60 * 60) * 1000L );
 
 		Date now = new Date();
 		if (now.before(timeFrom)) {
 			throw new AppException(HttpStatus.BAD_REQUEST, Message.StockReport.FUTURE_DATE_INVALID);
 		}
+
+		Optional<StockReport> checkedReport = stockReportRepository.findFirstByTimeFromAndTimeTo(timeFrom, timeTo);
+		if (checkedReport.isPresent()) {
+			return mapToDTO(checkedReport.get());
+		}
+
 		boolean creatingNew = timeTo.before(now);
 
 		int qtyInit = 0;
@@ -62,11 +65,11 @@ public class StockReportService {
 		int qtyDecrease = 0;
 		int qtyFinal = 0;
 
-		List<StockReportDetail> allDetails = new ArrayList<>();
+		List<StockReportDetail> reportDetails	 = new ArrayList<>();
 		List<Item> allItems = itemRepository.findAll();
 		for (Item item : allItems) {
 			List<StockChangeHistory> stockChanges =
-					stockChangeHistoryRepository.findAllStockChangesForReport(
+					stockChangeHistoryRepository.findAllByItemIdAndCreatedAtAfterAndCreatedAtBefore(
 							item.getId(),
 							timeFrom,
 							timeTo);
@@ -82,9 +85,11 @@ public class StockReportService {
 				}
 			}
 
-			Optional<StockChangeHistory> nearlyOptional =
-					stockChangeHistoryRepository.getNearlyStockChangeHistory(item.getId(), timeFrom);
-			int initial = nearlyOptional.map(StockChangeHistory::getQuantityLeft).orElse(0);
+			PageRequest pageRequest = PageRequest.of(0, 1, Sort.by(Sort.Order.desc("createdAt")));
+			List<StockChangeHistory> nearlies = stockChangeHistoryRepository.findByItemIdAndCreatedAtLessThanEqual(item.getId(), timeFrom, pageRequest);
+			StockChangeHistory nearlyOptional = nearlies.isEmpty() ? null : nearlies.get(0);
+
+			int initial = nearlyOptional == null ? 0 : nearlyOptional.getQuantityLeft();
 
 			int finalAmount = (stockChanges.isEmpty()) ?
 							  initial :
@@ -103,7 +108,7 @@ public class StockReportService {
 															.payback(paybackAmount)
 															.finalQty(finalAmount)
 															.build();
-				allDetails.add(detail);
+				reportDetails.add(detail);
 			}
 
 			qtyInit += initial;
@@ -115,7 +120,7 @@ public class StockReportService {
 		}
 
 		StockReport stockReport = StockReport.builder()
-											 .details(allDetails)
+											 .details(reportDetails)
 											 .timeFrom(timeFrom)
 											 .timeTo(timeTo)
 											 .initial(qtyInit)

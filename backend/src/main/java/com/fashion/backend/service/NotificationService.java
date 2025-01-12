@@ -1,8 +1,10 @@
 package com.fashion.backend.service;
 
+import com.fashion.backend.constant.Message;
 import com.fashion.backend.entity.Notification;
 import com.fashion.backend.entity.User;
 import com.fashion.backend.entity.UserAuth;
+import com.fashion.backend.exception.AppException;
 import com.fashion.backend.mail.MailSender;
 import com.fashion.backend.payload.ListResponse;
 import com.fashion.backend.payload.SimpleListResponse;
@@ -20,6 +22,7 @@ import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
 import org.springframework.data.jpa.domain.Specification;
+import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -35,26 +38,19 @@ public class NotificationService {
 
 	@Transactional
 	public ListResponse<NotificationResponse, NotificationFilter> getNotifications(AppPageRequest page,
-																				   NotificationFilter filter,
-																				   boolean changeToSeen) {
-		User receiver = Common.findCurrUser(userRepository, userAuthRepository);
+																				   NotificationFilter filter) {
+		User user = Common.findCurrentUser(userRepository, userAuthRepository);
 
 		Pageable pageable = PageRequest.of(page.getPage() - 1,
 										   page.getLimit(),
 										   Sort.by(Sort.Direction.DESC, "createdAt"));
-		Specification<Notification> spec = filterNotifications(receiver.getId(), filter);
+		Specification<Notification> spec = filterNotifications(user.getId(), filter);
 
 		Page<Notification> notificationPage = notificationRepository.findAll(spec, pageable);
 
 		List<Notification> notifications = notificationPage.getContent();
 
 		List<NotificationResponse> data = notifications.stream().map(this::mapToDTO).toList();
-
-		if (changeToSeen) {
-			notificationRepository.saveAll(notifications.stream()
-														.peek(notification -> notification.setSeen(true))
-														.toList());
-		}
 
 		return ListResponse.<NotificationResponse, NotificationFilter>builder()
 						   .data(data)
@@ -87,53 +83,58 @@ public class NotificationService {
 
 	@Transactional
 	public NumberNotificationNotSeenResponse getNumberUnseenNotification() {
-		UserAuth currUserAuth = Common.findCurrUserAuth(userAuthRepository);
+		User user = Common.findCurrentUser(userRepository, userAuthRepository);
 
 		return NumberNotificationNotSeenResponse.builder()
 												.number(notificationRepository.countUnseenNotificationsByToUserId(
-														currUserAuth.getId()))
+														user.getId()))
 												.build();
 	}
 
 	@Transactional
 	public SimpleListResponse<NotificationResponse> getUnseenNotifications() {
-		UserAuth currUserAuth = Common.findCurrUserAuth(userAuthRepository);
-		List<Notification> notifications = notificationRepository.findAllUnseenByToUserId(currUserAuth.getId());
+		User user = Common.findCurrentUser(userRepository, userAuthRepository);
+		List<Notification> notifications = notificationRepository.findAllUnseenByToUserId(user.getId());
 
 		return new SimpleListResponse<>(notifications.stream().map(this::mapToDTO).toList());
 	}
 
 	@Transactional
 	public SimpleResponse sendNotification(CreateNotificationRequest request) {
-		User sender = Common.findCurrUser(userRepository, userAuthRepository);
+		User user = Common.findCurrentUser(userRepository, userAuthRepository);
 
 		List<User> receivers;
 		if (request.getReceivers() == null || request.getReceivers().isEmpty()) {
 			receivers = userRepository.findAllNotDeleted();
 		} else {
-			receivers = userRepository.findByIdInAndAndIdNotEqualAndNotHasPhoneAndNotDelete(request.getReceivers(),
-																							sender.getUserAuth().getId());
+			receivers = userRepository.findByIdInAndIdNotAndUserAuthPhoneIsNotNullAndUserAuthIsDeletedFalse(request.getReceivers(),
+																							user.getId());
 		}
 
 		return Common.sendNotification(notificationRepository,
 									   mailSender,
 									   receivers,
-									   sender,
+									   user,
 									   request.getTitle(),
 									   request.getDescription());
 	}
 
 	@Transactional
 	public NotificationResponse seeNotification(Long notificationId) {
-		Notification notification = Common.findNotificationById(notificationId, notificationRepository);
+		User user = Common.findCurrentUser(userRepository, userAuthRepository);
+		Notification notification = notificationRepository.findByIdAndToUserId(notificationId, user.getId())
+											  .orElseThrow(() -> new AppException(HttpStatus.BAD_REQUEST,
+																				  Message.Notification.NOTIFICATION_NOT_EXIST));
+
 		notification.setSeen(true);
+
 		return mapToDTO(notificationRepository.save(notification));
 	}
 
 	@Transactional
 	public SimpleResponse seeAllNotification() {
-		UserAuth userAuth = Common.findCurrUserAuth(userAuthRepository);
-		List<Notification> notifications = notificationRepository.findAllByToUserId(userAuth.getId());
+		User user = Common.findCurrentUser(userRepository, userAuthRepository);
+		List<Notification> notifications = notificationRepository.findAllByToUserId(user.getId());
 
 		notificationRepository.saveAll(notifications.stream()
 													.peek(notification -> notification.setSeen(true))

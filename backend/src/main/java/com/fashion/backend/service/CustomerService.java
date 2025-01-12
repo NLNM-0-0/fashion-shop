@@ -34,11 +34,11 @@ public class CustomerService {
 
 	@Transactional
 	public SimpleResponse deleteCustomer(Long customerId) {
-		User user = Common.findUserById(customerId, userRepository);
+		User customer = Common.findUserById(customerId, userRepository);
 
-		UserAuth userAuth = user.getUserAuth();
+		UserAuth userAuth = customer.getUserAuth();
 
-		if (AuthHelper.isStaff(userAuth)) {
+		if (!AuthHelper.isNormalUser(userAuth)) {
 			throw new AppException(HttpStatus.BAD_REQUEST, Message.User.CAN_NOT_REACH_STAFF);
 		}
 
@@ -97,7 +97,7 @@ public class CustomerService {
 	public CustomerResponse getCustomer(Long id) {
 		User user = Common.findUserById(id, userRepository);
 
-		if (AuthHelper.isStaff(user.getUserAuth())) {
+		if (!AuthHelper.isNormalUser(user.getUserAuth())) {
 			throw new AppException(HttpStatus.BAD_REQUEST, Message.User.CAN_NOT_REACH_STAFF);
 		}
 
