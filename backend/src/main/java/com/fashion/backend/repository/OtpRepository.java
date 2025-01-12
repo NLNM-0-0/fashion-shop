@@ -7,7 +7,7 @@ import org.springframework.data.jpa.repository.Query;
 import java.util.Optional;
 
 public interface OtpRepository extends JpaRepository<OTP, Long> {
-	Optional<OTP> findByUserIdAndAndOtp(Long userId, String otp);
+	Optional<OTP> findByUserIdAndOtp(Long userId, String otp);
 
 	Optional<OTP> findByUserId(Long userId);
 }

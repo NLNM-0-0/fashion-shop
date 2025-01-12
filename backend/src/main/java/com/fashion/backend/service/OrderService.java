@@ -17,7 +17,6 @@ import com.fashion.backend.payload.staff.SimpleStaffResponse;
 import com.fashion.backend.repository.*;
 import com.fashion.backend.utils.TimeHelper;
 import com.fashion.backend.utils.tuple.Triple;
-import com.google.firestore.v1.StructuredQuery;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
@@ -71,7 +70,7 @@ public class OrderService {
 
 	@Transactional
 	public ListResponse<OrderResponse, UserOrderFilter> getOrders(AppPageRequest page, UserOrderFilter filter) {
-		User user = Common.findCurrUser(userRepository, userAuthRepository);
+		User user = Common.findCurrentUser(userRepository, userAuthRepository);
 
 		Pageable pageable = PageRequest.of(page.getPage() - 1,
 										   page.getLimit(),
@@ -127,13 +126,12 @@ public class OrderService {
 	@Transactional
 	public SimpleResponse receiveOrder(Long orderId) {
 		Order order = Common.findOrderById(orderId, orderRepository);
-		if (order.getStatus() == OrderStatus.DONE || order.getStatus() == OrderStatus.CANCELED) {
+		if (order.getStatus() != OrderStatus.SHIPPING) {
 			throw new AppException(HttpStatus.BAD_REQUEST, Message.Order.CAN_NOT_CLOSE_THIS_STATUS);
 		}
 
-		User user = Common.findCurrUser(userRepository, userAuthRepository);
-		boolean isMadeByCurrUser = Objects.equals(user.getId(), order.getCustomer().getId());
-		if (!isMadeByCurrUser) {
+		User user = Common.findCurrentUser(userRepository, userAuthRepository);
+		if (!Objects.equals(user.getId(), order.getCustomer().getId())) {
 			throw new AppException(HttpStatus.BAD_REQUEST, Message.Order.ORDER_JUST_CAN_BE_REACHED_BY_OWNER_CUSTOMER);
 		}
 
@@ -160,7 +158,7 @@ public class OrderService {
 
 		handlePaybackItem(order);
 
-		User user = Common.findCurrUser(userRepository, userAuthRepository);
+		User user = Common.findCurrentUser(userRepository, userAuthRepository);
 		sendEmailOrderStatusChange(order, user, OrderStatus.CANCELED);
 
 		return new SimpleResponse();
@@ -168,14 +166,11 @@ public class OrderService {
 
 	public SimpleResponse customerCancelOrder(Long orderId) {
 		Order order = Common.findOrderById(orderId, orderRepository);
-		if (order.getStatus().equals(OrderStatus.CANCELED) ||
-			order.getStatus().equals(OrderStatus.DONE) ||
-			order.getStatus().equals(OrderStatus.SHIPPING) ||
-			order.getStatus().equals(OrderStatus.CONFIRMED)) {
+		if (!order.getStatus().equals(OrderStatus.PENDING)) {
 			throw new AppException(HttpStatus.BAD_REQUEST, Message.Order.CAN_NOT_CLOSE_THIS_STATUS);
 		}
 
-		User user = Common.findCurrUser(userRepository, userAuthRepository);
+		User user = Common.findCurrentUser(userRepository, userAuthRepository);
 		boolean isMadeByCurrUser = Objects.equals(user.getId(), order.getCustomer().getId());
 		if (!isMadeByCurrUser) {
 			throw new AppException(HttpStatus.BAD_REQUEST, Message.Order.ORDER_JUST_CAN_BE_REACHED_BY_OWNER_CUSTOMER);
@@ -216,7 +211,7 @@ public class OrderService {
 
 		orderRepository.save(order);
 
-		User user = Common.findCurrUser(userRepository, userAuthRepository);
+		User user = Common.findCurrentUser(userRepository, userAuthRepository);
 		sendEmailOrderStatusChange(order, user, updatedStatus);
 
 		return new SimpleResponse();
@@ -231,26 +226,24 @@ public class OrderService {
 	}
 
 	@Transactional
-	public OrderResponse placeOrder(PlaceOrderRequest request, boolean isMadeByStaff) {
-		validateOrderDetails(request);
-
-		User user = Common.findCurrUser(userRepository, userAuthRepository);
+	public OrderResponse placeOrder(PlaceOrderRequest request) {
+		User user = Common.findCurrentUser(userRepository, userAuthRepository);
 
 		Triple<Integer, Integer, List<OrderDetail>> orderInfo = handleOrder(request.getCardIds());
 		int totalPrice = orderInfo.first();
 		int totalQuantity = orderInfo.second();
-		List<OrderDetail> details = orderInfo.third();
+		List<OrderDetail> orderDetails = orderInfo.third();
 
 		Order order = Order.builder()
-						   .staff(isMadeByStaff ? user : null)
-						   .customer(isMadeByStaff ? null : user)
+						   .staff(null)
+						   .customer(user)
 						   .name(request.getName())
 						   .phone(request.getPhone())
 						   .address(request.getAddress())
 						   .totalPrice(totalPrice)
 						   .totalQuantity(totalQuantity)
-						   .orderDetails(details)
-						   .status(isMadeByStaff ? OrderStatus.DONE : OrderStatus.PENDING)
+						   .orderDetails(orderDetails)
+						   .status(OrderStatus.PENDING)
 						   .build();
 
 		order = orderRepository.save(order);
@@ -260,15 +253,6 @@ public class OrderService {
 		cartRepository.deleteAllById(request.getCardIds());
 
 		return mapToDTO(order);
-	}
-
-	private void validateOrderDetails(PlaceOrderRequest request) {
-		if (request.getCardIds() == null || request.getCardIds().isEmpty()) {
-				throw new AppException(HttpStatus.BAD_REQUEST, Message.Order.ORDER_CAN_NOT_HAVE_NO_ITEM);
-		}
-		if (isContainOnlyUnique(request.getCardIds())) {
-			throw new AppException(HttpStatus.BAD_REQUEST, Message.Order.ORDER_CAN_NOT_HAVE_SAME_ITEM);
-		}
 	}
 
 	private boolean isContainOnlyUnique(List<Long> cardIds) {
@@ -306,7 +290,7 @@ public class OrderService {
 
 	private void handleOrderItem(Order order) {
 		List<ItemQuantity> savedItemQuantities = new ArrayList<>();
-		List<StockChangeHistory> savedHistories = new ArrayList<>();
+		List<StockChangeHistory> savedStockChangeHistory = new ArrayList<>();
 		List<Item> savedItems = new ArrayList<>();
 
 		for (OrderDetail orderDetail : order.getOrderDetails()) {
@@ -322,28 +306,29 @@ public class OrderService {
 			}
 
 			itemQuantity.setQuantity(quantityLeft);
-			savedItemQuantities.add(itemQuantity);
 
-			StockChangeHistory history = StockChangeHistory.builder()
+			StockChangeHistory stockChangeHistory = StockChangeHistory.builder()
 														   .item(item)
 														   .type(StockChangeType.SELL)
 														   .quantityLeft(quantityLeft)
 														   .quantity(-orderDetail.getQuantity())
 														   .build();
-			savedHistories.add(history);
 
 			item.setSold(item.getSold() + orderDetail.getQuantity());
+
+			savedItemQuantities.add(itemQuantity);
+			savedStockChangeHistory.add(stockChangeHistory);
 			savedItems.add(item);
 		}
 
 		itemQuantityRepository.saveAll(savedItemQuantities);
-		stockChangeHistoryRepository.saveAll(savedHistories);
+		stockChangeHistoryRepository.saveAll(savedStockChangeHistory);
 		itemRepository.saveAll(savedItems);
 	}
 
 	private void handlePaybackItem(Order order) {
 		List<ItemQuantity> savedItemQuantities = new ArrayList<>();
-		List<StockChangeHistory> savedHistories = new ArrayList<>();
+		List<StockChangeHistory> savedStockChangeHistories = new ArrayList<>();
 		List<Item> savedItems = new ArrayList<>();
 
 		for (OrderDetail orderDetail : order.getOrderDetails()) {
@@ -356,22 +341,24 @@ public class OrderService {
 			int quantityLeft = itemQuantity.getQuantity() + orderDetail.getQuantity();
 
 			itemQuantity.setQuantity(quantityLeft);
-			savedItemQuantities.add(itemQuantity);
 
-			StockChangeHistory history = StockChangeHistory.builder()
+			StockChangeHistory stockChangeHistory = StockChangeHistory.builder()
 														   .item(item)
 														   .type(StockChangeType.PAYBACK)
 														   .quantityLeft(quantityLeft)
 														   .quantity(orderDetail.getQuantity())
 														   .build();
-			savedHistories.add(history);
+
 
 			item.setSold(item.getSold() - orderDetail.getQuantity());
+
+			savedItemQuantities.add(itemQuantity);
+			savedStockChangeHistories.add(stockChangeHistory);
 			savedItems.add(item);
 		}
 
 		itemQuantityRepository.saveAll(savedItemQuantities);
-		stockChangeHistoryRepository.saveAll(savedHistories);
+		stockChangeHistoryRepository.saveAll(savedStockChangeHistories);
 		itemRepository.saveAll(savedItems);
 	}
 
@@ -396,7 +383,7 @@ public class OrderService {
 							.build();
 	}
 
-	private SimpleCustomerResponse mapToDTOCustomer(User user) {
+	private SimpleCustomerResponse 	mapToDTOCustomer(User user) {
 		if (user == null) {
 			return null;
 		}

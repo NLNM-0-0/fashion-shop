@@ -6,7 +6,7 @@ import lombok.Data;
 
 @Data
 @Builder
-public class CategoryResponse {
+public class 	CategoryResponse {
 	@Schema(
 			name = "id",
 			example = "1"

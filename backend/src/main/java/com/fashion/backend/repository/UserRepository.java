@@ -17,12 +17,12 @@ public interface UserRepository extends JpaRepository<User, Long>, JpaSpecificat
 	@Query("SELECT u FROM User u WHERE u.userAuth.isDeleted <> true")
 	List<User> findAllNotDeleted();
 
-	@Query("SELECT u FROM User u WHERE u.id <> :excludedId AND u.id IN :ids AND u.userAuth.phone = null AND u.userAuth.isDeleted <> true")
-	List<User> findByIdInAndAndIdNotEqualAndNotHasPhoneAndNotDelete(List<Long> ids, Long excludedId);
+	@Query("SELECT u FROM User u WHERE u.id <> :excludedId AND u.id IN :ids AND u.userAuth.phone IS NULL AND u.userAuth.isDeleted <> true")
+	List<User> findByIdInAndIdNotAndUserAuthPhoneIsNotNullAndUserAuthIsDeletedFalse(List<Long> ids, Long excludedId);
 
 	Optional<User> findFirstByUserAuthId(Long userAuthId);
 
-	Optional<User> findFirstByEmail(String email);
+	Optional<User> findByEmail(String email);
 
 	default Page<User> findAllNotHasPhoneAndNotDeleteAndNotHaveEmail(String email,
 																	 Specification<User> specs,

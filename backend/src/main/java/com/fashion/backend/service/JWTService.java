@@ -16,7 +16,7 @@ import java.util.function.Function;
 @Service
 public class JWTService {
 	private static final String SECRET_KEY = "daf66e01593f61a15b857cf433aae03a005812b31234e149036bcc8dee755dbb";
-	private static final int EXPIRATION = 1000 * 60 * 60 * 60;
+	private static final int EXPIRATION = 1000 * 60 * 60 * 24;
 
 	public String extractUsername(String token) {
 		return extractClaims(token, Claims::getSubject);

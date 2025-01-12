@@ -51,7 +51,6 @@ public class StaffService {
 									.build();
 		userAuthRepository.save(userAuth);
 
-		handleImage(request);
 		User user = mapToEntity(request);
 		user.setEmail(null);
 
@@ -60,21 +59,15 @@ public class StaffService {
 		return mapToDTO(userRepository.save(user));
 	}
 
-	private void handleImage(CreateStaffRequest request) {
-		if (request.getImage().isEmpty()) {
-			request.setImage(ApplicationConst.DEFAULT_AVATAR);
-		}
-	}
-
 	@Transactional
 	public StaffResponse updateStaff(Long staffId, UpdateStaffRequest request) {
-		User user = Common.findUserById(staffId, userRepository);
+		User staff = Common.findUserById(staffId, userRepository);
 
-		UserAuth userAuth = user.getUserAuth();
+		UserAuth userAuth = staff.getUserAuth();
 
 		String updatedEmail = userAuth.getEmail();
-		String currEmail = Common.getCurrUserName();
-		if (Objects.equals(updatedEmail, currEmail)) {
+		String currentEmail = Common.getCurrUserName();
+		if (Objects.equals(updatedEmail, currentEmail)) {
 			throw new AppException(HttpStatus.BAD_REQUEST, Message.User.CAN_NOT_UPDATE_YOURSELF);
 		} else if (AuthHelper.isNormalUser(updatedEmail)) {
 			throw new AppException(HttpStatus.BAD_REQUEST, Message.User.CAN_NOT_REACH_CUSTOMER);
@@ -83,27 +76,29 @@ public class StaffService {
 		Common.updateIfNotNull(request.getAdmin(), userAuth::setAdmin);
 		userAuthRepository.save(userAuth);
 
-		Common.updateIfNotNull(request.getName(), user::setName);
-		Common.updateIfNotNull(request.getDob(), user::setDob);
-		Common.updateIfNotNull(request.getAddress(), user::setAddress);
-		Common.updateIfNotNull(request.getImage(), user::setImage);
-		Common.updateIfNotNull(request.getMale(), user::setMale);
+		Common.updateIfNotNull(request.getName(), staff::setName);
+		Common.updateIfNotNull(request.getDob(), staff::setDob);
+		Common.updateIfNotNull(request.getAddress(), staff::setAddress);
+		Common.updateIfNotNull(request.getMale(), staff::setMale);
+		userRepository.save(staff);
 
-		return mapToDTO(user);
+		return mapToDTO(staff);
 	}
 
 	@Transactional
-	public SimpleResponse deleteStaff(Long userId) {
-		User user = Common.findUserById(userId, userRepository);
+	public SimpleResponse deleteStaff(Long staffId) {
+		User staff = Common.findUserById(staffId, userRepository);
 
+		UserAuth userAuth = staff.getUserAuth();
 		String email = Common.getCurrUserName();
-		if (Objects.equals(user.getUserAuth().getEmail(), email)) {
+		if (Objects.equals(staff.getUserAuth().getEmail(), email)) {
 			throw new AppException(HttpStatus.BAD_REQUEST, Message.User.CAN_NOT_DELETE_YOURSELF);
-		} else if (AuthHelper.isNormalUser(user.getUserAuth())) {
+		} else if (AuthHelper.isNormalUser(staff.getUserAuth())) {
 			throw new AppException(HttpStatus.BAD_REQUEST, Message.User.CAN_NOT_REACH_CUSTOMER);
 		}
 
-		userAuthRepository.deleteUserAuthById(user.getUserAuth().getId());
+		staff.getUserAuth().setDeleted(true);
+		userAuthRepository.save(staff.getUserAuth());
 
 		return new SimpleResponse();
 	}
@@ -215,7 +210,7 @@ public class StaffService {
 				   .email(request.getEmail())
 				   .address(request.getAddress())
 				   .dob(request.getDob())
-				   .image(request.getImage())
+				   .image(ApplicationConst.DEFAULT_AVATAR)
 				   .male(request.getMale())
 				   .build();
 	}

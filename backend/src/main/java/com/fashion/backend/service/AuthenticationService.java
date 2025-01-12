@@ -48,7 +48,7 @@ public class AuthenticationService {
 				)
 		);
 
-		UserAuth userAuth = Common.findAvailableUserAuth(request.getPhone(), false, userAuthRepository);
+		UserAuth userAuth = Common.findAvailableUserAuth(request.getPhone(), userAuthRepository);
 		String jwtToken = jwtService.generateToken(userAuth);
 		return AuthenticationResponse.builder().token(jwtToken).expired(jwtService.extractExpiration(jwtToken)).build();
 	}
@@ -62,46 +62,41 @@ public class AuthenticationService {
 				)
 		);
 
-		UserAuth userAuth = Common.findAvailableUserAuth(request.getEmail(), true, userAuthRepository);
+		UserAuth userAuth = Common.findAvailableUserAuth(request.getEmail(), userAuthRepository);
 		String jwtToken = jwtService.generateToken(userAuth);
 		return AuthenticationResponse.builder().token(jwtToken).expired(jwtService.extractExpiration(jwtToken)).build();
 	}
 
 	@Transactional
 	public SimpleResponse sendEmailToResetPassword(EmailRequest request) {
-		UserAuth userAuth = Common.findUserAuthByEmail(request.getEmail(), userAuthRepository);
+		UserAuth userAuth = Common.findActiveUserAuthByUserName(request.getEmail(), userAuthRepository);
 
 		String token = UUID.randomUUID().toString();
+		PasswordResetToken passwordResetToken = new PasswordResetToken(token, userAuth);
 
-		passwordResetTokenRepository.save(new PasswordResetToken(token, userAuth));
+		passwordResetTokenRepository.save(passwordResetToken);
 
 		passwordResetEmailLink(userAuth, token);
 		return new SimpleResponse();
 	}
 
 	private void passwordResetEmailLink(UserAuth user, String token) {
-		String url = generateResetPasswordUrl(token);
+		String url = ApplicationConst.FE_URL + ApplicationConst.RESET_PASSWORD_FE_PATH + token;
 
 		mailSender.sendResetPasswordEmail(url, user);
 	}
 
-	private String generateResetPasswordUrl(String token) {
-		return ApplicationConst.FE_URL + ApplicationConst.RESET_PASSWORD_FE_PATH + token;
-	}
-
 	@Transactional
 	public SimpleResponse registerUser(RegisterRequest request) {
-		Optional<UserAuth> userAuthOptional = userAuthRepository.findByPhone(request.getPhone());
-		if (userAuthOptional.isPresent()) {
+		Optional<UserAuth> checkedUserAuth = userAuthRepository.findByPhone(request.getPhone());
+		if (checkedUserAuth.isPresent()) {
 			throw new AppException(HttpStatus.BAD_REQUEST, Message.User.USER_EXIST);
 		}
 
-		Optional<User> userOptional = userRepository.findFirstByEmail(request.getEmail());
-		if (userOptional.isPresent()) {
+		Optional<User> checkedUser = userRepository.findByEmail(request.getEmail());
+		if (checkedUser.isPresent()) {
 			throw new AppException(HttpStatus.BAD_REQUEST, Message.User.USER_EXIST);
 		}
-
-		handleImage(request);
 
 		UserAuth userAuth = UserAuth.builder()
 									.phone(request.getPhone())
@@ -116,7 +111,6 @@ public class AuthenticationService {
 						.email(request.getEmail())
 						.name(request.getName())
 						.phone(null)
-						.image(request.getImage())
 						.address(request.getAddress())
 						.male(request.getMale())
 						.dob(request.getDob())
@@ -126,12 +120,6 @@ public class AuthenticationService {
 		userRepository.save(user);
 
 		return new SimpleResponse();
-	}
-
-	private void handleImage(RegisterRequest request) {
-		if (request.getImage().isEmpty()) {
-			request.setImage(ApplicationConst.DEFAULT_AVATAR);
-		}
 	}
 
 	@Transactional
@@ -152,40 +140,40 @@ public class AuthenticationService {
 
 	@Transactional
 	public SimpleResponse sendOtp(PhoneRequest request) {
-		UserAuth userAuth = Common.findUserAuthByPhone(request.getPhone(), userAuthRepository);
-		User user = Common.findUserByUserAuth(userAuth.getId(), userRepository);
+		UserAuth userAuth = Common.findActiveUserAuthByUserName(request.getPhone(), userAuthRepository);
+		User user = Common.findUserByUserAuthId(userAuth.getId(), userRepository);
+
+		String otpCode = OTP.generateOTP();
 
 		Optional<OTP> otp = otpRepository.findByUserId(user.getId());
 
-		String otpNumber = OTP.generateOTP();
 		OTP newOtp;
-
 		if (otp.isPresent() && !userAuth.isVerified()) {
 			newOtp = otp.get();
 			newOtp.increaseRetry();
-			newOtp.setOtp(otpNumber);
+			newOtp.setOtp(otpCode);
 		} else {
-			newOtp = new OTP(otpNumber, user);
+			newOtp = new OTP(otpCode, user);
 
 			userAuth.setVerified(false);
 			userAuthRepository.save(userAuth);
 		}
 
-//		if (!smsSender.sendOtp(userAuth.getPhone(), otpNumber)) {
-//			throw new AppException(HttpStatus.INTERNAL_SERVER_ERROR, Message.COMMON_ERR);
-//		}
-
 		otpRepository.save(newOtp);
+
+		if (!smsSender.sendOtp(userAuth.getPhone(), otpCode)) {
+			throw new AppException(HttpStatus.INTERNAL_SERVER_ERROR, Message.COMMON_ERR);
+		}
 
 		return new SimpleResponse();
 	}
 
 	@Transactional
 	public SimpleResponse verifiedOTPToResetPassword(OtpVerifyRequest request) {
-		UserAuth userAuth = Common.findUserAuthByPhone(request.getPhone(), userAuthRepository);
-		User user = Common.findUserByUserAuth(userAuth.getId(), userRepository);
+		UserAuth userAuth = Common.findActiveUserAuthByUserName(request.getPhone(), userAuthRepository);
+		User user = Common.findUserByUserAuthId(userAuth.getId(), userRepository);
 
-		OTP otp = otpRepository.findByUserIdAndAndOtp(user.getId(), request.getOtp())
+		OTP otp = otpRepository.findByUserIdAndOtp(user.getId(), request.getOtp())
 							   .orElseThrow(() -> new AppException(HttpStatus.BAD_REQUEST, Message.OTP_NOT_EXIST));
 
 		if (!otp.isValid()) {
@@ -197,10 +185,10 @@ public class AuthenticationService {
 
 	@Transactional
 	public SimpleResponse verifiedOTP(OtpVerifyRequest request) {
-		UserAuth userAuth = Common.findUserAuthByPhone(request.getPhone(), userAuthRepository);
-		User user = Common.findUserByUserAuth(userAuth.getId(), userRepository);
+		UserAuth userAuth = Common.findActiveUserAuthByUserName(request.getPhone(), userAuthRepository);
+		User user = Common.findUserByUserAuthId(userAuth.getId(), userRepository);
 
-		OTP otp = otpRepository.findByUserIdAndAndOtp(user.getId(), request.getOtp())
+		OTP otp = otpRepository.findByUserIdAndOtp(user.getId(), request.getOtp())
 							   .orElseThrow(() -> new AppException(HttpStatus.BAD_REQUEST, Message.OTP_NOT_EXIST));
 
 		if (!otp.isValid()) {
@@ -217,10 +205,10 @@ public class AuthenticationService {
 
 	@Transactional
 	public SimpleResponse resetPasswordByOTP(OtpResetPasswordRequest request) {
-		UserAuth userAuth = Common.findUserAuthByPhone(request.getPhone(), userAuthRepository);
-		User user = Common.findUserByUserAuth(userAuth.getId(), userRepository);
+		UserAuth userAuth = Common.findActiveUserAuthByUserName(request.getPhone(), userAuthRepository);
+		User user = Common.findUserByUserAuthId(userAuth.getId(), userRepository);
 
-		OTP otp = otpRepository.findByUserIdAndAndOtp(user.getId(), request.getOtp())
+		OTP otp = otpRepository.findByUserIdAndOtp(user.getId(), request.getOtp())
 							   .orElseThrow(() -> new AppException(HttpStatus.BAD_REQUEST, Message.OTP_NOT_EXIST));
 
 		if (!otp.isValid()) {

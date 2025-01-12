@@ -45,26 +45,7 @@ public class AdminNotificationController {
 	public ResponseEntity<ListResponse<NotificationResponse, NotificationFilter>> getNotifications(
 			@Valid AppPageRequest page,
 			@Valid NotificationFilter filter) {
-		return new ResponseEntity<>(notificationService.getNotifications(page, filter, false), HttpStatus.OK);
-	}
-
-	@GetMapping("/make_seen")
-	@SecurityRequirement(
-			name = "Bearer Authentication and seen"
-	)
-	@Operation(
-			summary = "Fetch notifications",
-			description = "Fetch notifications from database by filter and paging"
-	)
-	@ApiResponse(
-			responseCode = "200",
-			description = "Http Status is 200 OK"
-	)
-	@PreAuthorize("hasAnyAuthority('ADMIN', 'STAFF')")
-	public ResponseEntity<ListResponse<NotificationResponse, NotificationFilter>> getNotificationsAndMakeItSeen(
-			@Valid AppPageRequest page,
-			@Valid NotificationFilter filter) {
-		return new ResponseEntity<>(notificationService.getNotifications(page, filter, true), HttpStatus.OK);
+		return new ResponseEntity<>(notificationService.getNotifications(page, filter), HttpStatus.OK);
 	}
 
 	@PostMapping()

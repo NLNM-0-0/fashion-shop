@@ -9,17 +9,6 @@ import org.hibernate.validator.constraints.Length;
 @Data
 public class UpdateUserStaffRequest {
 	@Schema(
-			name = "address",
-			example = "TPHCM"
-	)
-	@Length(
-			min = 1,
-			max = 50,
-			message = Message.User.ADDRESS_VALIDATE
-	)
-	private String address;
-
-	@Schema(
 			name = "image",
 			example = ApplicationConst.DEFAULT_AVATAR
 	)

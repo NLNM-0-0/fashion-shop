@@ -25,7 +25,6 @@ public class ApplicationConfig {
 	public UserDetailsService userDetailsService() throws UsernameNotFoundException, AppException {
 		return username -> Common.findAvailableUserAuth(
 				username,
-				!AuthHelper.isNormalUser(username),
 				userAuthRepository
 		);
 	}

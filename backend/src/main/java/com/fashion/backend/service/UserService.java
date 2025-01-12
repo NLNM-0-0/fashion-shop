@@ -8,7 +8,6 @@ import com.fashion.backend.payload.SimpleResponse;
 import com.fashion.backend.payload.user.*;
 import com.fashion.backend.repository.UserAuthRepository;
 import com.fashion.backend.repository.UserRepository;
-import com.fashion.backend.utils.AuthHelper;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.security.core.context.SecurityContextHolder;
@@ -29,12 +28,11 @@ public class UserService {
 
 	@Transactional
 	public SimpleResponse changePassword(ChangePasswordRequest request) {
-		UserDetails userDetails = (UserDetails) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
-		if (!passwordEncoder.matches(request.getOldPassword(), userDetails.getPassword())) {
+		if (!isPasswordMatched(request.getOldPassword())) {
 			throw new AppException(HttpStatus.BAD_REQUEST, Message.User.OLD_PASSWORD_NOT_CORRECT);
 		}
 
-		UserAuth userAuth = Common.findCurrUserAuth(userAuthRepository);
+		UserAuth userAuth = Common.findCurrentUserAuth(userAuthRepository);
 
 		userAuth.setPassword(passwordEncoder.encode(request.getNewPassword()));
 		userAuthRepository.save(userAuth);
@@ -43,25 +41,33 @@ public class UserService {
 		return new SimpleResponse();
 	}
 
+	private boolean isPasswordMatched(String oldPassword) {
+		UserDetails userDetails = (UserDetails) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
+		String currentPassword = userDetails.getPassword();
+
+		String encodedOldPassword = passwordEncoder.encode(oldPassword);
+
+		return currentPassword.equals(encodedOldPassword);
+	}
+
 	@Transactional
 	public StaffProfileResponse seeStaffProfile() {
-		User user = Common.findCurrUser(userRepository, userAuthRepository);
+		User user = Common.findCurrentUser(userRepository, userAuthRepository);
 
 		return mapToStaffDTO(user);
 	}
 
 	@Transactional
 	public ProfileResponse seeProfile() {
-		User user = Common.findCurrUser(userRepository, userAuthRepository);
+		User user = Common.findCurrentUser(userRepository, userAuthRepository);
 
 		return mapToUserDTO(user);
 	}
 
 	@Transactional
 	public StaffProfileResponse updateUserStaff(UpdateUserStaffRequest request) {
-		User user = Common.findCurrUser(userRepository, userAuthRepository);
+		User user = Common.findCurrentUser(userRepository, userAuthRepository);
 
-		Common.updateIfNotNull(request.getAddress(), user::setAddress);
 		Common.updateIfNotNull(request.getImage(), user::setImage);
 
 		return mapToStaffDTO(userRepository.save(user));
@@ -69,10 +75,10 @@ public class UserService {
 
 	@Transactional
 	public ProfileResponse updateUser(UpdateUserRequest request) {
-		User user = Common.findCurrUser(userRepository, userAuthRepository);
+		User user = Common.findCurrentUser(userRepository, userAuthRepository);
 
 		if (request.getEmail() != null && !request.getEmail().equals(user.getEmail())) {
-			Optional<User> checkedUser = userRepository.findFirstByEmail(request.getEmail());
+			Optional<User> checkedUser = userRepository.findByEmail(request.getEmail());
 			if (checkedUser.isPresent()) {
 				throw new AppException(HttpStatus.BAD_REQUEST, Message.User.USER_EXIST);
 			}

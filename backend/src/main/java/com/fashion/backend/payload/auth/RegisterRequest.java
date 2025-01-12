@@ -70,12 +70,6 @@ public class RegisterRequest {
 	private String address;
 
 	@Schema(
-			name = "image",
-			example = ApplicationConst.DEFAULT_AVATAR
-	)
-	private String image;
-
-	@Schema(
 			name = "male",
 			example = "true"
 	)

@@ -21,22 +21,14 @@ public class SmsSender {
 	}
 
 	public boolean sendOtp(String phoneNumber, String otp) {
-		try {
-			System.out.println("------------" + provider.getUserInfo());
-		} catch (Exception e) {
-			System.out.println("------------" + e);
-		}
-
 		String message = "Your OTP code is: " + otp;
 		try {
 			String response = provider.sendSMS(phoneNumber, message, 2, apiPhone);
-			System.out.println("--------------------------------" + response);
 			if (response.contains("success")) {
 				return true;
 			}
 			throw new AppException(HttpStatus.INTERNAL_SERVER_ERROR, Message.SMS.SMS_SEND_FAIL);
 		} catch (Exception e) {
-			System.out.println(e);
 			throw new AppException(HttpStatus.INTERNAL_SERVER_ERROR, Message.SMS.SMS_SEND_FAIL);
 		}
 	}

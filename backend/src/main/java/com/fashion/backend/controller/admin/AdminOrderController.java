@@ -62,25 +62,6 @@ public class AdminOrderController {
 		return new ResponseEntity<>(orderService.getOrder(id), HttpStatus.OK);
 	}
 
-	@PostMapping
-	@SecurityRequirement(
-			name = "Bearer Authentication"
-	)
-	@Operation(
-			summary = "Create order",
-			description = "Create new order"
-	)
-	@ApiResponse(
-			responseCode = "201",
-			description = "Http Status is 201 CREATED"
-	)
-	@PreAuthorize("hasAnyAuthority('ADMIN', 'STAFF')")
-	public ResponseEntity<OrderResponse> createOrder(
-			@Valid @RequestBody PlaceOrderRequest request
-	) {
-		return new ResponseEntity<>(orderService.placeOrder(request, true), HttpStatus.CREATED);
-	}
-
 	@PutMapping("/{id}")
 	@SecurityRequirement(
 			name = "Bearer Authentication"

@@ -8,7 +8,7 @@ import java.util.List;
 import java.util.Optional;
 
 public interface ItemQuantityRepository extends JpaRepository<ItemQuantity, Long> {
-	Optional<ItemQuantity> findFirstByItemIdAndColorAndAndSize(Long itemId, Color color, String size);
+	Optional<ItemQuantity> findFirstByItemIdAndColorAndSize(Long itemId, Color color, String size);
 
 	List<ItemQuantity> findAllByItemId(Long itemId);
 

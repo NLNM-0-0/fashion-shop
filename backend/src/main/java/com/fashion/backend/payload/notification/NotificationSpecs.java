@@ -15,7 +15,7 @@ public class NotificationSpecs {
 	}
 
 	public static Specification<Notification> hasSenderName(String name) {
-		return (root, query, cb) -> cb.equal(root.get("fromUser").get("name"), name);
+		return (root, query, cb) -> cb.like(root.get("fromUser").get("name"), "%" + name + "%");
 	}
 
 	public static Specification<Notification> isDateCreatedAfter(Integer timeFrom) {

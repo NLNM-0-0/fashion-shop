@@ -30,9 +30,6 @@ public class Message {
 				= "You cannot access another customer's order";
 		public static final String CAN_NOT_CLOSE_THIS_STATUS = "Can't close order has this status";
 		public static final String ORDER_CAN_NOT_HAVE_NO_ITEM = "Order cannot be empty";
-		public static final String ORDER_ITEM_MUST_HAVE_COLOR = "Order information must include color";
-		public static final String ORDER_ITEM_MUST_HAVE_SIZE = "Order information must include size";
-		public static final String ORDER_CAN_NOT_HAVE_SAME_ITEM = "Order cannot have two identical products";
 		public static final String ORDER_CAN_NOT_HAVE_NOT_EXISTED_CART_ITEM = "Order cannot have not existed cart item";
 	}
 
@@ -63,7 +60,7 @@ public class Message {
 	public static class Category {
 		public static final String NAME_VALIDATE
 				= "Category name cannot be empty and must be a maximum of 200 characters";
-		public static final String CAN_NOT_DELETE_CATEGORY_THAT_EXIST_ITEM_CONTAIN_ONLY_IT
+		public static final String CANNOT_DELETE_CATEGORY_ASSIGNED_TO_ONLY_ITEM
 				= "There are products that only belong to this category. Cannot delete";
 		public static final String CATEGORY_NOT_EXIST = "Category does not exist in the system";
 	}
